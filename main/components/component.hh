@@ -55,6 +55,9 @@ namespace foundation {
           component_did_mount();
           return nullptr;
         };
+
+        virtual void do_rebuild() = 0;
+
         virtual std::shared_ptr<Styling> styling() = 0;
         virtual Component* append(lv_obj_t* obj) = 0;
 
@@ -94,12 +97,20 @@ namespace foundation {
         void forceUpdate() {
           if (component) {
               lv_obj_invalidate(component);
+              this->rebuild();
           }
 
           this->component_did_update();
         }
 
         void rebuild() {
+          if (this->component && this->style)
+            {
+              this->do_rebuild();
+            }
+        }
+
+        void UNSAFE_repainting() {
           if (this->component) {
               lv_obj_del(this->component);
               this->component = nullptr;
