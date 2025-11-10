@@ -9,10 +9,13 @@ struct preloader_screen_props {
   std::shared_ptr<Ref> ref = nullptr;
 };
 
+int i = 0;
+
 class PreloaderScreen final : public Component {
 private:
   preloader_screen_props props;
   std::shared_ptr<StackNavigator> navigator;
+  std::shared_ptr<Ref> label_ref = std::make_shared<Ref>("label");
 public:
   explicit PreloaderScreen(std::shared_ptr<StackNavigator> stack, const preloader_screen_props &props) : Component(nullptr, nullptr) {
     this->props = props;
@@ -26,33 +29,53 @@ public:
     Component::~Component();
   };
 
-  void on_mount() override {
-    Component::on_mount();
-  };
+  void component_did_mount() override
+  {
+    ESP_LOGI("preloader_screen", "Preloading screen");
+  }
 
 
   lv_obj_t *render() override {
-    auto navigator_ref = this->navigator;
+      auto navigator_ref = this->navigator;
+      auto label_ref = this->label_ref;
 
-    auto renderer = $view(
-      this->parent,
-      view_props{
-        .ref = nullptr,
-        .style = style,
-        .children = {},
-        .width = LV_PCT(100),
-        .height = LV_PCT(100),
-        .justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN,
-        .align_items = LV_FLEX_ALIGN_CENTER,
-        .track_cross_place = LV_FLEX_ALIGN_CENTER,
-        .flex_direction = LV_FLEX_FLOW_COLUMN,
-      });
+      return this->delegate($view(
+        this->parent,
+        view_props{
+          .ref = nullptr,
+          .style = style,
+          .children = {
+            $label(label_props{
+              .ref = this->label_ref,
+              .text = std::format("{}", i),
+            }),
+            $button(button_props{
+             .ref = nullptr,
+             .style = nullptr,
+             .text = "mmm",
+              .on_click = [this](lv_event_t *e) {
+                auto component = dynamic_cast<Label*>(this->label_ref->linked_component);
+                if (component) {
+                    i++;
+                    component->update(std::format("{}", i));
 
-    this->renderer_view = renderer;
-    this->renderer_view->set_parent(this->parent);
-    this->set_component(renderer->render());
-
-    return renderer->get_component();
+                }
+            },
+             .on_long_press = [](lv_event_t *e) { /* ... */ },
+             .on_pressed = [](lv_event_t *e) { /* ... */ },
+             .on_released = [](lv_event_t *e) { /* ... */ },
+             .on_focused = [](lv_event_t *e) { /* ... */ },
+             .on_defocused = [](lv_event_t *e) { /* ... */ },
+           }),
+          },
+          .width = LV_PCT(100),
+          .height = LV_PCT(100),
+          .justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN,
+          .align_items = LV_FLEX_ALIGN_CENTER,
+          .track_cross_place = LV_FLEX_ALIGN_CENTER,
+          .flex_direction = LV_FLEX_FLOW_COLUMN,
+        })
+    );
   }
 
   std::shared_ptr<Styling> styling() override {

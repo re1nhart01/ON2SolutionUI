@@ -35,8 +35,7 @@ public:
     Component::~Component();
   };
 
-  void on_mount() override {
-    Component::on_mount();
+  void component_did_mount() override {
   };
 
 

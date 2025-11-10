@@ -53,6 +53,7 @@ namespace foundation {
         virtual lv_obj_t* render()
         {
           component_did_mount();
+          return nullptr;
         };
         virtual std::shared_ptr<Styling> styling() = 0;
         virtual Component* append(lv_obj_t* obj) = 0;
@@ -122,11 +123,10 @@ namespace foundation {
             }
         }
 
-        void set_state(std::function<void(int)> callback) {
+        void set_state(std::function<void()> callback) {
           try {
-              callback(1);
+              callback();
           } catch (const std::runtime_error& e) {}
-
           this->forceUpdate();
         }
 

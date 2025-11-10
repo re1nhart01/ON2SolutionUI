@@ -39,7 +39,7 @@ void StackNavigator::navigate(const std::string& name) {
         lv_obj_t* obj = screen->render();
         screen->set_component(obj);
 
-        screen->on_mount();
+        // screen->component_did_mount();
 
         current_screen = std::make_shared<StackCurrentScreen>(StackCurrentScreen{
             .id = ++id_counter,
@@ -67,7 +67,7 @@ void StackNavigator::goBack() {
         lv_obj_t* obj = screen->render();
         screen->set_component(obj);
 
-        screen->on_mount();
+        // screen->on_mount();
     } else {
         ESP_LOGI("NO SCREENS IN STACK NAVIGATION", "");
     }
