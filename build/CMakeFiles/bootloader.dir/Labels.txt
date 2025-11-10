@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/bootloader
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/bootloader.rule
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/bootloader-complete.rule
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
