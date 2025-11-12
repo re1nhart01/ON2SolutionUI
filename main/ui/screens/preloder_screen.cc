@@ -45,7 +45,7 @@ public:
           .ref = nullptr,
           .style = style,
           .children = {
-            $label(label_props{
+            $text(text_props{
               .ref = this->label_ref,
               .text = std::format("{}", i),
             }),
@@ -54,11 +54,11 @@ public:
              .style = nullptr,
              .text = "mmm",
               .on_click = [this](lv_event_t *e) {
-                auto component = dynamic_cast<Label*>(this->label_ref->linked_component);
+                auto component = dynamic_cast<Text*>(this->label_ref->linked_component);
                 if (component) {
+                  component->set_state([component]() {
                     i++;
-                    component->update(std::format("{}", i));
-
+                  });
                 }
             },
              .on_long_press = [](lv_event_t *e) { /* ... */ },

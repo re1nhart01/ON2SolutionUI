@@ -23,7 +23,6 @@ auto screen = lv_scr_act();
 auto stack_navigator = std::make_shared<
   StackNavigator>(StackNavigatorConfig{.initial_route = "/main"}, screen);
 
-
 auto main_screen = std::make_shared<MainScreen>(
     stack_navigator, main_screen_props{.ref = nullptr});
 auto settings_screen = std::make_shared<SettingsScreen>(

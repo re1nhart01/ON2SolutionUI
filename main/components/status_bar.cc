@@ -14,7 +14,7 @@ namespace foundation {
   lv_obj_t* StatusBar::render() {
     std::shared_ptr<Styling> styleV = this->styling();
 
-    this->label = $label(label_props{
+    this->label = $text(text_props{
                   .ref = nullptr,
                   .style = nullptr,
                   .text = "00:00",

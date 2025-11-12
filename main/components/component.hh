@@ -56,7 +56,7 @@ namespace foundation {
           return nullptr;
         };
 
-        virtual void do_rebuild() = 0;
+        virtual void do_rebuild() { };
 
         virtual std::shared_ptr<Styling> styling() = 0;
         virtual Component* append(lv_obj_t* obj) = 0;

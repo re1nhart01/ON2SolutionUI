@@ -83,6 +83,7 @@ static void uart_interrupt_handler(void *pvParameters) {
         return;
     }
 
+
     while (xQueueReceive(uart_queue, &event, portMAX_DELAY)) {
         if (xSemaphoreTake(uart_mutex, portMAX_DELAY)) {
             int len = 0;

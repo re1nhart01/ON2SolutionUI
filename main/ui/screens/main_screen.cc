@@ -50,9 +50,9 @@ public:
                 .ref = nullptr,
                 .style = $s("header.labels.container"),
                 .children = {
-                    $label(label_props{ .ref = nullptr, .text = std::format("Channels: {}", 3) }),
-                    $label(label_props{ .ref = nullptr, .text = std::format("Inputs: {}", 3) }),
-                    $label(label_props{ .ref = nullptr, .text = std::format("Outputs: {}", 3) }),
+                    $text(text_props{ .ref = nullptr, .text = std::format("Channels: {}", 3) }),
+                    $text(text_props{ .ref = nullptr, .text = std::format("Inputs: {}", 3) }),
+                    $text(text_props{ .ref = nullptr, .text = std::format("Outputs: {}", 3) }),
                 },
                 header_labels_container_props
             }),
@@ -63,7 +63,7 @@ public:
                     $button(button_props{
                         .ref = nullptr,
                         .style = $s("header.button"),
-                        .child = $label(label_props{
+                        .child = $text(text_props{
                             .ref = nullptr,
                             .style = $s("header.label"),
                             .text = locales::en::header_information,
@@ -75,7 +75,7 @@ public:
                     $button(button_props{
                         .ref = nullptr,
                         .style = $s("header.button"),
-                        .child = $label(label_props{
+                        .child = $text(text_props{
                             .ref = nullptr,
                             .style = $s("header.label"),
                             .text = locales::en::header_settings,
@@ -97,7 +97,7 @@ public:
     return $button(button_props{
         .ref = nullptr,
         .style = $s("footer.button"),
-        .child = $label(label_props{
+        .child = $text(text_props{
           .ref = nullptr,
           .style = $s("header.label"),
           .text = locales::en::status,
@@ -110,7 +110,7 @@ public:
     .ref = nullptr,
     .style = $s("header.container"),
     .children = {
-      $label(label_props{
+      $text(text_props{
           .ref = nullptr,
           .style = $s("header.label"),
           .text = locales::en::oxygen_level,
@@ -130,7 +130,7 @@ public:
         .track_cross_place = LV_FLEX_ALIGN_CENTER,
         .flex_direction = LV_FLEX_FLOW_ROW,
       }),
-      $label(label_props{
+      $text(text_props{
         .ref = nullptr,
         .style = $s("header.label"),
         .text = locales::en::oxygen_rate,

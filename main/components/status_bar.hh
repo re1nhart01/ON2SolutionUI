@@ -1,7 +1,7 @@
 #pragma once
 
 #include "component.hh"
-#include "label.hh"
+#include "text.hh"
 #include "macro.hh"
 #include "ref.hh"
 #include "styling.hh"
@@ -19,7 +19,7 @@ namespace foundation {
   class StatusBar final : public Component {
   public:
     status_bar_props props;
-    std::shared_ptr<Label> label = nullptr;
+    std::shared_ptr<Text> label = nullptr;
     explicit StatusBar(const status_bar_props& props);
     ~StatusBar() override = default;
 

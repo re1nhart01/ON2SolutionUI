@@ -13,7 +13,7 @@
 #include "view.hh"
 #include "text_input.hh"
 #include "status_bar.hh"
-#include "label.hh"
+#include "text.hh"
 #include "scroll_view.hh"
 #include "stack_navigator.hh"
 #include "animated.hh"

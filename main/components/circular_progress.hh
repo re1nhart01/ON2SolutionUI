@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "component.hh"
-#include "label.hh"
+#include "text.hh"
 #include "view.hh"
 
 
@@ -30,7 +30,7 @@ namespace foundation {
   class CircularProgress final : public Component {
   private:
     circular_props props;
-    std::shared_ptr<Label> label = nullptr;
+    std::shared_ptr<Text> label = nullptr;
     lv_obj_t* arc_reference = nullptr;
     bool is_show_label = false;
 

@@ -48,7 +48,7 @@ namespace foundation {
     }
 
     if (this->is_show_label) {
-        this->label = $label(label_props{
+        this->label = $text(text_props{
             .text = "100%",
         });
 

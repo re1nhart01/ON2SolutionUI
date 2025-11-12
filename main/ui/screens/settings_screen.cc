@@ -61,7 +61,7 @@ public:
             .ref = nullptr,
             .style = nullptr,
           }),
-          $label(label_props{
+          $text(text_props{
                        .ref = nullptr,
                        .style = style2,
                        .text = "text",

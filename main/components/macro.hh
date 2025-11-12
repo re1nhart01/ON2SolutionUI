@@ -2,7 +2,7 @@
 #pragma once
 
 #include "button.hh"
-#include "label.hh"
+#include "text.hh"
 #include "view.hh"
 #include "text_input.hh"
 #include "status_bar.hh"
@@ -18,7 +18,7 @@
 
 
 #define $view_props(...)        ([]() { view_props p{}; __VA_ARGS__; return p; })()
-#define $label_props(...)       ([]() { label_props p{}; __VA_ARGS__; return p; })()
+#define $text_props(...)       ([]() { text_props p{}; __VA_ARGS__; return p; })()
 #define $button_props(...)      ([]() { button_props p{}; __VA_ARGS__; return p; })()
 #define $textinput_props(...)   ([]() { textinput_props p{}; __VA_ARGS__; return p; })()
 #define $status_bar_props(...)   ([]() { status_bar_props p{}; __VA_ARGS__; return p; })()
@@ -29,7 +29,7 @@
 
 
 #define $view(...)        std::make_shared<View>(__VA_ARGS__)
-#define $label(...)       std::make_shared<Label>(__VA_ARGS__)
+#define $text(...)       std::make_shared<Text>(__VA_ARGS__)
 #define $button(...)      std::make_shared<Button>(__VA_ARGS__)
 #define $input(...)       std::make_shared<TextInput>(__VA_ARGS__)
 #define $statusbar(...)   std::make_shared<StatusBar>(__VA_ARGS__)
