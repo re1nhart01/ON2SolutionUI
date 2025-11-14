@@ -1,7 +1,4 @@
 #include "app.cc"
-#include "components/application.hh"
-#include "components/macro.hh"
-
 #include <memory>
 
 extern "C" {

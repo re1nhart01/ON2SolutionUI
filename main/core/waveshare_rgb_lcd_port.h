@@ -1,13 +1,13 @@
 #ifndef _RGB_LCD_H_
 #define _RGB_LCD_H_
 
-#include "esp_log.h"
-#include "esp_heap_caps.h"
+#include "../../components/foundation/internals/lvgl_port.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
+#include "esp_heap_caps.h"
+#include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "lv_demos.h"
-#include "lvgl_port.h"
 
 #define CONFIG_EXAMPLE_LCD_TOUCH_CONTROLLER_GT911 1 // 1 initiates the touch, 0 closes the touch.
 

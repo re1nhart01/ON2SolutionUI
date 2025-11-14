@@ -1,8 +1,7 @@
 #include <utility>
 
-#include "components/component.hh"
-#include "components/macro.hh"
-#include "components/stack_navigator.hh"
+#include "../../components/foundation/components/component.h"
+#include "../../components/foundation/core/macro.h"
 
 namespace foundation
 {
@@ -39,24 +38,24 @@ public:
   ~PinCodeScreen() override = default;
 
   lv_obj_t *render() override {
-    return this->delegate($view(
-      this->parent,
-      view_props{
-        .ref = nullptr,
-        .style = this->styling(),
-        .children = {
-          $statusbar(status_bar_props{
-            .ref = nullptr,
-            .style = nullptr,
-          }),
-        },
-        .width = LV_PCT(100), \
-        .height = LV_PCT(100), \
-        .justify_content = LV_FLEX_ALIGN_START, \
-        .align_items = LV_FLEX_ALIGN_CENTER, \
-        .track_cross_place = LV_FLEX_ALIGN_CENTER, \
-        .flex_direction = LV_FLEX_FLOW_COLUMN
-      }));
+    return this->delegate(
+        $View(
+            ViewProps::up()
+                .set_style(this->styling())
+                .set_children({
+                    $StatusBar(
+                        StatusBarProps::up()
+                            .set_style(nullptr)
+                    )
+                })
+                .w(LV_PCT(100))
+                .h(LV_PCT(100))
+                .justify(LV_FLEX_ALIGN_START)
+                .items(LV_FLEX_ALIGN_CENTER)
+                .track_cross(LV_FLEX_ALIGN_CENTER)
+                .direction(LV_FLEX_FLOW_COLUMN)
+        )
+    );
   }
 
 

@@ -1,7 +1,10 @@
-#include "components/application.hh"
-#include "components/component.hh"
-#include "components/macro.hh"
-#include "components/stack_navigator.hh"
+#include "../../components/foundation/components/component.h"
+#include "../../components/foundation/core/macro.h"
+
+
+extern "C" {
+  #include "esp_log.h"
+}
 
 using namespace foundation;
 
@@ -39,75 +42,56 @@ public:
   };
 
 
-  lv_obj_t *render() override
-  {
-    std::shared_ptr<Styling> style = this->styling();
-    std::shared_ptr<Styling> style1 = std::make_shared<Styling>();
-    std::shared_ptr<Styling> style2 = std::make_shared<Styling>();
+  lv_obj_t* render() override
+    {
+        auto navigator_ref = this->navigator;
 
-    auto navigator_ref = this->navigator;
+        // Styles
+        auto style = this->styling();
+        auto text_style = std::make_shared<Styling>();
+        auto btn_style = std::make_shared<Styling>();
+        auto input_style = std::make_shared<Styling>();
 
-    LV_IMG_DECLARE(img_lvgl_logo);
-
-    imageStyle->setSize(100, 100);
-
-    auto renderer = $view(
-      this->parent,
-      view_props{
-        .ref = nullptr,
-        .style = style,
-        .children = {
-          $statusbar(status_bar_props{
-            .ref = nullptr,
-            .style = nullptr,
-          }),
-          $text(text_props{
-                       .ref = nullptr,
-                       .style = style2,
-                       .text = "text",
-                     }),
-                     $button(button_props{
-                       .ref = nullptr,
-                       .style = style1,
-                       .text = "navigate to admin",
-                       .on_click =
-                         [navigator_ref](lv_event_t *e) {
-                           navigator_ref->navigate("/main");
-                         },
-                       .on_long_press = [](lv_event_t *e) { /* ... */ },
-                       .on_pressed = [](lv_event_t *e) { /* ... */ },
-                       .on_released = [](lv_event_t *e) { /* ... */ },
-                       .on_focused = [](lv_event_t *e) { /* ... */ },
-                       .on_defocused = [](lv_event_t *e) { /* ... */ },
-                     }),
-                    $input(textinput_props{
-                        .ref = nullptr,
-                        .style = style1,
-                        .placeholder = "text",
-                        .on_click = [](lv_event_t *e) {  },
-                        .on_focused = [](lv_event_t *e) { /* ... */ },
-                        .on_defocused = [](lv_event_t *e) { /* ... */ },
-                        .on_value_changed = [](lv_event_t *e) { /* ... */ },
-                        .on_submit = [](std::string value) {
-                          ESP_LOGI("LoG", "%s", value.c_str());
-                          admin_keyboard.get()->hide();
-                        }
-                    }, admin_keyboard.get()),
-        },
-        .width = LV_PCT(100),
-        .height = LV_PCT(100),
-        .justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN,
-        .align_items = LV_FLEX_ALIGN_CENTER,
-        .track_cross_place = LV_FLEX_ALIGN_CENTER,
-        .flex_direction = LV_FLEX_FLOW_COLUMN,
-      });
-
-    this->renderer_view = renderer;
-    this->renderer_view->set_parent(this->parent);
-    this->set_component(renderer->render());
-
-    return renderer->get_component();
-  }
+         return this->delegate($View(
+            ViewProps::up()
+                .set_style(style)
+                .set_children({
+                    $StatusBar(
+                        StatusBarProps::up()
+                            .set_style(nullptr)
+                    ),
+                    $Text(
+                        TextProps::up()
+                            .set_style(text_style)
+                            .value("text")
+                    ),
+                    $Button(
+                        ButtonProps::up()
+                            .set_style(btn_style)
+                            .label("navigate to admin")
+                            .click([navigator_ref](lv_event_t* e){
+                                navigator_ref->navigate("/main");
+                            })
+                    ),
+                    $Input(
+                        TextInputProps::up()
+                            .set_style(input_style)
+                            .placeholder("text")
+                            .set_on_submit([](const std::string& value){
+                                ESP_LOGI("LOG", "%s", value.c_str());
+                                admin_keyboard->hide();
+                            }),
+                        admin_keyboard.get()
+                    ),
+                })
+                .w(LV_PCT(100))
+                .h(LV_PCT(100))
+                .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
+                .items(LV_FLEX_ALIGN_CENTER)
+                .track_cross(LV_FLEX_ALIGN_CENTER)
+                .direction(LV_FLEX_FLOW_COLUMN)
+        ));
+    }
 
 
 

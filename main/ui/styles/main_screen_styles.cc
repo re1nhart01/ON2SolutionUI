@@ -1,49 +1,50 @@
 
-#include "components/style_store.hh"
+#include "../../components/foundation/core/style_store/style_store.h"
 
-//----------------------------------- Shorthands ------------------------------------------------
+//----------------------------------- Shorthands
+//------------------------------------------------
 
-#define screen_container_props \
-  .width = LV_PCT(100), \
-  .height = LV_PCT(100), \
-  .justify_content = LV_FLEX_ALIGN_START, \
-  .align_items = LV_FLEX_ALIGN_CENTER, \
-  .track_cross_place = LV_FLEX_ALIGN_CENTER, \
-  .flex_direction = LV_FLEX_FLOW_COLUMN
+inline void screen_container_props(foundation::ViewProps & p) {
+  p.w(LV_PCT(100));
+  p.h(LV_PCT(100));
+  p.justify(LV_FLEX_ALIGN_START);
+  p.items(LV_FLEX_ALIGN_CENTER);
+  p.track_cross(LV_FLEX_ALIGN_CENTER);
+  p.direction(LV_FLEX_FLOW_COLUMN);
+}
 
-#define header_container_props \
-  .width = LV_PCT(100), \
-  .height = 55, \
-  .justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN, \
-  .align_items = LV_FLEX_ALIGN_CENTER, \
-  .track_cross_place = LV_FLEX_ALIGN_CENTER, \
-  .flex_direction = LV_FLEX_FLOW_ROW, \
+// ---------------------------- HEADER MAIN ----------------------------
 
-#define header_container_right_props \
-  .width = LV_PCT(40), \
-  .height = 55, \
-  .justify_content = LV_FLEX_ALIGN_END, \
-  .align_items = LV_FLEX_ALIGN_CENTER, \
-  .track_cross_place = LV_FLEX_ALIGN_CENTER, \
-  .flex_direction = LV_FLEX_FLOW_ROW, \
+inline void header_container_props(foundation::ViewProps & p) {
+  p.w(LV_PCT(100));
+  p.h(55);
+  p.justify(LV_FLEX_ALIGN_SPACE_BETWEEN);
+  p.items(LV_FLEX_ALIGN_CENTER);
+  p.track_cross(LV_FLEX_ALIGN_CENTER);
+  p.direction(LV_FLEX_FLOW_ROW);
+}
 
-#define header_container_props \
-  .width = LV_PCT(100), \
-  .height = 55, \
-  .justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN, \
-  .align_items = LV_FLEX_ALIGN_CENTER, \
-  .track_cross_place = LV_FLEX_ALIGN_CENTER, \
-  .flex_direction = LV_FLEX_FLOW_ROW, \
+// ---------------------------- HEADER RIGHT ----------------------------
 
-#define header_labels_container_props \
-  .width = LV_PCT(60), \
-  .height = LV_PCT(100), \
-  .justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN, \
-  .align_items = LV_FLEX_ALIGN_CENTER, \
-  .track_cross_place = LV_FLEX_ALIGN_CENTER, \
-  .flex_direction = LV_FLEX_FLOW_ROW, \
+inline void header_container_right_props(foundation::ViewProps & p) {
+  p.w(LV_PCT(40));
+  p.h(55);
+  p.justify(LV_FLEX_ALIGN_END);
+  p.items(LV_FLEX_ALIGN_CENTER);
+  p.track_cross(LV_FLEX_ALIGN_CENTER);
+  p.direction(LV_FLEX_FLOW_ROW);
+}
 
+// ---------------------------- HEADER LABELS ----------------------------
 
+inline void header_labels_container_props(foundation::ViewProps & p) {
+  p.w(LV_PCT(60));
+  p.h(LV_PCT(100));
+  p.justify(LV_FLEX_ALIGN_SPACE_BETWEEN);
+  p.items(LV_FLEX_ALIGN_CENTER);
+  p.track_cross(LV_FLEX_ALIGN_CENTER);
+  p.direction(LV_FLEX_FLOW_ROW);
+}
 //----------------------------------- Styles ------------------------------------------------
 
 

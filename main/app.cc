@@ -1,16 +1,11 @@
-#include "components/application.hh"
-#include "components/view.hh"
-
-#include "components/button.hh"
-#include "components/stack_navigator.hh"
-#include "components/state.hh"
+#include "core/navigation/stack_navigator/stack_navigator.h"
 #include "ui/screens/main_screen.cc"
 #include "ui/screens/pincode_screen.cc"
-#include "ui/screens/settings_screen.cc"
 #include "ui/screens/preloder_screen.cc"
+#include "ui/screens/settings_screen.cc"
 
 extern "C" {
-  #include "../../main/core/lvgl_port.h"
+  #include "../components/foundation/internals/lvgl_port.h"
 }
 
 using namespace foundation;

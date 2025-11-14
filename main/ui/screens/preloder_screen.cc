@@ -1,7 +1,6 @@
-#include "components/application.hh"
-#include "components/component.hh"
-#include "components/macro.hh"
-#include "components/stack_navigator.hh"
+#include "../../components/foundation/components/component.h"
+#include "../../components/foundation/core/application.h"
+#include "../../components/foundation/core/macro.h"
 
 using namespace foundation;
 
@@ -35,46 +34,42 @@ public:
   }
 
 
-  lv_obj_t *render() override {
-      auto navigator_ref = this->navigator;
-      auto label_ref = this->label_ref;
+  lv_obj_t* render() override {
+    auto navigator_ref = this->navigator;
 
-      return this->delegate($view(
-        this->parent,
-        view_props{
-          .ref = nullptr,
-          .style = style,
-          .children = {
-            $text(text_props{
-              .ref = this->label_ref,
-              .text = std::format("{}", i),
-            }),
-            $button(button_props{
-             .ref = nullptr,
-             .style = nullptr,
-             .text = "mmm",
-              .on_click = [this](lv_event_t *e) {
-                auto component = dynamic_cast<Text*>(this->label_ref->linked_component);
-                if (component) {
-                  component->set_state([component]() {
-                    i++;
-                  });
-                }
-            },
-             .on_long_press = [](lv_event_t *e) { /* ... */ },
-             .on_pressed = [](lv_event_t *e) { /* ... */ },
-             .on_released = [](lv_event_t *e) { /* ... */ },
-             .on_focused = [](lv_event_t *e) { /* ... */ },
-             .on_defocused = [](lv_event_t *e) { /* ... */ },
-           }),
-          },
-          .width = LV_PCT(100),
-          .height = LV_PCT(100),
-          .justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN,
-          .align_items = LV_FLEX_ALIGN_CENTER,
-          .track_cross_place = LV_FLEX_ALIGN_CENTER,
-          .flex_direction = LV_FLEX_FLOW_COLUMN,
-        })
+    return this->delegate(
+        $View(
+            ViewProps::up()
+                .set_style(this->styling())
+                .set_children({
+
+                    $Text(
+                        TextProps::up()
+                            .set_ref(this->label_ref)
+                            .value(std::format("{}", i))
+                    ),
+
+                    $Button(
+                        ButtonProps::up()
+                            .label("mmm")
+                            .click([this](lv_event_t* e) {
+                                auto component = dynamic_cast<Text*>(this->label_ref->linked_component);
+                                if (component) {
+                                    component->set_state([component]() {
+                                        i++;
+                                    });
+                                }
+                            })
+                    )
+
+                })
+                .w(LV_PCT(100))
+                .h(LV_PCT(100))
+                .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
+                .items(LV_FLEX_ALIGN_CENTER)
+                .track_cross(LV_FLEX_ALIGN_CENTER)
+                .direction(LV_FLEX_FLOW_COLUMN)
+        )
     );
   }
 

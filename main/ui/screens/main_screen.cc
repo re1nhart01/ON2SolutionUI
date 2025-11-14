@@ -1,14 +1,17 @@
 #include <utility>
 
-#include "components/component.hh"
+#include "../../components/foundation/components/component.h"
 
-#include "components/macro.hh"
-#include "components/references.hh"
-#include "components/stack_navigator.hh"
-#include "components/state.hh"
-#include "components/style_store.hh"
-#include "ui/styles/main_screen_styles.cc"
+#include "../../components/foundation/core/macro.h"
+#include "../../components/foundation/core/state/state.h"
+#include "../../components/foundation/core/style_store/style_store.h"
+#include "../../components/foundation/unused/references_h.txt"
+#include "components/button/button_props.h"
+#include "components/text/text_props.h"
+#include "components/view/view.h"
+#include "components/view/view_props.h"
 #include "ui/localization.hh"
+#include "ui/styles/main_screen_styles.cc"
 
 using namespace foundation;
 
@@ -39,145 +42,169 @@ public:
     style_main_screen_register(*this->styles);
   }
 
-[[nodiscard]] std::shared_ptr<View> render_header() const {
+    std::shared_ptr<View> render_header() const {
     auto navigator_ref = this->navigator;
 
-    return $view(view_props{
-        .ref = nullptr,
-        .style = $s("header.container"),
-        .children = {
-            $view(view_props{
-                .ref = nullptr,
-                .style = $s("header.labels.container"),
-                .children = {
-                    $text(text_props{ .ref = nullptr, .text = std::format("Channels: {}", 3) }),
-                    $text(text_props{ .ref = nullptr, .text = std::format("Inputs: {}", 3) }),
-                    $text(text_props{ .ref = nullptr, .text = std::format("Outputs: {}", 3) }),
-                },
-                header_labels_container_props
-            }),
-            $view(view_props{
-                .ref = nullptr,
-                .style = $s("header.container"),
-                .children = {
-                    $button(button_props{
-                        .ref = nullptr,
-                        .style = $s("header.button"),
-                        .child = $text(text_props{
-                            .ref = nullptr,
-                            .style = $s("header.label"),
-                            .text = locales::en::header_information,
-                        }),
-                        .on_click = [navigator_ref](lv_event_t* e) {
-                            navigator_ref->navigate("/pincode");
-                        }
-                    }),
-                    $button(button_props{
-                        .ref = nullptr,
-                        .style = $s("header.button"),
-                        .child = $text(text_props{
-                            .ref = nullptr,
-                            .style = $s("header.label"),
-                            .text = locales::en::header_settings,
-                        }),
-                        .on_click = [navigator_ref](lv_event_t* e) {
-                            navigator_ref->navigate("/pin_code");
-                        }
-                    }),
-                },
-                header_container_right_props
+    return $View(
+        ViewProps::up()
+            .set_style($s("header.container"))
+            .set_children({
+                $View(
+                    ViewProps::up()
+                        .set_style($s("header.labels.container"))
+                        .set_children({
+                            $Text(TextProps::up().value(std::format("Channels: {}", 3))),
+                            $Text(TextProps::up().value(std::format("Inputs: {}", 3))),
+                            $Text(TextProps::up().value(std::format("Outputs: {}", 3))),
+                        })
+                        .merge(header_labels_container_props)
+                ),
+                $View(
+                    ViewProps::up()
+                        .set_style($s("header.container"))
+                        .set_children({
+                            $Button(
+                                ButtonProps::up()
+                                    .set_style($s("header.button"))
+                                    .set_child(
+                                        $Text(
+                                            TextProps::up()
+                                                .set_style($s("header.label"))
+                                                .value(locales::en::header_information)
+                                        )
+                                    )
+                                    .click([navigator_ref](lv_event_t* e){
+                                        navigator_ref->navigate("/pincode");
+                                    })
+                            ),
+
+                            $Button(
+                                ButtonProps::up()
+                                    .set_style($s("header.button"))
+                                    .set_child(
+                                        $Text(
+                                            TextProps::up()
+                                                .set_style($s("header.label"))
+                                                .value(locales::en::header_settings)
+                                        )
+                                    )
+                                    .click([navigator_ref](lv_event_t* e){
+                                        navigator_ref->navigate("/pin_code");
+                                    })
+                            ),
+                        })
+                        .merge(header_container_right_props)
+                ),
             })
-        },
-        header_container_props
-    });
+            .merge(header_container_props)
+    );
 }
 
 
-  [[nodiscard]] std::shared_ptr<Button> render_footer() const {
-    return $button(button_props{
-        .ref = nullptr,
-        .style = $s("footer.button"),
-        .child = $text(text_props{
-          .ref = nullptr,
-          .style = $s("header.label"),
-          .text = locales::en::status,
-        }),
-      });
+
+  std::shared_ptr<Button> render_footer() const {
+    return $Button(
+        ButtonProps::up()
+            .set_style($s("footer.button"))
+            .set_child(
+                $Text(
+                    TextProps::up()
+                        .set_style($s("header.label"))
+                        .value(locales::en::status)
+                )
+            )
+    );
   }
 
-  [[nodiscard]] std::shared_ptr<View> render_body() const {
-    return $view(view_props{
-    .ref = nullptr,
-    .style = $s("header.container"),
-    .children = {
-      $text(text_props{
-          .ref = nullptr,
-          .style = $s("header.label"),
-          .text = locales::en::oxygen_level,
-      }),
-      $view(view_props{
-        .ref = nullptr,
-        .style = $s("header.labels.container"),
-        .children = {
-          $circular(circular_props{.ref = nullptr, .label_symbol = "%", .show_label_default = true, .min_dy = 0, .max_dy = 100, .default_dy = 20, .w = 100, .h = 100 }),
-          $circular(circular_props{.ref = nullptr, .label_symbol = "%", .show_label_default = true, .min_dy = 0, .max_dy = 100, .default_dy = 20, .w = 100, .h = 100 }),
-          $circular(circular_props{.ref = nullptr, .label_symbol = "%", .show_label_default = true, .min_dy = 0, .max_dy = 100, .default_dy = 20, .w = 100, .h = 100 }),
-        },
-        .width = LV_PCT(100),
-        .height = 110,
-        .justify_content = LV_FLEX_ALIGN_SPACE_AROUND,
-        .align_items = LV_FLEX_ALIGN_CENTER,
-        .track_cross_place = LV_FLEX_ALIGN_CENTER,
-        .flex_direction = LV_FLEX_FLOW_ROW,
-      }),
-      $text(text_props{
-        .ref = nullptr,
-        .style = $s("header.label"),
-        .text = locales::en::oxygen_rate,
-      }),
-      $view(view_props{
-      .ref = nullptr,
-      .style = $s("header.labels.container"),
-      .children = {
-        $circular(circular_props{.ref = nullptr, .label_symbol = "%", .show_label_default = true, .min_dy = 0, .max_dy = 100, .default_dy = 20, .w = 100, .h = 100 }),
-        $circular(circular_props{.ref = nullptr, .label_symbol = "%", .show_label_default = true, .min_dy = 0, .max_dy = 100, .default_dy = 20, .w = 100, .h = 100 }),
-        $circular(circular_props{.ref = nullptr, .label_symbol = "%", .show_label_default = true, .min_dy = 0, .max_dy = 100, .default_dy = 20, .w = 100, .h = 100 }),
-      },
-      .width = LV_PCT(100),
-      .height = 110,
-      .justify_content = LV_FLEX_ALIGN_SPACE_AROUND,
-      .align_items = LV_FLEX_ALIGN_CENTER,
-      .track_cross_place = LV_FLEX_ALIGN_CENTER,
-      .flex_direction = LV_FLEX_FLOW_ROW,
-    }),
-    },
-      .width = LV_PCT(100),
-      .height = LV_PCT(62),
-      .justify_content = LV_FLEX_ALIGN_START,
-      .align_items = LV_FLEX_ALIGN_CENTER,
-      .track_cross_place = LV_FLEX_ALIGN_START,
-      .flex_direction = LV_FLEX_FLOW_COLUMN
-  });
-  }
+  std::shared_ptr<View> render_body() const {
+
+    auto make_circle = [&]() {
+        return $Circular(
+            CircularProgressProps::up()
+                .set_ref(nullptr)
+                .label("%")
+                .show_label(true)
+                .min(0)
+                .max(100)
+                .value(20)
+                .w(100)
+                .h(100)
+        );
+    };
+
+    return $View(
+        ViewProps::up()
+            .set_style($s("header.container"))
+            .set_children({
+                $Text(
+                    TextProps::up()
+                        .set_style($s("header.label"))
+                        .value(locales::en::oxygen_level)
+                ),
+                $View(
+                    ViewProps::up()
+                        .set_style($s("header.labels.container"))
+                        .set_children({
+                            make_circle(),
+                            make_circle(),
+                            make_circle(),
+                        })
+                        .w(LV_PCT(100))
+                        .h(110)
+                        .justify(LV_FLEX_ALIGN_SPACE_AROUND)
+                        .items(LV_FLEX_ALIGN_CENTER)
+                        .track_cross(LV_FLEX_ALIGN_CENTER)
+                        .direction(LV_FLEX_FLOW_ROW)
+                ),
+                $Text(
+                    TextProps::up()
+                        .set_style($s("header.label"))
+                        .value(locales::en::oxygen_rate)
+                ),
+                $View(
+                    ViewProps::up()
+                        .set_style($s("header.labels.container"))
+                        .set_children({
+                            make_circle(),
+                            make_circle(),
+                            make_circle(),
+                        })
+                        .w(LV_PCT(100))
+                        .h(110)
+                        .justify(LV_FLEX_ALIGN_SPACE_AROUND)
+                        .items(LV_FLEX_ALIGN_CENTER)
+                        .track_cross(LV_FLEX_ALIGN_CENTER)
+                        .direction(LV_FLEX_FLOW_ROW)
+                ),
+            })
+            .w(LV_PCT(100))
+            .h(LV_PCT(62))
+            .justify(LV_FLEX_ALIGN_START)
+            .items(LV_FLEX_ALIGN_CENTER)
+            .track_cross(LV_FLEX_ALIGN_START)
+            .direction(LV_FLEX_FLOW_COLUMN)
+    );
+}
 
 
-  lv_obj_t *render() override {
-     return this->delegate($view(
-      this->parent,
-      view_props{
-        .ref = nullptr,
-        .style = this->styling(),
-        .children = {
-          $statusbar(status_bar_props{
-            .ref = nullptr,
-            .style = nullptr,
-          }),
-          $rn(render_header),
-          $rn(render_body),
-          $rn(render_footer),
-        },
-        screen_container_props,
-      }));
+
+  lv_obj_t* render() override {
+    return this->delegate(
+        $View(
+            ViewProps::up()
+                .set_style(this->styling())
+                .set_children({
+                    $StatusBar(
+                        StatusBarProps::up()
+                            .set_style(nullptr)
+                    ),
+                    this->render_header(),
+                    this->render_body(),
+                    this->render_footer(),
+                })
+                .merge(screen_container_props)
+        )
+    );
   }
 
 

@@ -12,11 +12,10 @@ file(GLOB_RECURSE SOURCES
 
 idf_component_register(
         SRCS ${SOURCES}
-        INCLUDE_DIRS
-        .
-        ./core
+        INCLUDE_DIRS .
+        REQUIRES foundation
 )
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_compile_options("-Wno-attributes")
+target_compile_options(${COMPONENT_LIB} PRIVATE "-Wno-attributes")
+set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD_REQUIRED ON)
