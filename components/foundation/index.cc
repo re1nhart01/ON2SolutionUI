@@ -35,6 +35,8 @@
 #include "core/styling/styling.h"
 
 #include "core/style_store/style_store.h"
+#include "core/ref_store/ref_store.h"
+#include "core/structures/static_hashmap.h"
 #include "components/props.h"
 
 extern "C" {
