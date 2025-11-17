@@ -3,16 +3,16 @@
 
 namespace foundation
 {
-  class CircularProgress final : public Component {
+  class CircularProgress final : public Component<CircularProgressProps> {
   private:
-    CircularProgressProps props;
+    using Component::props;
     std::shared_ptr<Text> label = nullptr;
     lv_obj_t* arc_reference = nullptr;
     bool is_show_label = false;
 
   public:
     explicit CircularProgress(CircularProgressProps  props)
-      : Component(nullptr, nullptr), props(std::move(props)) {
+      : Component(nullptr, nullptr, std::move(props)) {
       this->parent = nullptr;
 
       this->is_show_label = props.show_label_default;
@@ -34,7 +34,7 @@ namespace foundation
       auto props = this->props;
 
       lv_obj_t* container = lv_obj_create(parent_obj);
-      lv_obj_set_size(container, props.w + 5, props.h + 5);
+      lv_obj_set_size(container, props.width + 5, props.height + 5);
       lv_obj_clear_flag(container, LV_OBJ_FLAG_SCROLLABLE);
       lv_obj_set_style_bg_opa(container, LV_OPA_TRANSP, 0);
       lv_obj_set_style_border_width(container, 0, LV_PART_MAIN);
@@ -42,7 +42,7 @@ namespace foundation
       this->set_component(container);
 
       this->arc_reference = lv_arc_create(container);
-      lv_obj_set_size(arc_reference, props.w, props.h);
+      lv_obj_set_size(arc_reference, props.width, props.height);
       lv_arc_set_range(arc_reference, props.min_dy, props.max_dy);
       lv_arc_set_value(arc_reference, props.default_dy);
       lv_arc_set_bg_angles(arc_reference, 135, 45);
@@ -57,9 +57,7 @@ namespace foundation
       }
 
       if (this->is_show_label) {
-          this->label = $text(TextProps{
-              .text = "100%",
-          });
+          this->label = std::make_shared<Text>(TextProps::up().value("100%"));
 
           this->label->set_parent(container);
           this->label->render();

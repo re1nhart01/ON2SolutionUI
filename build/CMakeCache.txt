@@ -46,8 +46,9 @@ CMAKE_ASM_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 //Flags used by the ASM compiler during RELWITHDEBINFO builds.
 CMAKE_ASM_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
-//No help, variable specified on the command line.
-CMAKE_BUILD_TYPE:UNINITIALIZED=Debug
+//Choose the type of build, options are: None Debug Release RelWithDebInfo
+// MinSizeRel ...
+CMAKE_BUILD_TYPE:STRING=Debug
 
 //Enable colored diagnostics throughout.
 CMAKE_COLOR_DIAGNOSTICS:BOOL=ON
@@ -224,7 +225,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=idf_main
+CMAKE_PROJECT_NAME:STATIC=ON2SolutionUI
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION:STATIC=3.6.2
@@ -359,6 +360,15 @@ Mbed TLS_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
 Mbed TLS_SOURCE_DIR:STATIC=/home/evgeniy/esp-idf/components/mbedtls/mbedtls
+
+//Value Computed by CMake
+ON2SolutionUI_BINARY_DIR:STATIC=/home/evgeniy/Documents/GitHub/ON2SolutionUI/build
+
+//Value Computed by CMake
+ON2SolutionUI_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+ON2SolutionUI_SOURCE_DIR:STATIC=/home/evgeniy/Documents/GitHub/ON2SolutionUI
 
 //No help, variable specified on the command line.
 PYTHON:UNINITIALIZED=/home/evgeniy/.espressif/python_env/idf5.5_py3.12_env/bin/python
@@ -567,7 +577,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=124
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

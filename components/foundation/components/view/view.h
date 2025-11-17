@@ -4,13 +4,13 @@
 
 namespace foundation
 {
-  class View final : public Component {
+  class View final : public Component<ViewProps> {
   private:
-      ViewProps props;
-      std::vector<std::shared_ptr<Component>> children;
+      using Component::props;
+      std::vector<std::shared_ptr<VNode>> children;
 
   public:
-    explicit View(lv_obj_t * parent, const ViewProps &props) : Component(nullptr, parent), props(props) {
+    explicit View(lv_obj_t * parent, const ViewProps &props) : Component(nullptr, parent, props), props(props) {
       set_style(props.style);
       if(!props.children.empty()) {
           this->children.insert(this->children.end(), props.children.begin(), props.children.end());
@@ -21,7 +21,7 @@ namespace foundation
       }
     };
 
-    explicit View(const ViewProps &props) : Component(nullptr, nullptr), props(props) {
+    explicit View(const ViewProps &props) : Component(nullptr, nullptr, props), props(props) {
       set_style(props.style);
       if(!props.children.empty()) {
           this->children.insert(this->children.end(), props.children.begin(), props.children.end());

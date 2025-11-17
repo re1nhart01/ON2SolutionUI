@@ -2,10 +2,9 @@
 
 #include "../../components/foundation/components/component.h"
 
-#include "../../components/foundation/core/macro.h"
+#include "../../components/foundation/core/shortcuts.h"
 #include "../../components/foundation/core/state/state.h"
 #include "../../components/foundation/core/style_store/style_store.h"
-#include "../../components/foundation/unused/references_h.txt"
 #include "components/button/button_props.h"
 #include "components/text/text_props.h"
 #include "components/view/view.h"
@@ -15,29 +14,22 @@
 
 using namespace foundation;
 
-struct main_screen_props {
-  std::shared_ptr<Ref> ref = nullptr;
-};
+class MainScreen;
+struct MainScreenProps : BaseProps<MainScreenProps, MainScreen> {};
 
-class MainScreen final : public Component {
-  main_screen_props props;
+class MainScreen final : public Component<MainScreenProps> {
+  MainScreenProps props;
   std::shared_ptr<StackNavigator> navigator;
   StyleStorage* styles;
-  References* references;
 public:
   ~MainScreen() override {
     delete this->styles;
-    delete this->references;
   };
 
-  explicit MainScreen(std::shared_ptr<StackNavigator> stack, const main_screen_props &props) : Component(nullptr, nullptr) {
+  explicit MainScreen(std::shared_ptr<StackNavigator> stack, const MainScreenProps &props) : Component(nullptr, nullptr, props) {
     this->props = props;
     this->navigator = std::move(stack);
     this->styles = new StyleStorage();
-    this->references = new References();
-    if(this->props.ref != nullptr) {
-        this->props.ref->set(this);
-    }
 
     style_main_screen_register(*this->styles);
   }
@@ -48,11 +40,11 @@ public:
     return $View(
         ViewProps::up()
             .set_style($s("header.container"))
-            .set_children({
+            .set_children(Children{
                 $View(
                     ViewProps::up()
                         .set_style($s("header.labels.container"))
-                        .set_children({
+                        .set_children(Children{
                             $Text(TextProps::up().value(std::format("Channels: {}", 3))),
                             $Text(TextProps::up().value(std::format("Inputs: {}", 3))),
                             $Text(TextProps::up().value(std::format("Outputs: {}", 3))),
@@ -62,7 +54,7 @@ public:
                 $View(
                     ViewProps::up()
                         .set_style($s("header.container"))
-                        .set_children({
+                        .set_children(Children{
                             $Button(
                                 ButtonProps::up()
                                     .set_style($s("header.button"))
@@ -121,7 +113,6 @@ public:
     auto make_circle = [&]() {
         return $Circular(
             CircularProgressProps::up()
-                .set_ref(nullptr)
                 .label("%")
                 .show_label(true)
                 .min(0)
@@ -135,7 +126,7 @@ public:
     return $View(
         ViewProps::up()
             .set_style($s("header.container"))
-            .set_children({
+            .set_children(Children{
                 $Text(
                     TextProps::up()
                         .set_style($s("header.label"))
@@ -144,7 +135,7 @@ public:
                 $View(
                     ViewProps::up()
                         .set_style($s("header.labels.container"))
-                        .set_children({
+                        .set_children(Children{
                             make_circle(),
                             make_circle(),
                             make_circle(),
@@ -164,7 +155,7 @@ public:
                 $View(
                     ViewProps::up()
                         .set_style($s("header.labels.container"))
-                        .set_children({
+                        .set_children(Children{
                             make_circle(),
                             make_circle(),
                             make_circle(),
@@ -193,7 +184,7 @@ public:
         $View(
             ViewProps::up()
                 .set_style(this->styling())
-                .set_children({
+                .set_children(Children{
                     $StatusBar(
                         StatusBarProps::up()
                             .set_style(nullptr)

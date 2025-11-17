@@ -7,14 +7,14 @@
 #include <string>
 
 extern "C" {
-#include "../internals/lvgl_port.h"
+#include "internals/lvgl_port.h"
 #include "esp_log.h"
 }
 namespace foundation {
     class Application {
     protected:
         lv_obj_t* screen = nullptr;
-        Component* root = nullptr;
+        VNode* root = nullptr;
 
     public:
         Application(lv_obj_t* screen_v) {
@@ -22,19 +22,19 @@ namespace foundation {
         };
         virtual ~Application() = default;
 
-        virtual Component* root_component() = 0;
+        virtual VNode* root_component() = 0;
         virtual void before_load_application() = 0;
         virtual void after_load_application() = 0;
 
 
-        void set_root(Component *root_component);
+        void set_root(VNode *root_component);
         void renderApp();
         void tick(lv_obj_t* scr, std::function<void()> callback);
         void turnOnBacklight();
         void turnOffBacklight();
     };
 
-    inline void Application::set_root(Component* root_component) {
+    inline void Application::set_root(VNode* root_component) {
         this->root = root_component;
     }
 
@@ -52,7 +52,7 @@ namespace foundation {
         if (this->root == nullptr) {
             this->before_load_application();
 
-            Component* root_component_view = this->root_component();
+            VNode* root_component_view = this->root_component();
             this->set_root(root_component_view);
         }
 

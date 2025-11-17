@@ -1,38 +1,26 @@
 #include <utility>
 
 #include "../../components/foundation/components/component.h"
-#include "../../components/foundation/core/macro.h"
+#include "../../components/foundation/core/shortcuts.h"
 
-namespace foundation
-{
-  class StackNavigator;
-}
 
 using namespace foundation;
 
-struct pincode_screen_props
+class PinCodeScreen;
+struct PinCodeScreenProps : BaseProps<PinCodeScreenProps, PinCodeScreen>{};
+
+class PinCodeScreen : public Component<PinCodeScreenProps>
 {
-  std::shared_ptr<foundation::Ref> ref = nullptr;
-};
-
-
-
-class PinCodeScreen : public foundation::Component
-{
-  pincode_screen_props props;
+  PinCodeScreenProps props;
   std::shared_ptr<StackNavigator> navigator;
 
 public:
   explicit PinCodeScreen(std::shared_ptr<StackNavigator> stack,
-                      const pincode_screen_props &props)
-      : Component(nullptr, nullptr)
+                      const PinCodeScreenProps &props)
+      : Component(nullptr, nullptr, props)
   {
     this->props = props;
     this->navigator = std::move(stack);
-    if(this->props.ref != nullptr)
-      {
-        this->props.ref->set(this);
-      }
   }
 
   ~PinCodeScreen() override = default;
@@ -42,7 +30,7 @@ public:
         $View(
             ViewProps::up()
                 .set_style(this->styling())
-                .set_children({
+                .set_children(Children{
                     $StatusBar(
                         StatusBarProps::up()
                             .set_style(nullptr)

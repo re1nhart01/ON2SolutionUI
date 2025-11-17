@@ -1,27 +1,23 @@
 #include "../../components/foundation/components/component.h"
 #include "../../components/foundation/core/application.h"
-#include "../../components/foundation/core/macro.h"
+#include "../../components/foundation/core/shortcuts.h"
 
+class PreloaderScreen;
 using namespace foundation;
 
-struct preloader_screen_props {
-  std::shared_ptr<Ref> ref = nullptr;
-};
+struct PreloaderScreenProps : BaseProps<PreloaderScreenProps, PreloaderScreen> {};
 
 int i = 0;
 
-class PreloaderScreen final : public Component {
+class PreloaderScreen final : public Component<PreloaderScreenProps> {
 private:
-  preloader_screen_props props;
+  PreloaderScreenProps props;
   std::shared_ptr<StackNavigator> navigator;
-  std::shared_ptr<Ref> label_ref = std::make_shared<Ref>("label");
+  std::shared_ptr<Ref<Text>> label_ref = std::make_shared<Ref<Text>>("label");
 public:
-  explicit PreloaderScreen(std::shared_ptr<StackNavigator> stack, const preloader_screen_props &props) : Component(nullptr, nullptr) {
+  explicit PreloaderScreen(std::shared_ptr<StackNavigator> stack, const PreloaderScreenProps &props) : Component(nullptr, nullptr, props) {
     this->props = props;
     this->navigator = std::move(stack);
-    if (this->props.ref != nullptr) {
-        this->props.ref->set(this);
-    }
   }
 
   ~PreloaderScreen() override {
@@ -41,24 +37,22 @@ public:
         $View(
             ViewProps::up()
                 .set_style(this->styling())
-                .set_children({
+                .set_children(Children{
 
                     $Text(
                         TextProps::up()
                             .set_ref(this->label_ref)
-                            .value(std::format("{}", i))
+                            .value(std::format("count: {}", i))
                     ),
 
                     $Button(
                         ButtonProps::up()
                             .label("mmm")
                             .click([this](lv_event_t* e) {
-                                auto component = dynamic_cast<Text*>(this->label_ref->linked_component);
-                                if (component) {
-                                    component->set_state([component]() {
-                                        i++;
-                                    });
-                                }
+                                auto component = this->label_ref->get();
+                                component->set_state([component](TextProps& props) {
+                                    props.text = "count: " + std::to_string(i++);
+                                });
                             })
                     )
 

@@ -1,37 +1,30 @@
 #include "../../components/foundation/components/component.h"
-#include "../../components/foundation/core/macro.h"
+#include "../../components/foundation/core/shortcuts.h"
 
-
+class SettingsScreen;
 extern "C" {
   #include "esp_log.h"
 }
 
 using namespace foundation;
 
-struct settings_screen_props
-{
-  std::shared_ptr<Ref> ref = nullptr;
-};
+struct SettingsScreenProps : BaseProps<SettingsScreenProps, SettingsScreen> {};
 
 std::unique_ptr<KeyboardManager> admin_keyboard = std::make_unique<KeyboardManager>();
 std::shared_ptr<Styling> imageStyle = std::make_shared<Styling>();
 
-class SettingsScreen : public Component
+class SettingsScreen : public Component<SettingsScreenProps>
 {
-  settings_screen_props props;
+  SettingsScreenProps props;
   std::shared_ptr<StackNavigator> navigator;
 
 public:
   explicit SettingsScreen(std::shared_ptr<StackNavigator> stack,
-                       const settings_screen_props &props)
-      : Component(nullptr, nullptr)
+                       const SettingsScreenProps &props)
+      : Component(nullptr, nullptr, props)
   {
     this->props = props;
     this->navigator = std::move(stack);
-    if(this->props.ref != nullptr)
-      {
-        this->props.ref->set(this);
-      }
   }
 
   ~SettingsScreen() override {
@@ -55,7 +48,7 @@ public:
          return this->delegate($View(
             ViewProps::up()
                 .set_style(style)
-                .set_children({
+                .set_children(Children{
                     $StatusBar(
                         StatusBarProps::up()
                             .set_style(nullptr)
@@ -76,8 +69,8 @@ public:
                     $Input(
                         TextInputProps::up()
                             .set_style(input_style)
-                            .placeholder("text")
-                            .set_on_submit([](const std::string& value){
+                            .hint("text")
+                            .submit([](const std::string& value){
                                 ESP_LOGI("LOG", "%s", value.c_str());
                                 admin_keyboard->hide();
                             }),

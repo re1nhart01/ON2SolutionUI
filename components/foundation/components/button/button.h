@@ -9,14 +9,14 @@ namespace foundation
 {
   static void event_adapter(lv_event_t *event);
 
-  class Button final : public Component {
+  class Button final : public Component<ButtonProps> {
   private:
     lv_obj_t *label = nullptr;
 
   public:
-    ButtonProps props;
+    using Component::props;
 
-   explicit Button(const ButtonProps &props) : Component(nullptr, nullptr), props(props) {
+   explicit Button(const ButtonProps &props) : Component(nullptr, nullptr, std::move(props)) {
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }

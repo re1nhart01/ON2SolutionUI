@@ -10,22 +10,19 @@ extern "C" {
 
 using namespace foundation;
 
-auto label_ref_1 = std::make_shared<Ref>("LABEL_0");
-auto state_1 = std::make_shared<State<int>>(0);
-
 auto screen = lv_scr_act();
 
 auto stack_navigator = std::make_shared<
   StackNavigator>(StackNavigatorConfig{.initial_route = "/main"}, screen);
 
 auto main_screen = std::make_shared<MainScreen>(
-    stack_navigator, main_screen_props{.ref = nullptr});
+    stack_navigator, MainScreenProps{});
 auto settings_screen = std::make_shared<SettingsScreen>(
-    stack_navigator, settings_screen_props{.ref = nullptr});
+    stack_navigator, SettingsScreenProps{});
 auto pincode_screen = std::make_shared<PinCodeScreen>(
-    stack_navigator, pincode_screen_props{.ref = nullptr});
+    stack_navigator, PinCodeScreenProps{});
 auto preloader_screen = std::make_shared<PreloaderScreen>(
-    stack_navigator, preloader_screen_props{.ref = nullptr});
+    stack_navigator, PreloaderScreenProps{});
 
 class WaveApplication : public Application {
 public:
@@ -33,7 +30,7 @@ public:
     : Application(screen) {
   }
 
-  Component *root_component() override {
+  VNode *root_component() override {
     const auto initial = stack_navigator->getCurrentComponent();
 
     return initial.get();

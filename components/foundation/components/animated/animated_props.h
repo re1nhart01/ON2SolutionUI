@@ -2,13 +2,14 @@
 
 namespace foundation
 {
+  class Animated;
   enum AnimatedType {
     single_animation = 0xff,
     parallel_animation = 0xf1,
     chained_animation = 0xf2,
   };
 
-  struct AnimatedProps final : BaseProps<AnimatedProps> {
+  struct AnimatedProps final : BaseProps<AnimatedProps, Animated> {
     int32_t start_value = 0;
     int32_t end_value = 0;
     uint32_t duration = 500;

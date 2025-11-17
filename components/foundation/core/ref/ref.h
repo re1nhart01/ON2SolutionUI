@@ -1,31 +1,41 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 namespace foundation {
-  class Component;
-  class Ref {
-    public:
-        std::string name;
-        Component* linked_component = nullptr;
-
-        ~Ref() = default;
-        explicit Ref(const std::string& name) {
-            this->name = name;
-        };
-
-        void set(Component* component) {
-            if (this->linked_component != nullptr) return;
-            this->linked_component = component;
-        }
-
-        Component* get() {
-            return this->linked_component;
-        }
 
 
-        template <typename T> T get_typed() {
-          return static_cast<T>(this->get());
-        }
-    };
+  struct RefBase {
+    virtual ~RefBase() = default;
+  };
+
+  class BaseComponent;
+  template<typename Props> class Component;
+
+  template <typename T = BaseComponent>
+  class Ref : public RefBase {
+  public:
+    std::string name;
+    T* linked = nullptr;
+
+    ~Ref() = default;
+
+    explicit Ref(const std::string& name)
+        : name(name) {}
+
+    void set(T* component) {
+      if (this->linked != nullptr) return;
+      this->linked = component;
+    }
+
+    T* get() const {
+      return linked;
+    }
+
+    template <typename C>
+    C* cast() const {
+      return dynamic_cast<C*>(linked);
+    }
+  };
 }

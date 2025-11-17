@@ -17,4 +17,4 @@ set confirm off
 set confirm on
 
 # Load application symbols
-file /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/idf_main.elf
+file /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/ON2SolutionUI.elf

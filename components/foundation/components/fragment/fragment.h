@@ -4,7 +4,8 @@
 
 #ifndef FRAGMENT_H
 #define FRAGMENT_H
-#include "components/foundation/core/styling/styling.h"
+#include "core/styling/styling.h"
+#include "fragment_props.h"
 
 #endif //FRAGMENT_H
 
@@ -12,10 +13,11 @@
 
 namespace foundation
 {
-  class Fragment final : public Component {
+  class Fragment final : public Component<FragmentProps> {
+  using Component::props;
   public:
     explicit Fragment()
-      : Component(nullptr, nullptr) {
+      : Component(nullptr, nullptr, std::move(props)) {
       this->parent = nullptr;
     };
     ~Fragment() override = default;

@@ -4,7 +4,8 @@
 
 namespace foundation
 {
-  struct TextProps final : BaseProps<TextProps> {
+  class Text;
+  struct TextProps final : BaseProps<TextProps, Text> {
     std::string text;
 
     lv_event_cb_t on_click = nullptr;

@@ -10,7 +10,7 @@
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/flash.dir
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/encrypted-flash.dir
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/_project_elf_src.dir
-/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/idf_main.elf.dir
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/ON2SolutionUI.elf.dir
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/size.dir
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/size-files.dir
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/CMakeFiles/size-components.dir
@@ -869,6 +869,13 @@
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/espressif__esp_lcd_touch_gt911/CMakeFiles/install.dir
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/espressif__esp_lcd_touch_gt911/CMakeFiles/install/local.dir
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/espressif__esp_lcd_touch_gt911/CMakeFiles/install/strip.dir
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/foundation/CMakeFiles/__idf_foundation.dir
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/foundation/CMakeFiles/edit_cache.dir
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/foundation/CMakeFiles/rebuild_cache.dir
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/foundation/CMakeFiles/list_install_components.dir
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/foundation/CMakeFiles/install.dir
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/foundation/CMakeFiles/install/local.dir
+/home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/foundation/CMakeFiles/install/strip.dir
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/main/CMakeFiles/__idf_main.dir
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/main/CMakeFiles/edit_cache.dir
 /home/evgeniy/Documents/GitHub/ON2SolutionUI/build/esp-idf/main/CMakeFiles/rebuild_cache.dir

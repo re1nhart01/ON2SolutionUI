@@ -3,10 +3,11 @@
 
 namespace foundation
 {
-  class Text final : public Component {
+  class Text final : public Component<TextProps> {
   public:
-    TextProps props;
-    explicit Text(TextProps  props) : Component(nullptr, nullptr), props(std::move(props)) {
+    using Component::props;
+
+    explicit Text(TextProps  props) : Component(nullptr, nullptr, std::move(props)) {
       this->parent = nullptr;
 
       if (this->props.ref != nullptr) {
@@ -41,9 +42,10 @@ namespace foundation
 
     void do_rebuild() override
     {
-      auto instance = this->get_component();
+      const auto instance = this->get_component();
       if (instance == nullptr) return;
       lv_obj_update_layout(instance);
+      ESP_LOGI("Text", "%s", props.text.c_str());
       lv_label_set_text(instance, this->props.text.c_str());
     };
 

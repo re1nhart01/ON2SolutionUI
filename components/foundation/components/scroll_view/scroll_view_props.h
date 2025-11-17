@@ -1,12 +1,11 @@
 #pragma once
+#include "scroll_view.h"
 
 namespace foundation
 {
-  struct ScrollViewProps final : BaseProps<ScrollViewProps> {
-    std::shared_ptr<Ref> ref = nullptr;
-    std::shared_ptr<Styling> style;
-
-    std::vector<std::shared_ptr<Component>> children;
+  class ScrollView;
+  struct ScrollViewProps final : BaseProps<ScrollViewProps, ScrollView> {
+    std::vector<std::shared_ptr<VNode>> children;
     short width = LV_PCT(100);
     short height = LV_SIZE_CONTENT;
     lv_flex_align_t justify_content = LV_FLEX_ALIGN_START;
@@ -19,12 +18,12 @@ namespace foundation
 
     static ScrollViewProps up() { return ScrollViewProps{}; }
 
-    ScrollViewProps& add_child(const std::shared_ptr<Component>& c) {
+    ScrollViewProps& add_child(const std::shared_ptr<VNode>& c) {
       children.push_back(c);
       return *this;
     }
 
-    ScrollViewProps& set_children(const std::vector<std::shared_ptr<Component>>& ch) {
+    ScrollViewProps& set_children(const std::vector<std::shared_ptr<VNode>>& ch) {
       children = ch;
       return *this;
     }

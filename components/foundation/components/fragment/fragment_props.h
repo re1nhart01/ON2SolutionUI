@@ -2,8 +2,8 @@
 
 #pragma once
 
-
 namespace foundation
 {
-  struct FragmentProps final : BaseProps<FragmentProps> {};
+  class Fragment;
+  struct FragmentProps final : BaseProps<FragmentProps, Fragment> {};
 }

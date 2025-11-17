@@ -3,15 +3,15 @@
 
 namespace foundation
 {
-  class Image final : public Component {
+  class Image final : public Component<ImageProps> {
   private:
-    ImageProps props;
+    using Component::props;
     const std::string* base64_source = nullptr;
     lv_img_dsc_t img_dsc;
 
   public:
     explicit Image(const lv_img_dsc_t source, const ImageProps& props)
-      : Component(nullptr, nullptr), props(props), img_dsc(source) {
+      : Component(nullptr, nullptr, std::move(props)), img_dsc(source) {
       set_style(props.style);
 
       if (this->props.ref != nullptr) {

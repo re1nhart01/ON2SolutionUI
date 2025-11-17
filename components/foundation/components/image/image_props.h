@@ -1,21 +1,16 @@
 #pragma once
-
+#include "image.h"
 
 namespace foundation
 {
-  struct ImageProps final : BaseProps<ImageProps> {
-    std::shared_ptr<Ref> ref = nullptr;
+  class Image;
+  struct ImageProps final : BaseProps<ImageProps, Image> {
     std::shared_ptr<Styling> style;
 
     short real_width = 0;
     short real_height = 0;
 
     static ImageProps up() { return ImageProps{}; }
-
-    ImageProps& set_ref(std::shared_ptr<Ref> r) {
-      ref = std::move(r);
-      return *this;
-    }
 
     ImageProps& set_style(std::shared_ptr<Styling> s) {
       style = std::move(s);

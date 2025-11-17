@@ -3,7 +3,8 @@
 
 namespace foundation
 {
-  struct StatusBarProps final : BaseProps<StatusBarProps>
+  class StatusBar;
+  struct StatusBarProps final : BaseProps<StatusBarProps, StatusBar>
   {
     static StatusBarProps up() { return StatusBarProps{}; }
   };

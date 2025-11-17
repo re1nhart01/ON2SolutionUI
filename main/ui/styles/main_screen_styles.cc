@@ -1,5 +1,6 @@
 
-#include "../../components/foundation/core/style_store/style_store.h"
+#include "core/style_store/style_store.h"
+#include "components/view/view_props.h"
 
 //----------------------------------- Shorthands
 //------------------------------------------------

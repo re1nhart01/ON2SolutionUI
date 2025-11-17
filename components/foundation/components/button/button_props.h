@@ -1,5 +1,6 @@
 #pragma once
 #include "components/props.h"
+#include "components/vnode.h"
 #include "core/lv_event.h"
 #include "core/styling/styling.h"
 
@@ -8,9 +9,10 @@
 
 namespace foundation
 {
-  struct ButtonProps final : BaseProps<ButtonProps>
+  class Button;
+  struct ButtonProps final : BaseProps<ButtonProps, Button>
   {
-    std::shared_ptr<Component> child = nullptr;
+    std::shared_ptr<VNode> child = nullptr;
     std::string text;
 
     std::function<void(lv_event_t *)> on_click = nullptr;
@@ -22,17 +24,12 @@ namespace foundation
 
     static ButtonProps up() { return ButtonProps{}; }
 
-    ButtonProps& set_ref(std::shared_ptr<Ref> r) {
-      ref = std::move(r);
-      return *this;
-    }
-
     ButtonProps& set_style(std::shared_ptr<Styling> s) {
       style = std::move(s);
       return *this;
     }
 
-    ButtonProps& set_child(const std::shared_ptr<Component>& c) {
+    ButtonProps& set_child(const std::shared_ptr<VNode>& c) {
       child = c;
       return *this;
     }

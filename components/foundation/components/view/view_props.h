@@ -4,13 +4,18 @@
 #include "misc/lv_area.h"
 #include <lvgl__lvgl/src/lvgl.h>
 
+#include "components/vnode.h"
 #include <memory>
 
 namespace foundation
 {
-  struct ViewProps final : BaseProps<ViewProps>
+  class View;
+}
+namespace foundation
+{
+  struct ViewProps final : BaseProps<ViewProps, View>
   {
-    std::vector<std::shared_ptr<Component>> children;
+    std::vector<std::shared_ptr<VNode>> children;
 
     short width = LV_PCT(100);
     short height = LV_SIZE_CONTENT;
@@ -33,7 +38,7 @@ namespace foundation
       return *this;
     }
 
-    ViewProps& set_children(const std::vector<std::shared_ptr<Component>>& value)
+    ViewProps& set_children(const std::vector<std::shared_ptr<VNode>>& value)
     {
       this->children = std::move(value);
       return *this;

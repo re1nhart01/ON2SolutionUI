@@ -2,7 +2,8 @@
 
 namespace foundation
 {
-  struct TextInputProps final : BaseProps<TextInputProps> {
+  class TextInput;
+  struct TextInputProps final : BaseProps<TextInputProps, TextInput> {
     const char* placeholder = nullptr;
     lv_event_cb_t on_click = nullptr;
     lv_event_cb_t on_focused = nullptr;
@@ -11,11 +12,6 @@ namespace foundation
     std::function<void(std::string value)> on_submit = nullptr;
 
     static TextInputProps up() { return TextInputProps{}; }
-
-    TextInputProps& set_ref(std::shared_ptr<Ref> r) {
-      ref = std::move(r);
-      return *this;
-    }
 
     TextInputProps& set_style(std::shared_ptr<Styling> s) {
       style = std::move(s);

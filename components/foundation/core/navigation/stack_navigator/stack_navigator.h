@@ -1,13 +1,17 @@
 #pragma once
 
+#include "components/component.h"
+
+#include <memory>
 #include <stack>
+#include <string>
 
 namespace foundation
 {
   struct StackCurrentScreen {
     int id;
     std::string name;
-    std::shared_ptr<Component> screen;
+    std::shared_ptr<VNode> screen;
   };
 
   struct StackNavigatorConfig {
@@ -19,7 +23,7 @@ namespace foundation
     std::shared_ptr<StackCurrentScreen> current_screen = nullptr;
     lv_obj_t* parent = nullptr;
     StackNavigatorConfig config;
-    std::unordered_map<std::string, std::shared_ptr<Component>> screens;
+    std::unordered_map<std::string, std::shared_ptr<VNode>> screens;
     std::stack<StackCurrentScreen> stack;
     int id_counter = 0;
 
@@ -29,7 +33,7 @@ namespace foundation
       this->parent = parent;
   };
 
-  void registerScreen(const std::string& name, const std::shared_ptr<Component>& component) {
+  void registerScreen(const std::string& name, const std::shared_ptr<VNode>& component) {
     screens[name] = component;
 
     current_screen = std::make_shared<StackCurrentScreen>(StackCurrentScreen{
@@ -105,7 +109,7 @@ namespace foundation
       return current;
   }
 
-  std::shared_ptr<Component> getCurrentComponent() const {
+  std::shared_ptr<VNode> getCurrentComponent() const {
       return current_screen ? current_screen->screen : nullptr;
   }
 
@@ -114,7 +118,7 @@ namespace foundation
   }
 
   bool hasScreen(const std::string& name) const {
-      return screens.find(name) != screens.end();
+      return screens.contains(name);
   }
   };
 

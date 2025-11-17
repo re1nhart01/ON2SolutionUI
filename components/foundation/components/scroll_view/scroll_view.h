@@ -4,14 +4,14 @@
 
 namespace foundation
 {
-  class ScrollView final : public Component {
+  class ScrollView final : public Component<ScrollViewProps> {
   private:
-    ScrollViewProps props;
-    std::vector<std::shared_ptr<Component>> children;
+    using Component::props;
+    std::vector<std::shared_ptr<VNode>> children;
 
   public:
     explicit ScrollView(lv_obj_t* parent, const ScrollViewProps& props)
-      : Component(this->create_initial(parent), parent), props(props) {
+      : Component(this->create_initial(parent), parent, std::move(props)) {
       set_style(props.style);
 
       if (!props.children.empty()) {

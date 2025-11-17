@@ -4,17 +4,17 @@
 
 namespace foundation
 {
-  class Animated final : public Component {
+  class Animated final : public Component<AnimatedProps> {
   private:
     std::unique_ptr<lv_anim_t> reference;
     Component* component;
-    AnimatedProps* props;
+    using Component::props;
     AnimatedSubConfig* sub_config;
 
   public:
-    explicit Animated(Component* component, AnimatedProps* props, AnimatedSubConfig* sub_config)
+    explicit Animated(Component* component, AnimatedProps props, AnimatedSubConfig* sub_config)
     {
-      this->props = props;
+      this->props = std::move(props);
       this->sub_config = sub_config;
       this->component = component;
       this->reference = std::make_unique<lv_anim_t>();
@@ -30,12 +30,12 @@ namespace foundation
       auto* ref = this->reference.get();
 
       lv_anim_set_var(ref, obj);
-      lv_anim_set_time(ref, this->props->duration);
-      lv_anim_set_values(ref, this->props->start_value, this->props->end_value);
-      lv_anim_set_playback_time(ref, this->props->playback_duration);
-      lv_anim_set_repeat_count(ref, this->props->repeat_count);
+      lv_anim_set_time(ref, this->props.duration);
+      lv_anim_set_values(ref, this->props.start_value, this->props.end_value);
+      lv_anim_set_playback_time(ref, this->props.playback_duration);
+      lv_anim_set_repeat_count(ref, this->props.repeat_count);
 
-      switch (this->props->property) {
+      switch (this->props.property) {
         case AnimatedProps::Property::X:
           make_move_x_animation();
           break;

@@ -2,22 +2,18 @@
 
 namespace foundation
 {
-  struct CircularProgressProps final : BaseProps<CircularProgressProps> {
+  class CircularProgress;
+  struct CircularProgressProps final : BaseProps<CircularProgressProps, CircularProgress> {
     std::string label_symbol = "%";
     bool show_label_default = false;
     short min_dy = 0;
     short max_dy = 100;
     short default_dy = 0;
 
-    short w = 10;
-    short h = 10;
+    short width = 10;
+    short height = 10;
 
     static CircularProgressProps up() { return CircularProgressProps{}; }
-
-    CircularProgressProps& set_ref(std::shared_ptr<Ref> r) {
-      ref = std::move(r);
-      return *this;
-    }
 
     CircularProgressProps& set_style(std::shared_ptr<Styling> s) {
       style = std::move(s);
@@ -49,13 +45,13 @@ namespace foundation
       return *this;
     }
 
-    CircularProgressProps& width(short v) {
-      w = v;
+    CircularProgressProps& w(short v) {
+      width = v;
       return *this;
     }
 
-    CircularProgressProps& height(short v) {
-      h = v;
+    CircularProgressProps& h(short v) {
+      height = v;
       return *this;
     }
   };

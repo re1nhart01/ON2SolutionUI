@@ -16,6 +16,6 @@ idf_component_register(
         REQUIRES foundation
 )
 
-target_compile_options(${COMPONENT_LIB} PRIVATE "-Wno-attributes")
+target_compile_options(${COMPONENT_LIB} PRIVATE "-w")
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD_REQUIRED ON)

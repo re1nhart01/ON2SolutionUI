@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include "core/styling/styling.h"
 
 namespace foundation {
   class StyleStorage {

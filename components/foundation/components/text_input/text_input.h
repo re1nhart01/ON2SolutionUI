@@ -5,15 +5,15 @@
 
 namespace foundation
 {
-  class TextInput final : public Component {
+  class TextInput final : public Component<TextInputProps> {
   private:
     mutable lv_obj_t* keyboard = nullptr;
     KeyboardManager* kbManager = nullptr;
 
   public:
-    TextInputProps props;
+    using Component::props;
 
-    explicit TextInput(const TextInputProps& props, KeyboardManager* kbManager) : Component(nullptr, nullptr) {
+    explicit TextInput(const TextInputProps& props, KeyboardManager* kbManager) : Component(nullptr, nullptr, std::move(props)) {
       this->props = props;
       this->kbManager = kbManager;
 

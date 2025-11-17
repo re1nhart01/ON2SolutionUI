@@ -1,14 +1,15 @@
 #pragma once
-#include "core/macro.h"
+
+#include "components/text/text.h"
 #include "status_bar_props.h"
 
 namespace foundation
 {
-  class StatusBar final : public Component {
+  class StatusBar final : public Component<StatusBarProps> {
   public:
-    StatusBarProps props;
+    using Component::props;
     std::shared_ptr<Text> label = nullptr;
-    explicit StatusBar(const StatusBarProps& props) : Component(nullptr, nullptr), props(props) {
+    explicit StatusBar(const StatusBarProps& props) : Component(nullptr, nullptr, std::move(props)) {
       this->parent = nullptr;
 
       if (this->props.ref != nullptr) {
@@ -17,19 +18,19 @@ namespace foundation
     };
     ~StatusBar() override = default;
 
-    lv_obj_t* render() override
+    lv_obj_t * render() override
     {
+
       std::shared_ptr<Styling> styleV = this->styling();
 
-      this->label = $Text(TextProps::up().value("00:00"));
+      this->label = std::make_shared<Text>(TextProps::up().value("00:00"));
 
       return this->delegate(
-        $View(
+        std::make_shared<View>(
           this->parent,
           ViewProps::up()
-          .set_ref(nullptr)
           .set_style(styleV)
-          .set_children(std::vector<std::shared_ptr<Component>>{})
+          .set_children(std::vector<std::shared_ptr<VNode>>{})
           .w(LV_PCT(100))
           .h(24)
           .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)

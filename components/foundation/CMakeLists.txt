@@ -8,7 +8,12 @@ file(GLOB_RECURSE FOUNDATION_SOURCES
 idf_component_register(
         SRCS ${FOUNDATION_SOURCES}
         INCLUDE_DIRS .
-        REQUIRES lvgl
+        REQUIRES
+        lvgl
+        esp_lcd
+        driver
+        esp_timer
+        esp_lcd_touch_gt911
 )
 
 target_compile_features(${COMPONENT_LIB} PUBLIC cxx_std_20)
