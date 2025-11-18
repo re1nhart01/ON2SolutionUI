@@ -15,10 +15,8 @@ class StaticHashMap
   StaticHashMapNode<Key, Value> data[N];
 
   public:
-  StaticHashMap()
-  {
-
-  };
+  StaticHashMap() {};
+  ~StaticHashMap() {};
 
   size_t hasher(const Key& k) const {
     return std::hash<Key>{}(k) % N;
@@ -26,7 +24,7 @@ class StaticHashMap
 
   void put(const Key& key, const Value& value)
   {
-    size_t hash = hasher(key);
+    const size_t hash = hasher(key);
     for (size_t i = 0; i < N; i++)
       {
         size_t pos = (hash + i) % N;
@@ -43,7 +41,7 @@ class StaticHashMap
 
   Value& get(const Key& key)
   {
-    size_t hash = hasher(key);
+    const size_t hash = hasher(key);
     for (size_t i = 0; i < N; i++)
       {
         size_t pos = (hash + i) % N;

@@ -10,7 +10,7 @@ namespace foundation
       std::vector<std::shared_ptr<VNode>> children;
 
   public:
-    explicit View(lv_obj_t * parent, const ViewProps &props) : Component(nullptr, parent, props), props(props) {
+    explicit View(lv_obj_t * parent, const ViewProps &props) : Component(nullptr, parent, std::move(props)) {
       set_style(props.style);
       if(!props.children.empty()) {
           this->children.insert(this->children.end(), props.children.begin(), props.children.end());
@@ -21,7 +21,7 @@ namespace foundation
       }
     };
 
-    explicit View(const ViewProps &props) : Component(nullptr, nullptr, props), props(props) {
+    explicit View(const ViewProps &props) : Component(nullptr, nullptr, std::move(props)) {
       set_style(props.style);
       if(!props.children.empty()) {
           this->children.insert(this->children.end(), props.children.begin(), props.children.end());
@@ -41,15 +41,8 @@ namespace foundation
           this->set_component(this->create_initial(this->parent));
       }
       lv_obj_t *comp = get_component();
-      lv_obj_set_layout(comp, LV_LAYOUT_FLEX);
-      lv_obj_set_size(comp, props.width, props.height);
-      lv_obj_set_flex_flow(comp, props.flex_direction);
-      lv_obj_set_flex_align(comp, props.justify_content, props.align_items,
-                            props.track_cross_place);
 
-      lv_obj_set_scroll_dir(comp, LV_DIR_NONE);
-      lv_obj_set_scrollbar_mode(comp, LV_SCROLLBAR_MODE_OFF);
-      std::shared_ptr<Styling> style = this->styling();
+      this->do_rebuild();
 
       for (const auto& child : this->children) {
           if (child != nullptr) {
@@ -59,12 +52,31 @@ namespace foundation
               lv_obj_set_parent(child->get_component(), comp);
           }
       }
+      return comp;
+    };
+
+    void do_rebuild() override
+    {
+      lv_obj_t* obj = this->get_component();
+      if (!obj) return;
+
+      lv_obj_set_layout(obj, LV_LAYOUT_FLEX);
+      lv_obj_set_size(obj, props.width, props.height);
+      lv_obj_set_flex_flow(obj, props.flex_direction);
+      lv_obj_set_flex_align(obj, props.justify_content, props.align_items,
+                            props.track_cross_place);
+
+      lv_obj_set_scroll_dir(obj, LV_DIR_NONE);
+      lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_OFF);
+      std::shared_ptr<Styling> style = this->styling();
 
       if (style != nullptr) {
-          lv_obj_add_style(this->get_component(), style->getStyle(), LV_PART_MAIN);
+          style->applyTo(this->get_component());
       }
 
-      return comp;
+      for (const auto &child : children) {
+          child->do_rebuild();
+      }
     };
 
     std::shared_ptr<Styling> styling() override

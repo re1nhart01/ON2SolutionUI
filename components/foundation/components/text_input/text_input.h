@@ -30,45 +30,67 @@ namespace foundation
 
     lv_obj_t* render() override
     {
-      lv_obj_t* parent_obj = this->get_parent();
-      if (!parent_obj) return nullptr;
+      lv_obj_t* parent = this->get_parent();
+      if (!parent) return nullptr;
 
-      set_component(lv_textarea_create(parent_obj));
-
+      set_component(lv_textarea_create(parent));
       lv_obj_t* obj = this->get_component();
-      lv_textarea_set_one_line(obj, true);
-      lv_textarea_set_placeholder_text(obj, props.placeholder);
 
-      const auto& e = props;
-
-      if (e.on_click)          lv_obj_add_event_cb(obj, e.on_click, LV_EVENT_CLICKED, nullptr);
-      if (e.on_focused)        lv_obj_add_event_cb(obj, e.on_focused, LV_EVENT_FOCUSED, nullptr);
-      if (e.on_defocused)      lv_obj_add_event_cb(obj, e.on_defocused, LV_EVENT_DEFOCUSED, nullptr);
-      if (e.on_value_changed)  lv_obj_add_event_cb(obj, e.on_value_changed, LV_EVENT_VALUE_CHANGED, nullptr);
-
-      if (kbManager != nullptr) {
+      if (kbManager != nullptr)
+        {
           lv_obj_add_event_cb(obj, [](lv_event_t* e) {
-              _lv_obj_t* ta = lv_event_get_target(e);
-              auto* instance = static_cast<TextInput*>(lv_event_get_user_data(e));
-              if (instance->kbManager != nullptr) {
-                  instance->kbManager->create(lv_scr_act());
-                  if (instance->props.on_submit != nullptr) {
-                      instance->kbManager->attach_on_submit_event(instance->props.on_submit);
-                  }
-                  instance->kbManager->attach(ta);
-              }
+            auto* instance = static_cast<TextInput*>(lv_event_get_user_data(e));
+            if (!instance || !instance->kbManager) return;
+
+            instance->kbManager->create(lv_scr_act());
+
+            if (instance->props.on_submit != nullptr) {
+              instance->kbManager->attach_on_submit_event(instance->props.on_submit);
+            }
+
+            instance->kbManager->attach(lv_event_get_target(e));
           }, LV_EVENT_FOCUSED, this);
 
           lv_obj_add_event_cb(obj, [](lv_event_t* e) {
-              auto* instance = static_cast<TextInput*>(lv_event_get_user_data(e));
-              if (instance->kbManager != nullptr) {
-                  instance->kbManager->hide();
-              }
+            auto* instance = static_cast<TextInput*>(lv_event_get_user_data(e));
+            if (!instance || !instance->kbManager) return;
+            instance->kbManager->hide();
           }, LV_EVENT_DEFOCUSED, this);
-      }
+        }
+
+      do_rebuild();
 
       return obj;
     };
+
+    void do_rebuild() override
+    {
+      lv_obj_t* obj = this->get_component();
+      if (!obj) return;
+
+      lv_obj_update_layout(obj);
+
+      lv_textarea_set_one_line(obj, props.is_one_line);
+      lv_textarea_set_placeholder_text(obj, props.placeholder);
+      lv_textarea_set_password_mode(obj, props.is_secure);
+      lv_textarea_set_password_show_time(obj, props.secure_timeout);
+      lv_textarea_set_max_length(obj, props.length);
+
+      if (props.text != nullptr) {
+          lv_textarea_set_text(obj, props.text);
+      }
+
+      if (props.style) {
+          props.style->applyTo(obj);
+      }
+
+      lv_obj_remove_event_cb(obj, nullptr);
+
+      if (props.on_click)          lv_obj_add_event_cb(obj, props.on_click, LV_EVENT_CLICKED, nullptr);
+      if (props.on_focused)        lv_obj_add_event_cb(obj, props.on_focused, LV_EVENT_FOCUSED, nullptr);
+      if (props.on_defocused)      lv_obj_add_event_cb(obj, props.on_defocused, LV_EVENT_DEFOCUSED, nullptr);
+      if (props.on_value_changed)  lv_obj_add_event_cb(obj, props.on_value_changed, LV_EVENT_VALUE_CHANGED, nullptr);
+    }
 
     std::shared_ptr<Styling> styling() override
     {

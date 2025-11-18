@@ -45,7 +45,6 @@ namespace foundation
       const auto instance = this->get_component();
       if (instance == nullptr) return;
       lv_obj_update_layout(instance);
-      ESP_LOGI("Text", "%s", props.text.c_str());
       lv_label_set_text(instance, this->props.text.c_str());
     };
 

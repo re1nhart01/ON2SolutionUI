@@ -5,7 +5,7 @@
 namespace foundation {
 
   template <typename T, int MaxListeners = 8>
-  class State {
+class State {
   private:
     T value;
     std::function<void(const T&)> listeners[MaxListeners];
@@ -16,25 +16,22 @@ namespace foundation {
 
     const T& get() const { return value; }
 
-    void set(const T& newValue) {
-      if (newValue != value) {
+    void set(const T& newValue)
+    {
+      if (!std::equal_to<T>()(value, newValue)) {
           value = newValue;
           force_notify();
       }
     }
 
-    State<T> &operator=(const T &newValue)
+    State<T>& operator=(const T& newValue)
     {
       set(newValue);
       return *this;
     }
 
-    explicit operator T&() const
+    int subscribe(std::function<void(const T&)> cb)
     {
-      return get();
-    }
-
-    int subscribe(std::function<void(const T&)> cb) {
       if (count < MaxListeners) {
           listeners[count] = std::move(cb);
           return count++;
@@ -42,7 +39,8 @@ namespace foundation {
       return -1;
     }
 
-    int subscribe_once(std::function<void(const T&)> cb) {
+    int subscribe_once(std::function<void(const T&)> cb)
+    {
       if (count < MaxListeners) {
           int id = count;
           listeners[count++] = [this, cb = std::move(cb), id](const T& val) mutable {
@@ -54,18 +52,21 @@ namespace foundation {
       return -1;
     }
 
-    void unsubscribe(int id) {
+    void unsubscribe(int id)
+    {
       if (id >= 0 && id < count) {
           listeners[id] = nullptr;
       }
     }
 
-    void force_notify() {
+    void force_notify()
+    {
       for (int i = 0; i < count; ++i) {
           if (listeners[i])
             listeners[i](value);
       }
     }
   };
+
 
 }  // namespace foundation
