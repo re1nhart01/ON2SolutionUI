@@ -11,6 +11,7 @@
 #include "components/view/view_props.h"
 #include "ui/localization.hh"
 #include "ui/styles/main_screen_styles.cc"
+#include "protocols/uart/uart.h"
 
 using namespace foundation;
 

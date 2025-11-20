@@ -1,5 +1,7 @@
 
-
 build/*
 ./build/esp-idf
 build/esp-idf/main/
+
+.idea
+.vscode

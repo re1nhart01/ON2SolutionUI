@@ -1,13 +1,8 @@
-//
-// Created by evgeniy on 11/19/25.
-//
+#pragma once
 
-#ifndef DELEGATE_H
-#define DELEGATE_H
+#include <cstddef>
 #include <cstring>
-
-#endif //DELEGATE_H
-
+#include <utility>
 
 namespace foundation
 {
