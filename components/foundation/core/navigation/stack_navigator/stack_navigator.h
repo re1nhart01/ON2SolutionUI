@@ -1,6 +1,7 @@
 #pragma once
 
 #include "components/component.h"
+#include "navigation_screen.h"
 
 #include <memory>
 #include <stack>
@@ -52,6 +53,12 @@ namespace foundation
   }
 
   void navigate(const std::string& name) {
+      auto screen_before = this->current_screen->screen;
+
+      if (const auto s = dynamic_cast<NavigationScreen*>(screen_before.get())) {
+          s->on_blur();
+      }
+
       auto it = screens.find(name);
       if (it != screens.end()) {
           auto screen = it->second;
@@ -71,6 +78,10 @@ namespace foundation
               .name = name,
               .screen = screen
           });
+
+          if (const auto s = dynamic_cast<NavigationScreen*>(screen.get())) {
+              s->on_focus();
+          }
 
           this->push(*current_screen);
       }

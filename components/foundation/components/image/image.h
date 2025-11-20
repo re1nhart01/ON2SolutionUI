@@ -10,7 +10,7 @@ namespace foundation
     lv_img_dsc_t img_dsc;
 
   public:
-    explicit Image(const lv_img_dsc_t source, const ImageProps& props)
+    explicit Image(const lv_img_dsc_t &source, const ImageProps& props)
       : Component(nullptr, nullptr, std::move(props)), img_dsc(source) {
       set_style(props.style);
 

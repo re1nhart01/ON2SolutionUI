@@ -17,25 +17,33 @@ using namespace foundation;
 class MainScreen;
 struct MainScreenProps : BaseProps<MainScreenProps, MainScreen> {};
 
-class MainScreen final : public Component<MainScreenProps> {
+class MainScreen final : public Component<MainScreenProps>, public NavigationScreen {
   MainScreenProps props;
-  std::shared_ptr<StackNavigator> navigator;
   StyleStorage* styles;
 public:
   ~MainScreen() override {
     delete this->styles;
   };
 
-  explicit MainScreen(std::shared_ptr<StackNavigator> stack, const MainScreenProps &props) : Component(nullptr, nullptr, props) {
+  explicit MainScreen(const std::shared_ptr<StackNavigator>& stack, const MainScreenProps &props) : Component(nullptr, nullptr, props), NavigationScreen(stack) {
     this->props = props;
-    this->navigator = std::move(stack);
     this->styles = new StyleStorage();
 
     style_main_screen_register(*this->styles);
   }
 
+  void on_focus() override
+  {
+    NavigationScreen::on_focus();
+  };
+
+  void on_blur() override
+  {
+    NavigationScreen::on_focus();
+  };
+
     std::shared_ptr<View> render_header() const {
-    auto navigator_ref = this->navigator;
+    auto navigator_ref = this->navigation_ref;
 
     return $View(
         ViewProps::up()

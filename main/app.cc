@@ -12,22 +12,22 @@ using namespace foundation;
 
 auto screen = lv_scr_act();
 
-auto stack_navigator = std::make_shared<
-  StackNavigator>(StackNavigatorConfig{.initial_route = "/main"}, screen);
+class WaveApplication final : public Application {
+  std::shared_ptr<StackNavigator> stack_navigator;
 
-auto main_screen = std::make_shared<MainScreen>(
-    stack_navigator, MainScreenProps{});
-auto settings_screen = std::make_shared<SettingsScreen>(
-    stack_navigator, SettingsScreenProps{});
-auto pincode_screen = std::make_shared<PinCodeScreen>(
-    stack_navigator, PinCodeScreenProps{});
-auto preloader_screen = std::make_shared<PreloaderScreen>(
-    stack_navigator, PreloaderScreenProps{});
+  std::shared_ptr<MainScreen> main_screen;
+  std::shared_ptr<SettingsScreen> settings_screen;
+  std::shared_ptr<PinCodeScreen> pincode_screen;
+  std::shared_ptr<PreloaderScreen> preloader_screen;
 
-class WaveApplication : public Application {
 public:
-  explicit WaveApplication(lv_obj_t *screen)
-    : Application(screen) {
+  explicit WaveApplication(lv_obj_t *screen) : Application(screen) {
+    this->stack_navigator = std::make_shared<StackNavigator>(StackNavigatorConfig{.initial_route = "/main"}, screen);
+
+    main_screen      = std::make_shared<MainScreen>(stack_navigator, MainScreenProps{});
+    settings_screen  = std::make_shared<SettingsScreen>(stack_navigator, SettingsScreenProps{});
+    pincode_screen   = std::make_shared<PinCodeScreen>(stack_navigator, PinCodeScreenProps{});
+    preloader_screen = std::make_shared<PreloaderScreen>(stack_navigator, PreloaderScreenProps{});
   }
 
   VNode *root_component() override {
@@ -37,9 +37,10 @@ public:
   }
 
   void before_load_application() override {
+    stack_navigator->registerScreen("/preloader", preloader_screen);
     stack_navigator->registerScreen("/main", main_screen);
     stack_navigator->registerScreen("/pin_code", pincode_screen);
-    stack_navigator->registerScreen("/settings", preloader_screen);
+    stack_navigator->registerScreen("/settings", settings_screen);
   }
 
   void after_load_application() override {

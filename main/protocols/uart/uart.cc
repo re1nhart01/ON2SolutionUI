@@ -3,10 +3,17 @@
 
 #include "driver/uart.h"
 
-#include <string>
+#include "core/structures/delegate.h"
+#include "core/structures/static_hashmap.h"
+
 #include <bits/range_access.h>
+#include <string>
 
 #include "freertos/queue.h"
+
+#include <cstring>
+#include <functional>
+#include <tgmath.h>
 
 extern "C" {
 #include "esp_log.h"
@@ -126,3 +133,66 @@ static void uart_interrupt_handler(void *pvParameters) {
         }
     }
 }
+
+
+
+class UartHandler
+{
+private:
+  int tx_pin;
+  int rx_pin;
+  int baud_rate;
+  uart_port_t current_uart_num = UART_NUM_1;
+  uint32_t stack_dept = 4096;
+
+public:
+  struct UartHandlerEventKey
+  {
+    char* key_v;
+    uart_event_t event;
+  };
+  StaticHashMap<UartHandlerEventKey, foundation::Delegate<const std::string&>, 32> map;
+
+  explicit UartHandler()
+  {
+
+  };
+
+  bool init() const
+  {
+    uart_mutex = xSemaphoreCreateMutex();
+    uart_driver_install(current_uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 20, &uart_queue, 0);
+    uart_param_config(current_uart_num, &uart_config);
+    uart_set_pin(current_uart_num, this->tx_pin, this->rx_pin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    uart_enable_rx_intr(current_uart_num);
+    xTaskCreate(uart_interrupt_handler, "uart_event_task", stack_dept, nullptr, 12, nullptr);
+    return true;
+  }
+
+  void add_event_listener(const UartHandlerEventKey key, foundation::Delegate<const std::string&> callback)
+  {
+
+    this->map.put(key, callback);
+  }
+
+  int send(const char* text, size_t len)
+  {
+    uart_write_bytes(this->current_uart_num, text, strlen(text));
+    return 1;
+  };
+  int send(const std::string& text)
+  {
+    uart_write_bytes(this->current_uart_num, text.c_str(), strlen(text.c_str()));
+    return 1;
+  };
+
+  void remove_event_listener()
+  {
+
+  }
+
+  void enable_rx(bool value)
+  {
+
+  }
+};

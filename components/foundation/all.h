@@ -38,10 +38,12 @@
 #include "core/keyboard_manager/keyboard_manager.h"
 
 #include "core/navigation/stack_navigator/stack_navigator.h"
+#include "core/navigation/stack_navigator/navigation_screen.h"
 
 #include "core/styling/styling.h"
 
 #include "core/style_store/style_store.h"
 #include "components/props.h"
+#include "core/structures/delegate.h"
 
 #endif //ALL_H
