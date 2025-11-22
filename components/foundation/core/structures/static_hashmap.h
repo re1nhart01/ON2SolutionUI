@@ -54,17 +54,17 @@ class StaticHashMap
     return nullptr;
   }
 
-  Value& get(const Key& key, foundation::Delegate<std::string>)
-  {
-    const size_t hash = hasher(key);
-    for (size_t i = 0; i < N; i++)
-      {
-        size_t pos = (hash + i) % N;
-        if (data[pos].created && data[pos].key == key)
-          {
-            return data[pos].value;
-          }
-      }
-    return nullptr;
-  }
+  // Value& get(const Key& key, foundation::Delegate<std::string>)
+  // {
+  //   const size_t hash = hasher(key);
+  //   for (size_t i = 0; i < N; i++)
+  //     {
+  //       size_t pos = (hash + i) % N;
+  //       if (data[pos].created && data[pos].key == key)
+  //         {
+  //           return data[pos].value;
+  //         }
+  //     }
+  //   return nullptr;
+  // }
 };

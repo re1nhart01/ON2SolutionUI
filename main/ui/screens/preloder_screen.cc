@@ -10,18 +10,16 @@ struct PreloaderScreenProps final
 
 int i = 0;
 
-class PreloaderScreen final : public Component<PreloaderScreenProps>, NavigationScreen {
+class PreloaderScreen final : public NavigationScreen<PreloaderScreenProps> {
 private:
   PreloaderScreenProps props;
   std::shared_ptr<Ref<Text>> label_ref = std::make_shared<Ref<Text>>("label");
 public:
-  explicit PreloaderScreen(StackNavigator* stack, const PreloaderScreenProps &props) : Component(nullptr, nullptr, props), NavigationScreen(stack) {
+  explicit PreloaderScreen(StackNavigator* stack, const PreloaderScreenProps &props) : NavigationScreen(stack, props) {
     this->props = props;
   }
 
-  ~PreloaderScreen() override {
-    Component::~Component();
-  };
+  ~PreloaderScreen() override = default;
 
   void component_did_mount() override
   {

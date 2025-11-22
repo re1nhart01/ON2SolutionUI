@@ -1,13 +1,11 @@
 //
 // Created by evgeniy on 11/13/25.
 //
+#pragma once
 
-#ifndef FRAGMENT_H
-#define FRAGMENT_H
 #include "core/styling/styling.h"
 #include "fragment_props.h"
 
-#endif //FRAGMENT_H
 
 
 

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "components/component.h"
-#include "navigation_screen.h"
+#include "navigation_screen_base.h"
 
 #include <stack>
 #include <string>
+#include <unordered_map>
 
 namespace foundation
 {
@@ -30,90 +31,69 @@ namespace foundation
     int id_counter = 0;
 
   public:
-    explicit StackNavigator(const StackNavigatorConfig &config,
-                            lv_obj_t *parent)
-        : current_screen(), parent(parent), config(config)
-    {}
+    explicit StackNavigator(const StackNavigatorConfig &config, lv_obj_t *parent) : current_screen(), parent(parent), config(config) {}
 
     void registerScreen(const std::string& name, VNode* component) {
       screens[name] = component;
-
-      current_screen = StackCurrentScreen{
-        .id = id_counter++,
-        .name = name,
-        .screen = component
-    };
     }
 
     void navigate(const std::string& name) {
-      auto* prev = current_screen.screen;
+      VNode* prev = current_screen.screen;
 
-      if (auto s = dynamic_cast<NavigationScreen*>(prev)) {
+      if (auto* s = dynamic_cast<NavigationScreenBase*>(prev)) {
           s->on_blur();
       }
 
       auto it = screens.find(name);
-      if (it != screens.end()) {
-          VNode* screen = it->second;
+      if (it == screens.end()) return;
 
-          lv_obj_t* active = parent ? parent : lv_scr_act();
-          lv_obj_clean(active);
+      VNode* screen = it->second;
 
-          screen->set_parent(active);
-          screen->set_component(screen->render());
+      lv_obj_t* active = parent ? parent : lv_scr_act();
+      lv_obj_clean(active);
 
-          current_screen = StackCurrentScreen{
-            .id = id_counter++,
-            .name = name,
-            .screen = screen
-        };
+      screen->set_parent(active);
+      screen->set_component(screen->render());
 
-          if (auto s = dynamic_cast<NavigationScreen*>(screen)) {
-              s->on_focus();
-          }
+      if (prev != nullptr) {
+        stack.push(current_screen);
+      }
 
-          stack.push(current_screen);
+      current_screen = {
+        .id = id_counter++,
+        .name = name,
+        .screen = screen
+      };
+
+      if (auto* s = dynamic_cast<NavigationScreenBase*>(screen)) {
+          s->on_focus();
       }
     }
 
     void goBack() {
-      if (!stack.empty()) {
-          StackCurrentScreen previous = stack.top();
-          if (const auto s = dynamic_cast<NavigationScreen*>(previous.screen)) {
-              s->on_blur();
-          }
-          this->pop();
-
-
-          this->current_screen = previous;
-
-          const auto screen = previous.screen;
-          lv_obj_t* active_screen = this->parent;
-          lv_obj_clean(active_screen);
-
-          screen->set_parent(active_screen);
-
-          lv_obj_t* obj = screen->render();
-          screen->set_component(obj);
-
-          if (const auto s = dynamic_cast<NavigationScreen*>(previous.screen)) {
-              s->on_focus();
-          }
-          // screen->on_mount();
-      } else {
-          ESP_LOGI("NO SCREENS IN STACK NAVIGATION", "");
+      if (stack.empty()) {
+        ESP_LOGI("navigation", "Stack empty");
+        return;
       }
-    }
 
-    StackCurrentScreen pop() {
-      auto current = this->stack.top();
-      this->stack.pop();
-      return current;
-    }
+      if (auto* s = dynamic_cast<NavigationScreenBase*>(current_screen.screen)) {
+        s->on_blur();
+      }
 
-    StackCurrentScreen push(const StackCurrentScreen& current) {
-      this->stack.push(current);
-      return current;
+      StackCurrentScreen previous = stack.top();
+      stack.pop();
+      current_screen = previous;
+
+      VNode* screen = previous.screen;
+
+      lv_obj_clean(parent);
+      screen->set_parent(parent);
+      screen->set_component(screen->render());
+
+      // focus previous
+      if (auto* s = dynamic_cast<NavigationScreenBase*>(screen)) {
+        s->on_focus();
+      }
     }
 
     VNode* getCurrentComponent() const {
@@ -128,5 +108,4 @@ namespace foundation
       return current_screen.name;
     }
   };
-
 }

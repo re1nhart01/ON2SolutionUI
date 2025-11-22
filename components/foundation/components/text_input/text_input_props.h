@@ -12,7 +12,7 @@ namespace foundation
     std::function<void(std::string value)> on_submit = nullptr;
     bool is_secure = false;
     bool is_one_line = false;
-    char* text = '';
+    char* text = {};
     short secure_timeout = 1500;
     short length = 500;
 

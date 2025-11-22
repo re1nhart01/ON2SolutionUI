@@ -9,29 +9,32 @@
 #include "components/text/text_props.h"
 #include "components/view/view.h"
 #include "components/view/view_props.h"
+#include "protocols/uart/uart_proto.h"
 #include "ui/localization.hh"
 #include "ui/styles/main_screen_styles.cc"
-#include "protocols/uart/uart_proto.h"
 
+struct PinCodeScreenProps;
 using namespace foundation;
 
 class MainScreen;
 struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen> {};
 
-class MainScreen final : public Component<MainScreenProps>, public NavigationScreen {
+class MainScreen final : public NavigationScreen<MainScreenProps> {
   MainScreenProps props;
   StyleStorage* styles;
 public:
-  ~MainScreen() override {
-    delete this->styles;
-  };
-
-  explicit MainScreen(StackNavigator* stack, const MainScreenProps &props) : Component(nullptr, nullptr, props), NavigationScreen(stack) {
+  explicit MainScreen(StackNavigator* stack, const MainScreenProps &props) : NavigationScreen(stack, props) {
     this->props = props;
     this->styles = new StyleStorage();
 
     style_main_screen_register(*this->styles);
   }
+
+  ~MainScreen() override {
+    NavigationScreen::~NavigationScreen();
+
+    delete this->styles;
+  };
 
   void on_focus() override
   {

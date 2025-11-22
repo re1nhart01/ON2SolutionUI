@@ -9,14 +9,12 @@ using namespace foundation;
 class PinCodeScreen;
 struct PinCodeScreenProps final : BaseProps<PinCodeScreenProps, PinCodeScreen>{};
 
-class PinCodeScreen : public Component<PinCodeScreenProps>, NavigationScreen
+class PinCodeScreen : public NavigationScreen<PinCodeScreenProps>
 {
   PinCodeScreenProps props;
 
 public:
-  explicit PinCodeScreen(StackNavigator* stack,
-                      const PinCodeScreenProps &props)
-      : Component(nullptr, nullptr, props), NavigationScreen(stack)
+  explicit PinCodeScreen(StackNavigator* stack, const PinCodeScreenProps &props) : NavigationScreen(stack, props)
   {
     this->props = props;
   }

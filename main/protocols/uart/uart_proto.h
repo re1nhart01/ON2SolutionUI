@@ -73,7 +73,7 @@ private:
   QueueHandle_t uart_queue = nullptr;
   int tx_pin;
   int rx_pin;
-  int baud_rate;
+  int baud_rate = 9600;
   uart_port_t current_uart_num = UART_NUM_1;
   uint32_t stack_dept = 4096;
   size_t size = 0;
@@ -90,7 +90,7 @@ private:
 
 public:
   explicit UartHandler(const uart_port_t uart_num, const int tx_pin,
-    const int rx_pin, const int baud_rate = 9600,
+    const int rx_pin, const int baud_rate,
     const uint32_t stack_dept)
   {
     this->current_uart_num = uart_num;

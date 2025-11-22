@@ -9,28 +9,27 @@ extern "C" {
 using namespace foundation;
 
 struct SettingsScreenProps final
-    : BaseProps<SettingsScreenProps, SettingsScreen> {};
+    : BaseProps<SettingsScreenProps, SettingsScreen>
+{};
 
-std::unique_ptr<KeyboardManager> admin_keyboard = std::make_unique<KeyboardManager>();
-std::shared_ptr<Styling> imageStyle = std::make_shared<Styling>();
+auto admin_keyboard
+  = std::make_unique<KeyboardManager>();
+auto imageStyle = std::make_shared<Styling>();
 
-class SettingsScreen : public Component<SettingsScreenProps>, NavigationScreen
+class SettingsScreen final : public NavigationScreen<SettingsScreenProps>
 {
   SettingsScreenProps props;
 
 public:
-  explicit SettingsScreen(StackNavigator* stack,
-                       const SettingsScreenProps &props)
-      : Component(nullptr, nullptr, props), NavigationScreen(stack)
+  explicit SettingsScreen(StackNavigator* stack, const SettingsScreenProps &props) : NavigationScreen(stack, props)
   {
     this->props = props;
   }
 
-  ~SettingsScreen() override {
-    Component::~Component();
-  };
+  ~SettingsScreen() override = default;
 
   void component_did_mount() override {
+    NavigationScreen::component_did_mount();
   };
 
 

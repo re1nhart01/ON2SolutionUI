@@ -9,16 +9,15 @@ namespace foundation {
     Props props;
 
     Component() : VNode() {}
+    ~Component() override = default;
 
-    explicit Component(Props props)
-      : VNode(nullptr, nullptr), props(std::move(props))
+    explicit Component(Props props) : VNode(nullptr, nullptr), props(std::move(props))
     {
       // if (this->props.ref != nullptr)
       //   this->props.ref->set(this);
     }
 
-    Component(lv_obj_t* obj, lv_obj_t* parent, Props props)
-      : VNode(obj, parent), props(std::move(props))
+    Component(lv_obj_t* obj, lv_obj_t* parent, Props props) : VNode(obj, parent), props(std::move(props))
     {
       // if (this->props.ref != nullptr)
         // this->props.ref->set(this);

@@ -1,46 +1,24 @@
-//
-// Created by evgeniy on 11/19/25.
-//
 #pragma once
+
+#include "navigation_screen_base.h"
+#include "components/component.h"
 
 namespace foundation
 {
   class StackNavigator;
-  class NavigationScreen
+
+  template<typename Props>
+  class NavigationScreen 
+      : public Component<Props>, 
+        public NavigationScreenBase
   {
   public:
-    virtual ~NavigationScreen() = default;
-    StackNavigator* navigation_ref = nullptr;
+    ~NavigationScreen() override = default;
 
-    explicit NavigationScreen(StackNavigator* navigation_ref)
+    explicit NavigationScreen(StackNavigator* navigator, Props props)
+      : Component<Props>(props)
     {
-      this->navigation_ref = navigation_ref;
-    }
-
-    bool is_focused = false;
-
-    virtual void on_focus()
-    {
-      is_focused = true;
-      ESP_LOGI("navigation", "Focused");
-    }
-
-    virtual void on_blur()
-    {
-      is_focused = false;
-      ESP_LOGI("navigation", "Focused");
-    }
-
-    bool get_is_focused() const {
-      return is_focused;
-    }
-
-    void set_focused(const bool focused) {
-      is_focused = focused;
-    }
-
-    StackNavigator* get_navigation_ref() const {
-      return navigation_ref;
+      this->navigation_ref = navigator;
     }
   };
 }

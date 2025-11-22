@@ -31,6 +31,7 @@
 #include "core/keyboard_manager/keyboard_manager.h"
 
 #include "core/navigation/stack_navigator/stack_navigator.h"
+#include "core/navigation/stack_navigator/navigation_screen_base.h"
 
 #include "core/styling/styling.h"
 
