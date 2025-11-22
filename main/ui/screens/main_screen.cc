@@ -11,12 +11,12 @@
 #include "components/view/view_props.h"
 #include "ui/localization.hh"
 #include "ui/styles/main_screen_styles.cc"
-#include "protocols/uart/uart.h"
+#include "protocols/uart/uart_proto.h"
 
 using namespace foundation;
 
 class MainScreen;
-struct MainScreenProps : BaseProps<MainScreenProps, MainScreen> {};
+struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen> {};
 
 class MainScreen final : public Component<MainScreenProps>, public NavigationScreen {
   MainScreenProps props;
@@ -26,7 +26,7 @@ public:
     delete this->styles;
   };
 
-  explicit MainScreen(const std::shared_ptr<StackNavigator>& stack, const MainScreenProps &props) : Component(nullptr, nullptr, props), NavigationScreen(stack) {
+  explicit MainScreen(StackNavigator* stack, const MainScreenProps &props) : Component(nullptr, nullptr, props), NavigationScreen(stack) {
     this->props = props;
     this->styles = new StyleStorage();
 
@@ -40,7 +40,7 @@ public:
 
   void on_blur() override
   {
-    NavigationScreen::on_focus();
+    NavigationScreen::on_blur();
   };
 
     std::shared_ptr<View> render_header() const {

@@ -7,20 +7,18 @@
 using namespace foundation;
 
 class PinCodeScreen;
-struct PinCodeScreenProps : BaseProps<PinCodeScreenProps, PinCodeScreen>{};
+struct PinCodeScreenProps final : BaseProps<PinCodeScreenProps, PinCodeScreen>{};
 
-class PinCodeScreen : public Component<PinCodeScreenProps>
+class PinCodeScreen : public Component<PinCodeScreenProps>, NavigationScreen
 {
   PinCodeScreenProps props;
-  std::shared_ptr<StackNavigator> navigator;
 
 public:
-  explicit PinCodeScreen(std::shared_ptr<StackNavigator> stack,
+  explicit PinCodeScreen(StackNavigator* stack,
                       const PinCodeScreenProps &props)
-      : Component(nullptr, nullptr, props)
+      : Component(nullptr, nullptr, props), NavigationScreen(stack)
   {
     this->props = props;
-    this->navigator = std::move(stack);
   }
 
   ~PinCodeScreen() override = default;

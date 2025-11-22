@@ -22,7 +22,7 @@ extern "C" {
   #include "sdkconfig.h"
 }
 
-static const char *TAG = "example";
+static auto TAG = "example";
 
 #define BUF_SIZE (1024)
 #define UART_EMPTY_THRESH_DEFAULT (10)
@@ -69,18 +69,26 @@ namespace UartTypes
 class UartHandler
 {
 private:
-  SemaphoreHandle_t uart_mutex;
+  SemaphoreHandle_t uart_mutex = nullptr;
   QueueHandle_t uart_queue = nullptr;
   int tx_pin;
   int rx_pin;
   int baud_rate;
   uart_port_t current_uart_num = UART_NUM_1;
   uint32_t stack_dept = 4096;
+  size_t size = 0;
+  std::array<UartTypes::UartHandlerEvent, 32> list{};
+
+  bool push_array(const UartTypes::UartHandlerEvent& value)
+  {
+    if (size < list.size()) {
+        list[size++] = value;
+        return true;
+    }
+    return false;
+  }
 
 public:
-  std::array<UartTypes::UartHandlerEvent, 32> list{};
-  size_t size = 0;
-
   explicit UartHandler(const uart_port_t uart_num, const int tx_pin,
     const int rx_pin, const int baud_rate = 9600,
     const uint32_t stack_dept)
@@ -91,15 +99,6 @@ public:
     this->baud_rate = baud_rate;
     this->stack_dept = stack_dept;
   };
-
-  bool push_array(const UartTypes::UartHandlerEvent& value)
-  {
-    if (size < list.size()) {
-        list[size++] = value;
-        return true;
-    }
-    return false;
-  }
 
   bool init()
   {
@@ -113,8 +112,10 @@ public:
   }
 
   static void uart_interrupt_handler_trampoline(void *pvParameters) {
-    UartHandler* self = static_cast<UartHandler*>(pvParameters);
-    self->uart_interrupt_handler(pvParameters);
+    if (auto self = static_cast<UartHandler *>(pvParameters); self != nullptr)
+    {
+      self->uart_interrupt_handler();
+    }
   }
 
   void add_event_listener(const UartTypes::UartHandlerEvent &event)
@@ -134,6 +135,7 @@ public:
     xSemaphoreGive(uart_mutex);
     return length;
   };
+
   int send(const std::string& text) const
   {
     xSemaphoreTake(uart_mutex, portMAX_DELAY);
@@ -191,7 +193,7 @@ public:
     }
   }
 
-  void uart_interrupt_handler(void *pvParameters)
+  void uart_interrupt_handler()
   {
     uart_event_t event;
     uint8_t buff[BUF_SIZE];

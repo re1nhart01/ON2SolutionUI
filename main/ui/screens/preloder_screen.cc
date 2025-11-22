@@ -5,19 +5,18 @@
 class PreloaderScreen;
 using namespace foundation;
 
-struct PreloaderScreenProps : BaseProps<PreloaderScreenProps, PreloaderScreen> {};
+struct PreloaderScreenProps final
+    : BaseProps<PreloaderScreenProps, PreloaderScreen> {};
 
 int i = 0;
 
-class PreloaderScreen final : public Component<PreloaderScreenProps> {
+class PreloaderScreen final : public Component<PreloaderScreenProps>, NavigationScreen {
 private:
   PreloaderScreenProps props;
-  std::shared_ptr<StackNavigator> navigator;
   std::shared_ptr<Ref<Text>> label_ref = std::make_shared<Ref<Text>>("label");
 public:
-  explicit PreloaderScreen(std::shared_ptr<StackNavigator> stack, const PreloaderScreenProps &props) : Component(nullptr, nullptr, props) {
+  explicit PreloaderScreen(StackNavigator* stack, const PreloaderScreenProps &props) : Component(nullptr, nullptr, props), NavigationScreen(stack) {
     this->props = props;
-    this->navigator = std::move(stack);
   }
 
   ~PreloaderScreen() override {
@@ -31,7 +30,7 @@ public:
 
 
   lv_obj_t* render() override {
-    auto navigator_ref = this->navigator;
+    auto navigator_ref = this->navigation_ref;
 
     return this->delegate(
         $View(
