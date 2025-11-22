@@ -4,3 +4,4 @@
 
 
 #include "localization.hh"
+#include "protocols/uart/uart_proto.h"
