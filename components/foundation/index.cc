@@ -7,6 +7,9 @@
 #include "components/text/text.h"
 #include "components/text/text_props.h"
 
+#include "components/activity_indicator/activity_indicator.h"
+#include "components/activity_indicator/activity_indicator_props.h"
+
 #include "components/text_input/text_input.h"
 #include "components/text_input/text_input_props.h"
 

@@ -9,13 +9,15 @@ struct PreloaderScreenProps final
     : BaseProps<PreloaderScreenProps, PreloaderScreen> {};
 
 int i = 0;
+bool flag = false;
 
 class PreloaderScreen final : public NavigationScreen<PreloaderScreenProps> {
 private:
   PreloaderScreenProps props;
   std::shared_ptr<Ref<Text>> label_ref = std::make_shared<Ref<Text>>("label");
+  std::shared_ptr<Ref<View>> view_ref = std::make_shared<Ref<View>>("zxc");
 public:
-  explicit PreloaderScreen(StackNavigator* stack, const PreloaderScreenProps &props) : NavigationScreen(stack, props) {
+  explicit PreloaderScreen(const std::shared_ptr<StackNavigator> &stack, const PreloaderScreenProps &props) : NavigationScreen(stack, props) {
     this->props = props;
   }
 
@@ -35,6 +37,7 @@ public:
             ViewProps::up()
                 .set_style(this->styling())
                 .set_children(Children{
+                    $View(ViewProps::up().w(600).h(240).set_ref(this->view_ref).set_children(Children{})),
 
                     $Text(
                         TextProps::up()
@@ -46,10 +49,36 @@ public:
                         ButtonProps::up()
                             .label("mmm")
                             .click([this](lv_event_t* e) {
-                                auto component = this->label_ref->get();
-                                component->set_state([component](TextProps& props) {
+                              auto component_f = this->label_ref->get();
+                                auto component_g = this->view_ref->get();
+
+                                component_f->set_state([component_f](TextProps& props) {
+                                  auto tex = props.text.c_str();
+
+                                    ESP_LOGI("problem", "%s", tex);
                                     props.text = "count: " + std::to_string(i++);
                                 });
+
+                              component_g->set_state([](ViewProps& p, VNode* v) {
+                                  const auto self = dynamic_cast<View*>(v);
+
+                                  if (flag)
+                                  {
+                                    p.children.push_back($Text(TextProps::up().value(std::format("Hello", i))));
+                                  }
+                                  else
+                                  {
+                                      if (!p.children.empty()) {
+                                          p.children.pop_back();
+                                      }
+                                  }
+
+                                  flag = !flag;
+
+                                  self->refresh_childrens();
+                                });
+
+
                             })
                     )
 

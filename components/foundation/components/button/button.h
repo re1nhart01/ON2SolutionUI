@@ -67,7 +67,8 @@ namespace foundation
       lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
       lv_obj_set_flex_align(obj, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER,
                             LV_FLEX_ALIGN_CENTER);
-
+      
+      this->set_active(this->props.is_visible);
       if (label != nullptr)
         {
           lv_label_set_text(label, props.text.c_str());

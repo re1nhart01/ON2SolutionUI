@@ -13,32 +13,43 @@ using namespace foundation;
 auto screen = lv_scr_act();
 
 class WaveApplication final : public Application {
-  StackNavigator stack_navigator;
+  std::shared_ptr<StackNavigator> stack_navigator;
 
-  MainScreen main_screen;
-  SettingsScreen settings_screen;
-  PinCodeScreen pincode_screen;
-  PreloaderScreen preloader_screen;
+  std::shared_ptr<MainScreen> main_screen;
+  std::shared_ptr<SettingsScreen> settings_screen;
+  std::shared_ptr<PinCodeScreen> pincode_screen;
+ std::shared_ptr<PreloaderScreen> preloader_screen;
 
 public:
   explicit WaveApplication(lv_obj_t *screen)
-      : Application(screen),
-        stack_navigator(StackNavigatorConfig{.initial_route = "/main"}, screen),
-        main_screen(&stack_navigator, MainScreenProps{}),
-        settings_screen(&stack_navigator, SettingsScreenProps{}),
-        pincode_screen(&stack_navigator, PinCodeScreenProps{}),
-        preloader_screen(&stack_navigator, PreloaderScreenProps{})
-  {}
+      : Application(screen)
+  {
+
+    this->stack_navigator = std::make_shared<
+  StackNavigator>(StackNavigatorConfig{.initial_route = "/main"}, screen);
+
+    this->main_screen = std::make_shared<MainScreen>(
+        stack_navigator, MainScreenProps{});
+    this->settings_screen = std::make_shared<SettingsScreen>(
+        stack_navigator, SettingsScreenProps{});
+    this->pincode_screen = std::make_shared<PinCodeScreen>(
+        stack_navigator, PinCodeScreenProps{});
+    this->preloader_screen = std::make_shared<PreloaderScreen>(
+        stack_navigator, PreloaderScreenProps{});
+
+  }
 
   VNode *root_component() override {
-    return stack_navigator.getCurrentComponent();
+    auto root = stack_navigator->getCurrentComponent().get();
+    return root;
   }
 
   void before_load_application() override {
-    stack_navigator.registerScreen("/preloader", &preloader_screen);
-    stack_navigator.registerScreen("/main", &main_screen);
-    stack_navigator.registerScreen("/pin_code", &pincode_screen);
-    stack_navigator.registerScreen("/settings", &settings_screen);
+    stack_navigator->registerScreen("/main", main_screen);
+    stack_navigator->registerScreen("/pin_code", pincode_screen);
+    stack_navigator->registerScreen("/settings", settings_screen);
+    stack_navigator->registerScreen("/preloader", preloader_screen);
+
   }
 
   void after_load_application() override {

@@ -2,31 +2,27 @@
 #include "vnode.h"
 
 namespace foundation {
-
   template<typename Props>
   class Component : public VNode {
   public:
     Props props;
 
-    Component() : VNode() {}
-    ~Component() override = default;
+    explicit Component(const Props& props) : VNode(nullptr, nullptr), props(props) {}
 
-    explicit Component(Props props) : VNode(nullptr, nullptr), props(std::move(props))
-    {
-      // if (this->props.ref != nullptr)
-      //   this->props.ref->set(this);
-    }
+    explicit Component(lv_obj_t* obj, lv_obj_t* parent, const Props& props) : VNode(obj, parent), props(props) {}
 
-    Component(lv_obj_t* obj, lv_obj_t* parent, Props props) : VNode(obj, parent), props(std::move(props))
-    {
-      // if (this->props.ref != nullptr)
-        // this->props.ref->set(this);
-    }
-
-    // setState() with props mutation
     template<typename Fn>
     void set_state(Fn&& fn) {
-      fn(this->props);
+      if constexpr (std::is_invocable_v<Fn, Props&>) {
+          fn(this->props);
+
+      } else if constexpr (std::is_invocable_v<Fn, Props&, Component*>) {
+          fn(this->props, this);
+
+      } else {
+          static_assert(false, "Invalid set_state callback signature");
+      }
+
       this->forceUpdate();
     }
   };

@@ -14,7 +14,7 @@ class PinCodeScreen : public NavigationScreen<PinCodeScreenProps>
   PinCodeScreenProps props;
 
 public:
-  explicit PinCodeScreen(StackNavigator* stack, const PinCodeScreenProps &props) : NavigationScreen(stack, props)
+  explicit PinCodeScreen(const std::shared_ptr<StackNavigator> &stack, const PinCodeScreenProps &props) : NavigationScreen(stack, props)
   {
     this->props = props;
   }

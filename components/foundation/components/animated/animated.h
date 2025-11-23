@@ -8,11 +8,10 @@ namespace foundation
   private:
     std::unique_ptr<lv_anim_t> reference;
     Component* component;
-    using Component::props;
     AnimatedSubConfig* sub_config;
 
   public:
-    explicit Animated(Component* component, AnimatedProps props, AnimatedSubConfig* sub_config)
+    explicit Animated(Component *component, AnimatedProps props, AnimatedSubConfig *sub_config) : Component(props)
     {
       this->props = std::move(props);
       this->sub_config = sub_config;

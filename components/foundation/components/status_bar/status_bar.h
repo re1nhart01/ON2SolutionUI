@@ -20,7 +20,6 @@ namespace foundation
 
     lv_obj_t * render() override
     {
-
       std::shared_ptr<Styling> styleV = this->styling();
 
       this->label = std::make_shared<Text>(TextProps::up().value("00:00"));

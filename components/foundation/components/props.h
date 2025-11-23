@@ -11,7 +11,9 @@ namespace foundation
   struct BaseProps
   {
     std::shared_ptr<Ref<RefT>> ref = nullptr;
-    std::shared_ptr<Styling> style;
+    std::shared_ptr<Styling> style = nullptr;
+
+    bool is_visible = true;
 
     virtual ~BaseProps() = default;
 
@@ -22,6 +24,12 @@ namespace foundation
 
     Derived& set_ref(const std::shared_ptr<Ref<RefT>>& r) {
       ref = r;
+      return static_cast<Derived&>(*this);
+    }
+
+    Derived* set_visible(const bool value)
+    {
+      this->is_visible = value;
       return static_cast<Derived&>(*this);
     }
 

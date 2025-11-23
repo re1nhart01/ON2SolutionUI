@@ -19,11 +19,11 @@ namespace foundation {
     virtual ~VNode() { VNode::component_will_unmount(); }
 
     VNode() {
-      this->style = std::make_shared<Styling>();
+      this->style = nullptr;
     }
 
     VNode(lv_obj_t* obj, lv_obj_t* parent) : component(obj), parent(parent) {
-      this->style = std::make_shared<Styling>();
+      this->style = nullptr;
     }
 
     virtual void component_did_mount()    { ESP_LOGI("VNode", "componentDidMount"); }
@@ -60,7 +60,8 @@ namespace foundation {
     }
 
     void forceUpdate() {
-      if (component) {
+        ESP_LOGI("problem", "%s", this->get_component() == nullptr ? "null" : "not null");
+      if (this->get_component() != nullptr) {
         lv_obj_invalidate(component);
         rebuild();
       }
@@ -68,8 +69,11 @@ namespace foundation {
     }
 
     void rebuild() {
-      if (component && style)
+      auto obj = this->get_component();
+      if (obj != nullptr)
+      {
         do_rebuild();
+      }
     }
 
     void UNSAFE_repainting() {

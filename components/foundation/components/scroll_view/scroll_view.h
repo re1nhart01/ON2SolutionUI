@@ -34,15 +34,7 @@ namespace foundation
       }
       lv_obj_t* comp = get_component();
 
-      lv_obj_set_layout(comp, LV_LAYOUT_FLEX);
-      lv_obj_set_size(comp, props.width, props.height);
-      lv_obj_set_flex_flow(comp, props.flex_direction);
-      lv_obj_set_flex_align(comp, props.justify_content, props.align_items, props.track_cross_place);
-
-      lv_obj_set_scroll_dir(comp, props.horizontal ? LV_DIR_HOR : LV_DIR_VER);
-      lv_obj_set_scrollbar_mode(comp, props.disabled ? LV_SCROLLBAR_MODE_OFF : LV_SCROLLBAR_MODE_ACTIVE);
-
-      std::shared_ptr<Styling> style = this->styling();
+      this->do_rebuild();
 
       for (const auto& child : this->children) {
           if (child != nullptr) {
@@ -53,11 +45,34 @@ namespace foundation
           }
       }
 
-      if (style != nullptr) {
-          lv_obj_add_style(this->get_component(), style->getStyle(), LV_PART_MAIN);
-      }
+
 
       return comp;
+    };
+
+
+    void do_rebuild() override
+    {
+      lv_obj_t* obj = this->get_component();
+      if (!obj) return;
+
+      this->set_active(this->props.is_visible);
+
+      lv_obj_set_layout(obj, LV_LAYOUT_FLEX);
+      lv_obj_set_size(obj, props.width, props.height);
+      lv_obj_set_flex_flow(obj, props.flex_direction);
+      lv_obj_set_flex_align(obj, props.justify_content, props.align_items, props.track_cross_place);
+
+      lv_obj_set_scroll_dir(obj, props.horizontal ? LV_DIR_HOR : LV_DIR_VER);
+      lv_obj_set_scrollbar_mode(obj, props.disabled ? LV_SCROLLBAR_MODE_OFF : LV_SCROLLBAR_MODE_ACTIVE);
+
+      if (std::shared_ptr<Styling> style = this->styling(); style != nullptr) {
+          style->applyTo(this->get_component());
+      }
+
+      for (const auto &child : children) {
+          child->do_rebuild();
+      }
     };
 
     std::shared_ptr<Styling> styling() override

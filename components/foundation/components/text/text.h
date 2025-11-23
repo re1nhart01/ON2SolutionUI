@@ -5,11 +5,7 @@ namespace foundation
 {
   class Text final : public Component<TextProps> {
   public:
-    using Component::props;
-
-    explicit Text(TextProps  props) : Component(nullptr, nullptr, std::move(props)) {
-      this->parent = nullptr;
-
+    explicit Text(const TextProps& props) : Component(props) {
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }
@@ -42,10 +38,13 @@ namespace foundation
 
     void do_rebuild() override
     {
-      const auto instance = this->get_component();
-      if (instance == nullptr) return;
-      lv_obj_update_layout(instance);
-      lv_label_set_text(instance, this->props.text.c_str());
+      lv_obj_t* obj = this->get_component();
+      if (!obj) return;
+
+      this->set_active(this->props.is_visible);
+
+      lv_obj_update_layout(obj);
+      lv_label_set_text(obj, this->props.text.c_str());
     };
 
     std::shared_ptr<Styling> styling() override

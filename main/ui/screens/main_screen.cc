@@ -23,7 +23,7 @@ class MainScreen final : public NavigationScreen<MainScreenProps> {
   MainScreenProps props;
   StyleStorage* styles;
 public:
-  explicit MainScreen(StackNavigator* stack, const MainScreenProps &props) : NavigationScreen(stack, props) {
+  explicit MainScreen(const std::shared_ptr<StackNavigator> &stack, const MainScreenProps &props) : NavigationScreen(stack, props) {
     this->props = props;
     this->styles = new StyleStorage();
 
@@ -121,7 +121,6 @@ public:
   }
 
   std::shared_ptr<View> render_body() const {
-
     auto make_circle = [&]() {
         return $Circular(
             CircularProgressProps::up()

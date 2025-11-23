@@ -21,7 +21,7 @@ class SettingsScreen final : public NavigationScreen<SettingsScreenProps>
   SettingsScreenProps props;
 
 public:
-  explicit SettingsScreen(StackNavigator* stack, const SettingsScreenProps &props) : NavigationScreen(stack, props)
+  explicit SettingsScreen(const std::shared_ptr<StackNavigator> &stack, const SettingsScreenProps &props) : NavigationScreen(stack, props)
   {
     this->props = props;
   }
