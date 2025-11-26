@@ -42,7 +42,7 @@ public:
       return std::make_shared<PreloaderScreen>(navigator, PreloaderScreenProps{});
     });
 
-    navigator->register_screen("/preloader", [navigator]() {
+    navigator->register_screen("/settings", [navigator]() {
       return std::make_shared<SettingsScreen>(navigator, SettingsScreenProps{});
     });
 

@@ -49,7 +49,7 @@ public:
   void on_focus() override
   {
     NavigationScreen::on_focus();
-    this->uart_handler = new UartHandler(UART_NUM_1, GPIO_NUM_18, GPIO_NUM_17, 9600, 16384);
+    this->uart_handler = new UartHandler(UART_NUM_1, GPIO_NUM_6, GPIO_NUM_7, 9600, 16384);
     ESP_LOGI("main_screen", "on_FOCUS");
       this->uart_handler->init();
       this->uart_handler->enable_rx(true);

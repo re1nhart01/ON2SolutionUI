@@ -1,14 +1,15 @@
 #pragma once
 
 #include "components/component.h"
+#include "core/structures/delegate.h"
 #include "navigation_screen_base.h"
 
-#include <memory>
-#include <stack>
-#include <optional>
 #include <functional>
-#include <unordered_map>
+#include <memory>
+#include <optional>
+#include <stack>
 #include <string>
+#include <unordered_map>
 
 namespace foundation {
 
@@ -22,7 +23,7 @@ struct StackNavigatorConfig {
     std::string initial_route;
 };
 
-using ScreenFactory = std::function<std::shared_ptr<VNode>()>;
+using ScreenFactory = Delegate<std::shared_ptr<VNode>()>;
 
 class StackNavigator : public std::enable_shared_from_this<StackNavigator> {
 private:
