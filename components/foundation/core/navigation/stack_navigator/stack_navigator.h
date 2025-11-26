@@ -1,6 +1,7 @@
 #pragma once
 
 #include "components/component.h"
+#include "navigation_screen_base.h"
 
 #include <memory>
 #include <stack>
@@ -33,7 +34,7 @@ namespace foundation
       this->parent = parent;
   };
 
-  void registerScreen(const std::string& name, const std::shared_ptr<VNode>& component) {
+  void register_screen(const std::string& name, const std::shared_ptr<VNode>& component) {
     screens[name] = component;
 
     current_screen = std::make_shared<StackCurrentScreen>(StackCurrentScreen{
@@ -44,33 +45,52 @@ namespace foundation
   }
 
   void start() {
-      if (screens.contains(config.initial_route)) {
-          navigate(config.initial_route);
-      } else {
-          // TODO: handle error case (optional)
-      }
+    const std::string initial = this->config.initial_route;
+    if (const auto it = screens.find(initial); it != screens.end())
+    {
+      const std::shared_ptr<VNode>& component =  it->second;
+      current_screen = std::make_shared<StackCurrentScreen>(StackCurrentScreen{
+        .id = id_counter++,
+        .name = initial,
+        .screen = component
+    });
+
+    if (auto* s = dynamic_cast<NavigationScreenBase*>(component.get()))
+    {
+      s->on_focus();
+    }
+  }
   }
 
   void navigate(const std::string& name) {
-      auto it = screens.find(name);
-      if (it != screens.end()) {
-          auto screen = it->second;
+    if (const auto it = screens.find(name); it != screens.end()) {
+        const auto screen = it->second;
           lv_obj_t* active_screen = this->parent != nullptr ? this->parent : lv_scr_act();
+
+        auto prev = this->current_screen->screen;
+
+        if (auto* s = dynamic_cast<NavigationScreenBase*>(prev.get()))
+        {
+          s->on_blur();
+        }
 
           lv_obj_clean(active_screen);
 
           screen->set_parent(active_screen);
 
+          current_screen = std::make_shared<StackCurrentScreen>(StackCurrentScreen{
+             .id = ++id_counter,
+             .name = name,
+             .screen = screen
+          });
+
           lv_obj_t* obj = screen->render();
           screen->set_component(obj);
 
-          // screen->component_did_mount();
-
-          current_screen = std::make_shared<StackCurrentScreen>(StackCurrentScreen{
-              .id = ++id_counter,
-              .name = name,
-              .screen = screen
-          });
+          if (auto* s = dynamic_cast<NavigationScreenBase*>(screen.get()))
+          {
+            s->on_focus();
+          }
 
           this->push(*current_screen);
       }
@@ -78,10 +98,14 @@ namespace foundation
 
   void goBack() {
       if (!stack.empty()) {
+          if (auto* s = dynamic_cast<NavigationScreenBase*>(current_screen->screen.get()))
+          {
+            s->on_blur();
+          }
+
           StackCurrentScreen previous = stack.top();
           this->pop();
 
-          this->current_screen = std::make_shared<StackCurrentScreen>(previous);
 
           auto screen = previous.screen;
           lv_obj_t* active_screen = this->parent;
@@ -91,6 +115,12 @@ namespace foundation
 
           lv_obj_t* obj = screen->render();
           screen->set_component(obj);
+
+          this->current_screen = std::make_shared<StackCurrentScreen>(previous);
+          if (auto* s = dynamic_cast<NavigationScreenBase*>(current_screen->screen.get()))
+          {
+            s->on_focus();
+          }
 
           // screen->on_mount();
       } else {

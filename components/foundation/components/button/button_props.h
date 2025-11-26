@@ -2,6 +2,7 @@
 #include "components/props.h"
 #include "components/vnode.h"
 #include "core/lv_event.h"
+#include "core/structures/delegate.h"
 #include "core/styling/styling.h"
 
 #include <functional>
@@ -15,12 +16,13 @@ namespace foundation
     std::shared_ptr<VNode> child = nullptr;
     std::string text;
 
-    std::function<void(lv_event_t *)> on_click = nullptr;
-    std::function<void(lv_event_t *)> on_long_press = nullptr;
-    std::function<void(lv_event_t *)> on_pressed = nullptr;
-    std::function<void(lv_event_t *)> on_released = nullptr;
-    std::function<void(lv_event_t *)> on_focused = nullptr;
-    std::function<void(lv_event_t *)> on_defocused = nullptr;
+
+    Delegate<void(lv_event_t *)> on_click{};
+    Delegate<void(lv_event_t *)> on_long_press{};
+    Delegate<void(lv_event_t *)> on_pressed{};
+    Delegate<void(lv_event_t *)> on_released{};
+    Delegate<void(lv_event_t *)> on_focused{};
+    Delegate<void(lv_event_t *)> on_defocused{};
 
     static ButtonProps up() { return ButtonProps{}; }
 

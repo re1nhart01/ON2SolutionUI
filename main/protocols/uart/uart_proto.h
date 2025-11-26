@@ -26,6 +26,8 @@ static auto TAG = "example";
 
 #define BUF_SIZE (1024)
 #define UART_EMPTY_THRESH_DEFAULT (10)
+static SemaphoreHandle_t uart_mutex;
+static QueueHandle_t uart_queue;
 
 extern "C" {
   inline uart_config_t uart_config = {
@@ -47,13 +49,13 @@ namespace UartTypes
 {
   struct UartData
   {
-    std::array<char, BUF_SIZE> data;
+    uint8_t data[BUF_SIZE];
     size_t len;
     bool flag;
   };
   struct UartCallbackResponse
   {
-    UartData data;
+    UartData response;
   };
 
   struct UartHandlerEvent
@@ -69,15 +71,15 @@ namespace UartTypes
 class UartHandler
 {
 private:
-  SemaphoreHandle_t uart_mutex = nullptr;
-  QueueHandle_t uart_queue = nullptr;
+
   int tx_pin;
   int rx_pin;
   int baud_rate = 9600;
-  uart_port_t current_uart_num = UART_NUM_1;
-  uint32_t stack_dept = 4096;
+  uart_port_t current_uart_num;
+  uint32_t stack_dept;
   size_t size = 0;
   std::array<UartTypes::UartHandlerEvent, 32> list{};
+  TaskHandle_t task_handle = nullptr;
 
   bool push_array(const UartTypes::UartHandlerEvent& value)
   {
@@ -107,18 +109,18 @@ public:
     uart_param_config(current_uart_num, &uart_config);
     uart_set_pin(current_uart_num, this->tx_pin, this->rx_pin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     uart_enable_rx_intr(current_uart_num);
-    xTaskCreate(uart_interrupt_handler_trampoline, "uart_event_task", stack_dept, this, 12, nullptr);
+    xTaskCreate(uart_interrupt_handler_trampoline, "uart_event_task", stack_dept, this, 12, &this->task_handle);
     return true;
   }
 
   static void uart_interrupt_handler_trampoline(void *pvParameters) {
-    if (auto self = static_cast<UartHandler *>(pvParameters); self != nullptr)
+    if (const auto self = static_cast<UartHandler *>(pvParameters); self != nullptr)
     {
       self->uart_interrupt_handler();
     }
   }
 
-  void add_event_listener(const UartTypes::UartHandlerEvent &event)
+  void add_event_listener(const UartTypes::UartHandlerEvent& event)
   {
     xSemaphoreTake(uart_mutex, portMAX_DELAY);
     push_array(event);
@@ -146,6 +148,19 @@ public:
     xSemaphoreGive(uart_mutex);
     return length;
   };
+
+  void remove_all_event_listeners()
+  {
+    this->list = {};
+    this->enable_rx(false);
+
+    if(task_handle) {
+        vTaskDelete(task_handle);
+        task_handle = nullptr;
+    }
+
+    uart_driver_delete(current_uart_num);
+  }
 
   void remove_event_listener(const char * key_v)
   {
@@ -196,37 +211,44 @@ public:
   void uart_interrupt_handler()
   {
     uart_event_t event;
-    uint8_t buff[BUF_SIZE];
-
     if (!uart_queue) {
         ESP_LOGE(TAG, "UART queue is NULL!");
         return;
     }
 
-    while (xQueueReceive(uart_queue, &event, portMAX_DELAY)) {
+    while (xQueueReceive(uart_queue, &event, pdMS_TO_TICKS(600))) {
         if (xSemaphoreTake(uart_mutex, portMAX_DELAY)) {
             switch (event.type) {
               case UART_DATA:
                 {
+                  UartTypes::UartData uart_data;
                   size_t len = 0;
-                  len = uart_read_bytes(this->current_uart_num, buff, event.size, pdMS_TO_TICKS(100));
 
-                  if(len > 0 && len < sizeof(buff))
+                  len = uart_read_bytes(this->current_uart_num,
+                                        uart_data.data,
+                                        event.size,
+                                        pdMS_TO_TICKS(600));
+
+                  if(len > 0 && len < sizeof(uart_data.data))
                     {
-                      buff[len] = '\0';
-                    }
-                  else
-                    {
-                      buff[sizeof(buff) - 1] = '\0';
+                      uart_data.data[len] = '\0';
+                    } else {
+                        uart_data.data[sizeof(uart_data.data) - 1] = '\0';
                     }
 
-                  UartTypes::UartData data;
-                  data.len = len;
-                  data.flag = true;
-                  memcpy(data.data.data(), buff, len);
-                  data.data[len] = '\0';
+                  uart_data.len = len;
+                  uart_data.flag = true;
 
-                  UartTypes::UartCallbackResponse resp{ .data = data };
+                  auto str = std::string(reinterpret_cast<const char*>(uart_data.data), uart_data.len);
+
+                  // ESP_LOG_BUFFER_HEXDUMP(TAG, uart_data.data, uart_data.len, ESP_LOG_INFO);
+                  ESP_LOGI("TAB", str.c_str());
+                  ESP_LOGI("UART_CALLBACK", "data: %.*s", uart_data.len, uart_data.data);
+
+                  ESP_LOGI(TAG, "EVENT_ARRIVED");
+                  ESP_LOGI(TAG, "Received %d bytes: %s", len, uart_data.data); // Use data.data.data()
+
+                  UartTypes::UartCallbackResponse resp{ .response = uart_data };
                   execute_callback_event(UART_DATA, resp);
                 }
                 break;
@@ -234,7 +256,7 @@ public:
                 uart_flush_input(this->current_uart_num);
                 xQueueReset(uart_queue);
                 {
-                  UartTypes::UartCallbackResponse resp{ .data = {} };
+                  UartTypes::UartCallbackResponse resp{ .response = {} };
                   this->execute_callback_event(UART_FIFO_OVF, resp);
                 }
                 break;
@@ -242,26 +264,26 @@ public:
                 uart_flush_input(this->current_uart_num);
                 xQueueReset(uart_queue);
                 {
-                  UartTypes::UartCallbackResponse resp{ .data = {} };
+                  UartTypes::UartCallbackResponse resp{ .response = {} };
                   this->execute_callback_event(UART_BUFFER_FULL, resp);
                 }
                 break;
               case UART_PARITY_ERR:
                 {
-                  UartTypes::UartCallbackResponse resp{ .data = {} };
+                  UartTypes::UartCallbackResponse resp{ .response = {} };
                   this->execute_callback_event(UART_PARITY_ERR, resp);
                 }
                 break;
               case UART_FRAME_ERR:
                 {
-                  UartTypes::UartCallbackResponse resp{ .data = {} };
+                  UartTypes::UartCallbackResponse resp{ .response = {} };
                   this->execute_callback_event(UART_FRAME_ERR, resp);
                 }
                 break;
               default:
                 ESP_LOGW(TAG, "Unhandled UART event: %d", event.type);
                 {
-                  UartTypes::UartCallbackResponse resp{ .data = {} };
+                  UartTypes::UartCallbackResponse resp{ .response = {} };
                   this->execute_callback_event(UART_WAKEUP, resp);
                 }
                 break;

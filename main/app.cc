@@ -45,11 +45,11 @@ public:
   }
 
   void before_load_application() override {
-    stack_navigator->registerScreen("/main", main_screen);
-    stack_navigator->registerScreen("/pin_code", pincode_screen);
-    stack_navigator->registerScreen("/settings", settings_screen);
-    stack_navigator->registerScreen("/preloader", preloader_screen);
-
+    stack_navigator->register_screen("/pin_code", pincode_screen);
+    stack_navigator->register_screen("/settings", settings_screen);
+    stack_navigator->register_screen("/preloader", preloader_screen);
+    stack_navigator->register_screen("/main", main_screen);
+    // stack_navigator->start();
   }
 
   void after_load_application() override {

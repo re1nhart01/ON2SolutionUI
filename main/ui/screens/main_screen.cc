@@ -12,6 +12,7 @@
 #include "protocols/uart/uart_proto.h"
 #include "ui/localization.hh"
 #include "ui/styles/main_screen_styles.cc"
+#include "lg/dataset/parser.cc"
 
 struct PinCodeScreenProps;
 using namespace foundation;
@@ -22,28 +23,69 @@ struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen> {};
 class MainScreen final : public NavigationScreen<MainScreenProps> {
   MainScreenProps props;
   StyleStorage* styles;
+  UartHandler* uart_handler;
+  std::shared_ptr<Ref<Text>> text_ref;
 public:
   explicit MainScreen(const std::shared_ptr<StackNavigator> &stack, const MainScreenProps &props) : NavigationScreen(stack, props) {
     this->props = props;
     this->styles = new StyleStorage();
-
     style_main_screen_register(*this->styles);
+
+    this->uart_handler = new UartHandler(UART_NUM_1, GPIO_NUM_18, GPIO_NUM_17, 9600, 16384);
+    this->text_ref = std::make_shared<Ref<Text>>("text");
+
+    if (this->uart_handler != nullptr; const auto handler = this->uart_handler)
+    {
+    this->uart_handler->init();
+    this->uart_handler->enable_rx(true);
+    auto text_reference = this->text_ref;
+    handler->add_event_listener(UartTypes::UartHandlerEvent{
+      .key_v = const_cast<char*>("read_data_dto"),
+      .event = UART_DATA,
+      .delegate = [text_reference](const UartTypes::UartCallbackResponse& data) {
+        ESP_LOGI("main_screen", "delegate");
+        ESP_LOGI("main_screen_1", std::string(reinterpret_cast<const char*>(data.response.data)).c_str());
+
+
+
+        if (text_reference->is_ready())
+          {
+            text_reference->get()->set_state([data](TextProps& props) {
+              const std::string rand_str = packets[random_in_range(0, 9)];
+              const auto dataset = parse_into_dataset(rand_str);
+
+              props.text = std::to_string(dataset.oxygen_levels[0]);
+            });
+          }
+       }
+      });
+    }
   }
 
   ~MainScreen() override {
     NavigationScreen::~NavigationScreen();
-
+    this->uart_handler->remove_all_event_listeners();
+    delete this->uart_handler;
     delete this->styles;
+    ESP_LOGI("main_screen", "Main screen destroyed");
   };
+
+  std::shared_ptr<Styling> $s(const std::string& key) const
+  {
+    return this->styles->get(key);
+  }
 
   void on_focus() override
   {
     NavigationScreen::on_focus();
+
   };
 
   void on_blur() override
   {
     NavigationScreen::on_blur();
+    ESP_LOGI("main_screen", "on_blur");
+    // this->uart_handler->enable_rx(false);
   };
 
     std::shared_ptr<View> render_header() const {
@@ -140,6 +182,7 @@ public:
             .set_children(Children{
                 $Text(
                     TextProps::up()
+                        .set_ref(text_ref)
                         .set_style($s("header.label"))
                         .value(locales::en::oxygen_level)
                 ),

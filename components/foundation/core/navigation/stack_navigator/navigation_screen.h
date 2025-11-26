@@ -8,8 +8,8 @@ namespace foundation
   class StackNavigator;
 
   template<typename Props>
-  class NavigationScreen 
-      : public Component<Props>, 
+  class NavigationScreen
+      : public Component<Props>,
         public NavigationScreenBase
   {
   public:

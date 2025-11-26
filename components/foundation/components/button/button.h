@@ -102,7 +102,7 @@ namespace foundation
     auto *instance = static_cast<Button *>(lv_event_get_user_data(event));
     if (!instance) return;
 
-    const auto &events = instance->props;
+    auto &events = instance->props;
 
     switch (event->code) {
       case LV_EVENT_CLICKED:

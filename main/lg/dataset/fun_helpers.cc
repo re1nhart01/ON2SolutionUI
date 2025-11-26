@@ -3,6 +3,8 @@
 //
 
 #include <cstring>
+#include <string>
+
 bool contains_substring(const char* haystack, const char* needle) {
   if (!*needle) return true;
 
@@ -65,4 +67,36 @@ char* substring(const char* str, size_t start, size_t length) {
   result[length] = '\0';
 
   return result;
+}
+
+inline int shtin(const std::string& s, int def = 0) {
+  if (s.empty()) return def;
+  char* end;
+  long v = strtol(s.c_str(), &end, 16);
+  if (end == s.c_str()) return def;
+  return (int)v;
+}
+
+inline unsigned long shtul(const std::string& s, unsigned long def = 0) {
+  if (s.empty()) return def;
+  char* end;
+  unsigned long v = strtoul(s.c_str(), &end, 16);
+  if (end == s.c_str()) return def;
+  return v;
+}
+
+inline int stin(const std::string& s, int def = 0) {
+  if (s.empty()) return def;
+  char* end;
+  long v = strtol(s.c_str(), &end, 10);
+  if (end == s.c_str()) return def;
+  return (int)v;
+}
+
+inline float stfl(const std::string& s, float def = 0.f) {
+  if (s.empty()) return def;
+  char* end;
+  float v = strtof(s.c_str(), &end);
+  if (end == s.c_str()) return def;
+  return v;
 }

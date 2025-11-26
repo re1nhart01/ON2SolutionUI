@@ -63,4 +63,4 @@ struct DatasetDTO {
   uint8_t outputs;
   uint32_t errors;
   uint8_t crc;
-};
+} ;
