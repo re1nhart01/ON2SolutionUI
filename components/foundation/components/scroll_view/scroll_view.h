@@ -7,23 +7,23 @@ namespace foundation
   class ScrollView final : public Component<ScrollViewProps> {
   private:
     using Component::props;
-    std::vector<std::shared_ptr<VNode>> children;
 
   public:
     explicit ScrollView(lv_obj_t* parent, const ScrollViewProps& props)
       : Component(this->create_initial(parent), parent, std::move(props)) {
       set_style(props.style);
 
-      if (!props.children.empty()) {
-          this->children.insert(this->children.end(), props.children.begin(), props.children.end());
-      }
-
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }
     };
 
-    ~ScrollView() override = default;
+    ~ScrollView() override
+    {
+      if (this->props.ref != nullptr) {
+          this->props.ref->unlink();
+      }
+    };
 
     lv_obj_t* render() override
     {
@@ -36,7 +36,7 @@ namespace foundation
 
       this->do_rebuild();
 
-      for (const auto& child : this->children) {
+      for (const auto& child : this->props.children) {
           if (child != nullptr) {
               child->set_active(true);
               child->set_parent(comp);
@@ -70,7 +70,7 @@ namespace foundation
           style->applyTo(this->get_component());
       }
 
-      for (const auto &child : children) {
+      for (const auto &child : this->props.children) {
           child->do_rebuild();
       }
     };

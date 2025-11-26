@@ -16,7 +16,12 @@ namespace foundation
           this->props.ref->set(this);
       }
     };
-    ~StatusBar() override = default;
+    ~StatusBar() override
+    {
+      if (this->props.ref != nullptr) {
+          this->props.ref->unlink();
+      }
+    };
 
     lv_obj_t * render() override
     {

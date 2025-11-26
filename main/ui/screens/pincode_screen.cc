@@ -22,6 +22,8 @@ public:
   ~PinCodeScreen() override = default;
 
   lv_obj_t *render() override {
+    auto navigator_ref = this->navigation_ref;
+
     return this->delegate(
         $View(
             ViewProps::up()
@@ -30,7 +32,17 @@ public:
                     $StatusBar(
                         StatusBarProps::up()
                             .set_style(nullptr)
-                    )
+                    ),
+                  $Button(ButtonProps::up()
+                                    .set_child(
+                                        $Text(
+                                            TextProps::up()
+                                                .value("higger")
+                                        )
+                                    )
+                                    .click([navigator_ref](lv_event_t* e){
+                                        navigator_ref->navigate("/main");
+                                    }))
                 })
                 .w(LV_PCT(100))
                 .h(LV_PCT(100))

@@ -151,15 +151,32 @@ public:
 
   void remove_all_event_listeners()
   {
-    this->list = {};
-    this->enable_rx(false);
+    if (uart_queue == nullptr) {
+        ESP_LOGW(TAG, "[remove_all_event_listeners] UART queue is NULL — nothing to remove");
+        return;
+    }
 
-    if(task_handle) {
+    this->enable_rx(false);
+    if (task_handle != nullptr) {
+        ESP_LOGI(TAG, "Deleting UART task...");
         vTaskDelete(task_handle);
         task_handle = nullptr;
     }
 
-    uart_driver_delete(current_uart_num);
+    this->list = {};
+    ESP_LOGI(TAG, "Deleting UART driver...");
+    if (const esp_err_t err = uart_driver_delete(current_uart_num); err != ESP_OK) {
+        ESP_LOGE(TAG, "uart_driver_delete failed: %s", esp_err_to_name(err));
+    }
+
+    uart_queue = nullptr;
+
+    if (uart_mutex != nullptr) {
+        vSemaphoreDelete(uart_mutex);
+        uart_mutex = nullptr;
+    }
+
+    ESP_LOGI(TAG, "UART event listeners fully removed");
   }
 
   void remove_event_listener(const char * key_v)

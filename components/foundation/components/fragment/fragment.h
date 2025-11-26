@@ -6,9 +6,6 @@
 #include "core/styling/styling.h"
 #include "fragment_props.h"
 
-
-
-
 namespace foundation
 {
   class Fragment final : public Component<FragmentProps> {

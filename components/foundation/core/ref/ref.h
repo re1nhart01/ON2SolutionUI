@@ -40,6 +40,12 @@ namespace foundation {
       return linked != nullptr && ready;
     }
 
+    void unlink()
+    {
+      this->linked = nullptr;
+      this->ready = false;
+    }
+
     template <typename C>
     C* cast() const {
       return dynamic_cast<C*>(linked);

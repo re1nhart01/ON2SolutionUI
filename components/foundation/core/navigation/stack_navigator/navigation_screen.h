@@ -9,7 +9,8 @@ namespace foundation
 
   template<typename Props>
   class NavigationScreen
-      : public Component<Props>,
+      : public virtual VNode,
+        public Component<Props>,
         public NavigationScreenBase
   {
   public:

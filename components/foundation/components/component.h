@@ -3,7 +3,7 @@
 
 namespace foundation {
   template<typename Props>
-  class Component : public VNode {
+  class Component : public virtual VNode {
   public:
     Props props;
 
@@ -13,6 +13,7 @@ namespace foundation {
 
     template<typename Fn>
     void set_state(Fn&& fn) {
+      if (!this->component) return;
       if constexpr (std::is_invocable_v<Fn, Props&>) {
           fn(this->props);
 

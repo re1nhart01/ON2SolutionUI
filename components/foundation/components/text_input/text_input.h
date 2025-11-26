@@ -26,7 +26,12 @@ namespace foundation
       }
     };
 
-    ~TextInput() override = default;
+    ~TextInput() override
+    {
+      if (this->props.ref != nullptr) {
+          this->props.ref->unlink();
+      }
+    };
 
     lv_obj_t* render() override
     {

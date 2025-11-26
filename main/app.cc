@@ -15,28 +15,11 @@ auto screen = lv_scr_act();
 class WaveApplication final : public Application {
   std::shared_ptr<StackNavigator> stack_navigator;
 
-  std::shared_ptr<MainScreen> main_screen;
-  std::shared_ptr<SettingsScreen> settings_screen;
-  std::shared_ptr<PinCodeScreen> pincode_screen;
- std::shared_ptr<PreloaderScreen> preloader_screen;
-
 public:
   explicit WaveApplication(lv_obj_t *screen)
       : Application(screen)
   {
-
-    this->stack_navigator = std::make_shared<
-  StackNavigator>(StackNavigatorConfig{.initial_route = "/main"}, screen);
-
-    this->main_screen = std::make_shared<MainScreen>(
-        stack_navigator, MainScreenProps{});
-    this->settings_screen = std::make_shared<SettingsScreen>(
-        stack_navigator, SettingsScreenProps{});
-    this->pincode_screen = std::make_shared<PinCodeScreen>(
-        stack_navigator, PinCodeScreenProps{});
-    this->preloader_screen = std::make_shared<PreloaderScreen>(
-        stack_navigator, PreloaderScreenProps{});
-
+    this->stack_navigator = std::make_shared<StackNavigator>(StackNavigatorConfig{.initial_route = "/main"}, screen);
   }
 
   VNode *root_component() override {
@@ -45,11 +28,25 @@ public:
   }
 
   void before_load_application() override {
-    stack_navigator->register_screen("/pin_code", pincode_screen);
-    stack_navigator->register_screen("/settings", settings_screen);
-    stack_navigator->register_screen("/preloader", preloader_screen);
-    stack_navigator->register_screen("/main", main_screen);
-    // stack_navigator->start();
+    auto navigator = this->stack_navigator;
+
+    navigator->register_screen("/main", [navigator]() {
+      return std::make_shared<MainScreen>(navigator, MainScreenProps{});
+    });
+
+    navigator->register_screen("/pin_code", [navigator]() {
+        return std::make_shared<PinCodeScreen>(navigator, PinCodeScreenProps{});
+    });
+
+    navigator->register_screen("/preloader", [navigator]() {
+      return std::make_shared<PreloaderScreen>(navigator, PreloaderScreenProps{});
+    });
+
+    navigator->register_screen("/preloader", [navigator]() {
+      return std::make_shared<SettingsScreen>(navigator, SettingsScreenProps{});
+    });
+
+    navigator->start();
   }
 
   void after_load_application() override {

@@ -24,7 +24,12 @@ namespace foundation
       }
     };
 
-    ~View() override = default;
+    ~View() override
+    {
+      if (this->props.ref != nullptr) {
+          this->props.ref->unlink();
+      }
+    };
 
     lv_obj_t* render() override
     {

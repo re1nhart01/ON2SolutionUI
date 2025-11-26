@@ -18,7 +18,11 @@ namespace foundation
       }
     }
 
-    ~ActivityIndicator() override = default;
+    ~ActivityIndicator() override {
+      if (this->props.ref != nullptr) {
+          this->props.ref->unlink();
+      }
+    };
 
     lv_obj_t *render() override
     {

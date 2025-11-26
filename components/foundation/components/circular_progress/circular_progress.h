@@ -22,7 +22,12 @@ namespace foundation
       }
     };
 
-    ~CircularProgress() override = default;
+    ~CircularProgress() override
+    {
+      if (this->props.ref != nullptr) {
+          this->props.ref->unlink();
+      }
+    };
 
     lv_obj_t* render() override
     {
