@@ -46,6 +46,8 @@ using VNodePtr = std::shared_ptr<foundation::VNode>;
 
   using Children = std::vector<std::shared_ptr<foundation::VNode>>;
 
+  #define $s(key) (this->styles->get(key))
+
     namespace foundation {
       struct entrypoint {};
     }

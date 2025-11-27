@@ -49,7 +49,7 @@ namespace UartTypes
 {
   struct UartData
   {
-    uint8_t data[BUF_SIZE];
+    std::string packet;
     size_t len;
     bool flag;
   };
@@ -227,46 +227,38 @@ public:
 
   void uart_interrupt_handler()
   {
+    uint8_t data[BUF_SIZE];
     uart_event_t event;
     if (!uart_queue) {
         ESP_LOGE(TAG, "UART queue is NULL!");
         return;
     }
 
-    while (xQueueReceive(uart_queue, &event, pdMS_TO_TICKS(600))) {
+
+
+    while (xQueueReceive(uart_queue, &event, portMAX_DELAY)) {
         if (xSemaphoreTake(uart_mutex, portMAX_DELAY)) {
             switch (event.type) {
               case UART_DATA:
                 {
-                  UartTypes::UartData uart_data;
-                  size_t len = 0;
+                  const int len = uart_read_bytes(
+                      this->current_uart_num,
+                      data,
+                      event.size,
+                      pdMS_TO_TICKS(100)
+                  );
 
-                  len = uart_read_bytes(this->current_uart_num,
-                                        uart_data.data,
-                                        event.size,
-                                        pdMS_TO_TICKS(600));
-
-                  if(len > 0 && len < sizeof(uart_data.data))
+                  if (len > 0)
                     {
-                      uart_data.data[len] = '\0';
-                    } else {
-                        uart_data.data[sizeof(uart_data.data) - 1] = '\0';
+                      data[len] = '\0';
+
+                      UartTypes::UartData uart_data;
+                      uart_data.len = len;
+                      uart_data.packet.assign(reinterpret_cast<const char*>(data), len);
+                      uart_data.flag = true;
+
+                      execute_callback_event(UART_DATA, { .response = uart_data });
                     }
-
-                  uart_data.len = len;
-                  uart_data.flag = true;
-
-                  auto str = std::string(reinterpret_cast<const char*>(uart_data.data), uart_data.len);
-
-                  // ESP_LOG_BUFFER_HEXDUMP(TAG, uart_data.data, uart_data.len, ESP_LOG_INFO);
-                  ESP_LOGI("TAB", str.c_str());
-                  ESP_LOGI("UART_CALLBACK", "data: %.*s", uart_data.len, uart_data.data);
-
-                  ESP_LOGI(TAG, "EVENT_ARRIVED");
-                  ESP_LOGI(TAG, "Received %d bytes: %s", len, uart_data.data); // Use data.data.data()
-
-                  UartTypes::UartCallbackResponse resp{ .response = uart_data };
-                  execute_callback_event(UART_DATA, resp);
                 }
                 break;
               case UART_FIFO_OVF:

@@ -41,35 +41,14 @@ public:
     ESP_LOGI("main_screen", "Main screen destroyed");
   };
 
-  std::shared_ptr<Styling> $s(const std::string& key) const
-  {
-    return this->styles->get(key);
-  }
-
   void on_focus() override
   {
     NavigationScreen::on_focus();
-    this->uart_handler = new UartHandler(UART_NUM_1, GPIO_NUM_6, GPIO_NUM_7, 9600, 16384);
+    this->uart_handler = new UartHandler(UART_NUM_1, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
     ESP_LOGI("main_screen", "on_FOCUS");
       this->uart_handler->init();
       this->uart_handler->enable_rx(true);
-      auto text_reference = this->text_ref;
-
-      this->uart_handler->add_event_listener(UartTypes::UartHandlerEvent{
-        .key_v = const_cast<char*>("read_data_dto"),
-        .event = UART_DATA,
-        .delegate = [text_reference](const UartTypes::UartCallbackResponse& data) {
-          if (text_reference->is_ready())
-            {
-              text_reference->get()->set_state([data](TextProps& props) {
-                const std::string rand_str = packets[random_in_range(0, 9)];
-                const auto dataset = parse_into_dataset(rand_str);
-
-                props.text = std::to_string(dataset.oxygen_levels[0]);
-              });
-            }
-         }
-      });
+      this->add_uart_data_event();
   };
 
   void on_blur() override
@@ -77,6 +56,46 @@ public:
     NavigationScreen::on_blur();
     this->uart_handler->remove_all_event_listeners();
   };
+
+
+  void add_uart_data_event() const
+  {
+    auto text_reference = this->text_ref;
+
+    this->uart_handler->add_event_listener(UartTypes::UartHandlerEvent{
+      .key_v = const_cast<char*>("read_data_dto"),
+      .event = UART_DATA,
+      .delegate = [text_reference](const UartTypes::UartCallbackResponse& uart_data) {
+
+        struct AsyncUpdateContext {
+            std::shared_ptr<foundation::Ref<Text>> text_ref;
+            UartTypes::UartCallbackResponse data;
+        };
+
+        if (!text_reference->is_ready()) return;
+
+        auto* ctx = new AsyncUpdateContext{
+            .text_ref = text_reference,
+            .data = uart_data
+        };
+
+        lv_async_call(
+            [](void* user_data) {
+                auto* ctx = static_cast<AsyncUpdateContext*>(user_data);
+
+                if (ctx->text_ref->is_ready()) {
+                    ctx->text_ref->get()->set_state([ctx](TextProps& props) {
+                        props.text = ctx->data.response.packet;
+                    });
+                }
+
+                delete ctx;
+            },
+            ctx
+        );
+      }
+  });
+  }
 
     std::shared_ptr<View> render_header() const {
     auto navigator_ref = this->navigation_ref;
@@ -215,7 +234,7 @@ public:
             .w(LV_PCT(100))
             .h(LV_PCT(62))
             .justify(LV_FLEX_ALIGN_START)
-            .items(LV_FLEX_ALIGN_CENTER)
+            .items(LV_FLEX_ALIGN_START)
             .track_cross(LV_FLEX_ALIGN_START)
             .direction(LV_FLEX_FLOW_COLUMN)
     );
