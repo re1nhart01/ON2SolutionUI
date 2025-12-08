@@ -31,48 +31,96 @@ namespace foundation
 
     lv_obj_t* render() override
     {
+      if (this->get_component() != nullptr) {
+          this->do_rebuild();
+          return this->get_component();
+      }
+
       Component::render();
 
       lv_obj_t* parent_obj = this->get_parent();
       if (!parent_obj) return nullptr;
 
-      auto props = this->props;
-
       lv_obj_t* container = lv_obj_create(parent_obj);
-      lv_obj_set_size(container, props.width + 5, props.height + 5);
-      lv_obj_clear_flag(container, LV_OBJ_FLAG_SCROLLABLE);
-      lv_obj_set_style_bg_opa(container, LV_OPA_TRANSP, 0);
-      lv_obj_set_style_border_width(container, 0, LV_PART_MAIN);
-
       this->set_component(container);
 
+      lv_obj_clear_flag(container, LV_OBJ_FLAG_SCROLLABLE);
+      lv_obj_set_style_bg_opa(container, LV_OPA_TRANSP, LV_PART_MAIN);
+      lv_obj_set_style_border_width(container, 0, LV_PART_MAIN);
+
       this->arc_reference = lv_arc_create(container);
+
+      this->is_show_label = this->props.show_label_default;
+
+      // Стиль для arc через styling() / props.style
+      if (this->props.style != nullptr) {
+          lv_obj_add_style(
+              this->arc_reference,
+              this->props.style->getStyle(),
+              LV_PART_MAIN
+          );
+      }
+
+      this->do_rebuild();
+
+      return container;
+    }
+
+
+    void do_rebuild() override
+    {
+      auto container = this->get_component();
+      if (!container) return;
+
+      lv_obj_set_size(container, props.width, props.height);
+
+      if (!this->arc_reference) return;
+
       lv_obj_set_size(arc_reference, props.width, props.height);
       lv_arc_set_range(arc_reference, props.min_dy, props.max_dy);
       lv_arc_set_value(arc_reference, props.default_dy);
       lv_arc_set_bg_angles(arc_reference, 135, 45);
       lv_arc_set_rotation(arc_reference, 0);
+
       lv_obj_clear_flag(arc_reference, LV_OBJ_FLAG_CLICKABLE);
-      lv_obj_set_style_bg_opa(arc_reference, LV_OPA_TRANSP, 0);
+      lv_obj_set_style_bg_opa(arc_reference, LV_OPA_TRANSP, LV_PART_MAIN);
       lv_obj_remove_style(arc_reference, nullptr, LV_PART_KNOB);
+
+      if (props.style != nullptr) {
+          lv_obj_add_style(
+              arc_reference,
+              props.style->getStyle(),
+              LV_PART_MAIN
+          );
+      }
+
       lv_obj_center(arc_reference);
 
-      if (style != nullptr) {
-          lv_obj_add_style(arc_reference, this->styling()->getStyle(), LV_PART_MAIN);
-      }
+      if (props.show_label_default)
+        {
+          if (!this->label)
+            {
+              this->label = std::make_shared<Text>(
+                  TextProps::up().value(std::format("{}{}", props.default_dy, props.label_symbol))
+              );
+              this->label->set_parent(container);
+              this->label->render();
+            }
 
-      if (this->is_show_label) {
-          this->label = std::make_shared<Text>(TextProps::up().value("100%"));
+          this->label->update(
+              std::format("{}{}", props.default_dy, props.label_symbol)
+          );
 
-          this->label->set_parent(container);
-          this->label->render();
-
-          lv_obj_align_to(this->label->get_component(), arc_reference, LV_ALIGN_CENTER, 0, 0);
+          lv_obj_center(this->label->get_component());
           lv_obj_move_foreground(this->label->get_component());
-      }
-
-      return container;
-    };
+        }
+      else
+        {
+          if (this->label) {
+              lv_obj_add_flag(this->label->get_component(), LV_OBJ_FLAG_HIDDEN);
+          }
+        }
+    }
 
     std::shared_ptr<Styling> styling() override
     {
@@ -88,24 +136,20 @@ namespace foundation
       return this;
     };
 
-    void show_label(bool value) const
+    void update(const short value) const
     {
-      throw "TODO!";
-    };
-
-    void update(short value) const
-    {
-      if (const auto arc = this->get_component(); arc != nullptr) {
-          const short correct_value =
-           value < this->props.min_dy ?
-            this->props.min_dy :
-            value > this->props.max_dy ?
-            this->props.max_dy : value;
-          lv_arc_set_value(arc, correct_value);
-          if (this->is_show_label) {
-              this->label->update(std::format("{}{}", value, this->props.label_symbol));
-          }
+      const short correct_value = std::clamp(value, props.min_dy, props.max_dy);
+      if (this->arc_reference != nullptr) {
+          lv_arc_set_value(this->arc_reference, correct_value);
       }
-    };
+
+      if (this->is_show_label && this->label) {
+          this->label->update(std::format(
+              "{}{}",
+              correct_value,
+              this->props.label_symbol
+          ));
+      }
+    }
   };
 }
