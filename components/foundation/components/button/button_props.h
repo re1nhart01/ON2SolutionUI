@@ -31,7 +31,7 @@ namespace foundation
       return *this;
     }
 
-    ButtonProps& set_child(const std::shared_ptr<VNode>& c) {
+    ButtonProps& set_child(std::shared_ptr<VNode> c) {
       child = c;
       return *this;
     }

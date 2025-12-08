@@ -35,6 +35,10 @@ namespace foundation {
       return linked;
     }
 
+    T* take() const {
+      return linked;
+    }
+
     bool is_ready()
     {
       return linked != nullptr && ready;

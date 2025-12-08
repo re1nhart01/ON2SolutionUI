@@ -50,10 +50,26 @@ inline DatasetStatuses StringToDatasetStatus(const char* str) {
   return DatasetStatuses::Unknown;
 }
 
+inline std::string GetTextValueFromStatus(const DatasetStatuses status)
+{
+  switch(status)
+  {
+    case DatasetStatuses::StandBy: return "STAND BY";
+    case DatasetStatuses::BoosterDelay: return "BOOSTER DELAY";
+    case DatasetStatuses::Startup: return "STARTUP";
+    case DatasetStatuses::Running: return "RUNNING";
+    case DatasetStatuses::Producing: return "PRODUCING";
+    case DatasetStatuses::Alarm: return "ALARM";
+    case DatasetStatuses::TankFull: return "TANK FULL";
+    case DatasetStatuses::AutoAdjusting: return "AUTO ADJUSTING";
+    default: return "UNKNOWN";
+  }
+}
 
 struct DatasetDTO {
-  std::string device_number;
-  std::string moto_hours;
+  char device_number[16];
+  char moto_hours[16];
+
   DatasetStatuses status;
   uint8_t channels;
   data_storage_array<float> oxygen_levels;
@@ -63,4 +79,4 @@ struct DatasetDTO {
   uint8_t outputs;
   uint32_t errors;
   uint8_t crc;
-} ;
+};

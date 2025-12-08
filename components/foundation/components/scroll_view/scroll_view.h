@@ -41,11 +41,8 @@ namespace foundation
               child->set_active(true);
               child->set_parent(comp);
               child->render();
-              lv_obj_set_parent(child->get_component(), comp);
           }
       }
-
-
 
       return comp;
     };

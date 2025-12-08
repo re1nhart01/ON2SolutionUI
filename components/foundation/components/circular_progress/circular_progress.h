@@ -11,7 +11,7 @@ namespace foundation
     bool is_show_label = false;
 
   public:
-    explicit CircularProgress(CircularProgressProps  props)
+    explicit CircularProgress(CircularProgressProps props)
       : Component(nullptr, nullptr, std::move(props)) {
       this->parent = nullptr;
 
@@ -52,7 +52,6 @@ namespace foundation
 
       this->is_show_label = this->props.show_label_default;
 
-      // Стиль для arc через styling() / props.style
       if (this->props.style != nullptr) {
           lv_obj_add_style(
               this->arc_reference,
@@ -60,41 +59,6 @@ namespace foundation
               LV_PART_MAIN
           );
       }
-
-      this->do_rebuild();
-
-      return container;
-    }
-
-
-    void do_rebuild() override
-    {
-      auto container = this->get_component();
-      if (!container) return;
-
-      lv_obj_set_size(container, props.width, props.height);
-
-      if (!this->arc_reference) return;
-
-      lv_obj_set_size(arc_reference, props.width, props.height);
-      lv_arc_set_range(arc_reference, props.min_dy, props.max_dy);
-      lv_arc_set_value(arc_reference, props.default_dy);
-      lv_arc_set_bg_angles(arc_reference, 135, 45);
-      lv_arc_set_rotation(arc_reference, 0);
-
-      lv_obj_clear_flag(arc_reference, LV_OBJ_FLAG_CLICKABLE);
-      lv_obj_set_style_bg_opa(arc_reference, LV_OPA_TRANSP, LV_PART_MAIN);
-      lv_obj_remove_style(arc_reference, nullptr, LV_PART_KNOB);
-
-      if (props.style != nullptr) {
-          lv_obj_add_style(
-              arc_reference,
-              props.style->getStyle(),
-              LV_PART_MAIN
-          );
-      }
-
-      lv_obj_center(arc_reference);
 
       if (props.show_label_default)
         {
@@ -120,6 +84,47 @@ namespace foundation
               lv_obj_add_flag(this->label->get_component(), LV_OBJ_FLAG_HIDDEN);
           }
         }
+
+      this->do_rebuild();
+
+      return container;
+    }
+
+
+    void do_rebuild() override
+    {
+      const auto container = this->get_component();
+      if (!container) return;
+
+      lv_obj_set_size(container, props.width, props.height);
+
+      lv_obj_set_size(arc_reference, props.width, props.height);
+      lv_arc_set_range(arc_reference, props.min_dy, props.max_dy);
+      lv_arc_set_value(arc_reference, props.default_dy);
+      lv_arc_set_bg_angles(arc_reference, 135, 45);
+      lv_arc_set_rotation(arc_reference, 0);
+
+      lv_obj_clear_flag(arc_reference, LV_OBJ_FLAG_CLICKABLE);
+      lv_obj_set_style_bg_opa(arc_reference, LV_OPA_TRANSP, LV_PART_MAIN);
+      lv_obj_remove_style(arc_reference, nullptr, LV_PART_KNOB);
+
+      if (props.style != nullptr) {
+          lv_obj_add_style(
+              arc_reference,
+              props.style->getStyle(),
+              LV_PART_MAIN
+          );
+      }
+
+      lv_obj_center(arc_reference);
+
+      if (!props.show_label_default)
+        {
+          if (this->label) {
+              lv_obj_add_flag(this->label->get_component(), LV_OBJ_FLAG_HIDDEN);
+          }
+        }
+      this->update(props.default_dy);
     }
 
     std::shared_ptr<Styling> styling() override

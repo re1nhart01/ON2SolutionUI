@@ -1,5 +1,3 @@
-#include <utility>
-
 #include "../../components/foundation/components/component.h"
 
 #include "../../components/foundation/core/shortcuts.h"
@@ -9,10 +7,11 @@
 #include "components/text/text_props.h"
 #include "components/view/view.h"
 #include "components/view/view_props.h"
+#include "core/ref_store/ref_store.h"
+#include "lg/dataset/parser.cc"
 #include "protocols/uart/uart_proto.h"
 #include "ui/localization.hh"
 #include "ui/styles/main_screen_styles.cc"
-#include "lg/dataset/parser.cc"
 
 struct PinCodeScreenProps;
 using namespace foundation;
@@ -22,29 +21,31 @@ struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen> {};
 
 class MainScreen final : public NavigationScreen<MainScreenProps> {
   MainScreenProps props;
-  StyleStorage* styles = nullptr;
-  UartHandler* uart_handler = nullptr;
-  std::shared_ptr<Ref<Text>> text_ref = nullptr;
-public:
-  explicit MainScreen(const std::shared_ptr<StackNavigator> &stack, const MainScreenProps &props) : NavigationScreen(stack, props) {
-    this->props = props;
-    this->styles = new StyleStorage();
-    style_main_screen_register(*this->styles);
-    this->text_ref = std::make_shared<Ref<Text>>("text");
+  std::unique_ptr<StyleStorage> styles;
+  std::unique_ptr<UartHandler> uart_handler = nullptr;
 
-  }
+  SharedRefStore<12>* ref_store;
+public:
+  explicit MainScreen(const std::shared_ptr<StackNavigator> &stack, const MainScreenProps &props)
+    : NavigationScreen(stack, props),
+      props(props),
+      styles(std::make_unique<StyleStorage>()),
+      ref_store(new SharedRefStore<12>())
+{
+    style_main_screen_register(*this->styles);
+}
 
   ~MainScreen() override {
     NavigationScreen::~NavigationScreen();
-    delete this->styles;
-    delete this->uart_handler;
+
+    delete ref_store;
     ESP_LOGI("main_screen", "Main screen destroyed");
   };
 
   void on_focus() override
   {
     NavigationScreen::on_focus();
-    this->uart_handler = new UartHandler(UART_NUM_1, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
+    this->uart_handler = std::make_unique<UartHandler>(UART_NUM_1, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
     ESP_LOGI("main_screen", "on_FOCUS");
       this->uart_handler->init();
       this->uart_handler->enable_rx(true);
@@ -58,46 +59,104 @@ public:
   };
 
 
-  void add_uart_data_event() const
+  void update_specific_label(const std::string& value, const std::shared_ptr<Ref<Text>>& ref)
   {
-    auto text_reference = this->text_ref;
-
-    this->uart_handler->add_event_listener(UartTypes::UartHandlerEvent{
-      .key_v = const_cast<char*>("read_data_dto"),
-      .event = UART_DATA,
-      .delegate = [text_reference](const UartTypes::UartCallbackResponse& uart_data) {
-
-        struct AsyncUpdateContext {
-            std::shared_ptr<foundation::Ref<Text>> text_ref;
-            UartTypes::UartCallbackResponse data;
-        };
-
-        if (!text_reference->is_ready()) return;
-
-        auto* ctx = new AsyncUpdateContext{
-            .text_ref = text_reference,
-            .data = uart_data
-        };
-
-        lv_async_call(
-            [](void* user_data) {
-                auto* ctx = static_cast<AsyncUpdateContext*>(user_data);
-
-                if (ctx->text_ref->is_ready()) {
-                    ctx->text_ref->get()->set_state([ctx](TextProps& props) {
-                        props.text = ctx->data.response.packet;
-                    });
-                }
-
-                delete ctx;
-            },
-            ctx
-        );
-      }
-  });
+    if (ref->get() == nullptr && !ref->is_ready()) return;
+    ref->get()->set_state(
+      [value](TextProps& props) {
+        props.value(value);
+    });
   }
 
-    std::shared_ptr<View> render_header() const {
+  void update_specific_circular(short value, const std::shared_ptr<Ref<CircularProgress>>& ref)
+  {
+    if (ref->get() == nullptr && !ref->is_ready()) return;
+    ref->get()->set_state(
+      [value](CircularProgressProps& props) {
+        props.value(value);
+    });
+  }
+
+  void add_uart_data_event()
+  {
+    this->uart_handler->add_event_listener(UartTypes::UartHandlerEvent{
+        .key_v = const_cast<char*>("read_data_dto"),
+        .event = UART_DATA,
+        .delegate = [this](const UartTypes::UartCallbackResponse& uart_data) {
+            if (uart_data.response.packet.empty()) return;
+
+            const DatasetDTO unpacked_uart_data = parse_into_dataset(uart_data.response.packet);
+
+            struct AsyncUpdateContext {
+                MainScreen* screen = nullptr;
+                DatasetDTO data{};
+            };
+
+            auto* ctx = new AsyncUpdateContext{
+                .screen = this,
+                .data = unpacked_uart_data
+            };
+
+            lv_async_call(
+                [](void* user_data) {
+                    auto *ctx = static_cast<AsyncUpdateContext *>(user_data);
+
+                    const auto text_channels_ref = ctx->screen->ref_store->get<Text>("text_channels");
+                    const auto text_inputs_ref = ctx->screen->ref_store->get<Text>("text_inputs");
+                    const auto text_outputs_ref = ctx->screen->ref_store->get<Text>("text_outputs");
+                    const auto main_button_ref = ctx->screen->ref_store->get<Text>("main_button");
+                    const auto status_bar_ref = ctx->screen->ref_store->get<Text>("status_bar_moto");
+
+                    ctx->screen->update_specific_label(
+                        std::format("Channels: {}", ctx->data.channels),
+                        text_channels_ref
+                    );
+
+                    ctx->screen->update_specific_label(
+                        std::format("Inputs: {}", ctx->data.channels),
+                        text_inputs_ref
+                    );
+
+                    ctx->screen->update_specific_label(
+                        std::format("Outputs: {}", ctx->data.channels),
+                        text_outputs_ref
+                    );
+
+                    ctx->screen->update_specific_label(
+                        ctx->data.moto_hours,
+                        status_bar_ref
+                    );
+
+                    ctx->screen->update_specific_label(
+                      GetTextValueFromStatus(ctx->data.status),
+                      main_button_ref
+                    );
+
+                    for (size_t i = 0; i < 3; i++)
+                    {
+                        auto oxygen_level = static_cast<short>(std::round(ctx->data.oxygen_levels[i]));
+                        auto oxygen_rate = static_cast<short>(std::round(ctx->data.oxygen_speed[i]));
+
+                        ctx->screen->update_specific_circular(
+                          oxygen_level,
+                          ctx->screen->ref_store->get<CircularProgress>(std::format("oxygen_level_{}", i))
+                      );
+
+                        ctx->screen->update_specific_circular(
+                          oxygen_rate,
+                          ctx->screen->ref_store->get<CircularProgress>(std::format("oxygen_rate_{}", i))
+                       );
+                    }
+
+                    delete ctx;
+                },
+                ctx
+            );
+        }
+    });
+  }
+
+    std::shared_ptr<View> render_header() {
     auto navigator_ref = this->navigation_ref;
 
     return $View(
@@ -108,9 +167,9 @@ public:
                     ViewProps::up()
                         .set_style($s("header.labels.container"))
                         .set_children(Children{
-                            $Text(TextProps::up().value(std::format("Channels: {}", 3))),
-                            $Text(TextProps::up().value(std::format("Inputs: {}", 3))),
-                            $Text(TextProps::up().value(std::format("Outputs: {}", 3))),
+                            $Text(TextProps::up().set_ref(this->ref_store->create<Text>("text_channels")).value("Channels: 0")),
+                            $Text(TextProps::up().set_ref(this->ref_store->create<Text>("text_inputs")).value("Inputs: 0")),
+                            $Text(TextProps::up().set_ref(this->ref_store->create<Text>("text_outputs")).value("Outputs: 0")),
                         })
                         .merge(header_labels_container_props)
                 ),
@@ -157,13 +216,14 @@ public:
 
 
 
-  std::shared_ptr<Button> render_footer() const {
+  std::shared_ptr<Button> render_footer() {
     return $Button(
         ButtonProps::up()
             .set_style($s("footer.button"))
             .set_child(
                 $Text(
                     TextProps::up()
+                        .set_ref(this->ref_store->create<Text>("main_button"))
                         .set_style($s("header.label"))
                         .value(locales::en::status)
                 )
@@ -171,15 +231,16 @@ public:
     );
   }
 
-  std::shared_ptr<View> render_body() const {
-    auto make_circle = [&]() {
+  std::shared_ptr<View> render_body() {
+    auto make_circle = [&](const std::string& ref_name) {
         return $Circular(
             CircularProgressProps::up()
+                .set_ref(this->ref_store->create<CircularProgress>(ref_name))
                 .label("%")
                 .show_label(true)
                 .min(0)
                 .max(100)
-                .value(20)
+                .value(0)
                 .w(100)
                 .h(100)
         );
@@ -191,7 +252,6 @@ public:
             .set_children(Children{
                 $Text(
                     TextProps::up()
-                        .set_ref(text_ref)
                         .set_style($s("header.label"))
                         .value(locales::en::oxygen_level)
                 ),
@@ -199,9 +259,9 @@ public:
                     ViewProps::up()
                         .set_style($s("header.labels.container"))
                         .set_children(Children{
-                            make_circle(),
-                            make_circle(),
-                            make_circle(),
+                            make_circle("oxygen_level_0"),
+                            make_circle("oxygen_level_1"),
+                            make_circle("oxygen_level_2"),
                         })
                         .w(LV_PCT(100))
                         .h(110)
@@ -219,9 +279,9 @@ public:
                     ViewProps::up()
                         .set_style($s("header.labels.container"))
                         .set_children(Children{
-                            make_circle(),
-                            make_circle(),
-                            make_circle(),
+                            make_circle("oxygen_rate_0"),
+                            make_circle("oxygen_rate_1"),
+                            make_circle("oxygen_rate_2"),
                         })
                         .w(LV_PCT(100))
                         .h(110)
@@ -234,7 +294,7 @@ public:
             .w(LV_PCT(100))
             .h(LV_PCT(62))
             .justify(LV_FLEX_ALIGN_START)
-            .items(LV_FLEX_ALIGN_START)
+            .items(LV_FLEX_ALIGN_CENTER)
             .track_cross(LV_FLEX_ALIGN_START)
             .direction(LV_FLEX_FLOW_COLUMN)
     );
@@ -248,9 +308,15 @@ public:
             ViewProps::up()
                 .set_style(this->styling())
                 .set_children(Children{
-                    $StatusBar(
-                        StatusBarProps::up()
-                            .set_style(nullptr)
+                  $StatusBar(
+                    StatusBarProps::up()
+                        .set_background_color(lv_color_hex(0x2A2A2A))
+                        .set_height(30)
+                        .set_children(Children{
+                            $Text(TextProps::up().set_ref(ref_store->create<Text>("status_bar_moto")).value("06:10 AM").set_style($s("status_bar.time"))),
+                            $Text(TextProps::up().value("ON2 Solution").set_style($s("status_bar.logo"))),
+                            $Text(TextProps::up().value("85%").set_style($s("status_bar.battery"))),
+                        })
                     ),
                     this->render_header(),
                     this->render_body(),

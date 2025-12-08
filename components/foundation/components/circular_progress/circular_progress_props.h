@@ -40,7 +40,17 @@ namespace foundation
       return *this;
     }
 
-    CircularProgressProps& value(short v) {
+    CircularProgressProps& value(const short v) {
+      default_dy = v;
+      return *this;
+    }
+
+    CircularProgressProps& value(const float v) {
+      default_dy = v;
+      return *this;
+    }
+
+    CircularProgressProps& value(const int v) {
       default_dy = v;
       return *this;
     }

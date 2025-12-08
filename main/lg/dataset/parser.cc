@@ -23,94 +23,115 @@ uint32_t random_in_range(uint32_t min, uint32_t max) {
   uint32_t r = esp_random();
   return min + r % (max - min + 1);
 }
+static data_storage_array<float> unpack_arrays_float(const char* start, size_t len) {
+    data_storage_array<float> result{};
 
+    const char* current = start + 3;
+    const char* data_start = current;
+    uint8_t idx = 0;
 
-static data_storage_array<float> unpack_arrays_float(const std::string& data) {
-  data_storage_array<float> result{};
-  std::string tmp;
-  uint8_t idx = 0;
+    while (current < start + len) {
+        if (*current == ';' || *current == '/') {
+            size_t val_len = current - data_start;
 
-  for (size_t i = 3; i < data.size(); i++) {
-      if (data[i] == ';' || data[i] == '/') {
-          result[idx++] = stfl(tmp);
-          tmp.clear();
-      } else {
-          tmp += data[i];
-      }
-      if (idx >= result.size()) break;
-  }
+            result[idx++] = parse_float(data_start, val_len);
+            data_start = current + 1;
+        }
 
-  return result;
+        if (idx >= result.size()) break;
+        current++;
+    }
+
+    if (idx < result.size() && data_start < start + len) {
+        size_t val_len = (start + len) - data_start;
+        result[idx] = parse_float(data_start, val_len);
+    }
+
+    return result;
 }
-
-
 
 DatasetDTO parse_into_dataset(const std::string& value_string) {
     DatasetDTO result{};
-
-    std::string temporary;
-    bool locked = false;
-    int index_of_start = 0;
 
     if (value_string.empty() || value_string[0] != '$') {
         return result;
     }
 
-    for (int i = 1; i < value_string.length(); i++) {
-        if (value_string[i] != '<') {
-            result.device_number += value_string[i];
-        } else {
-            index_of_start = i + 1;
-            break;
-        }
+    const char* raw_packet = value_string.c_str();
+    const char* current = raw_packet + 1;
+    const char* data_start;
+    size_t data_len;
+
+    const char* tag_start = strchr(current, '<');
+    if (!tag_start) return result;
+
+    data_len = tag_start - current;
+    if (data_len < sizeof(result.device_number)) {
+        strncpy(result.device_number, current, data_len);
+        result.device_number[data_len] = '\0';
     }
 
-    for (int i = index_of_start; i < value_string.length(); i++) {
-        if (locked) {
-            temporary += value_string[i];
+    current = tag_start + 1;
+    const char* end_packet = strchr(current, '>');
+    if (!end_packet) return result;
+
+    while (current < end_packet) {
+        data_start = current;
+        current = strchr(current, '/');
+
+        if (!current || current > end_packet) {
+            current = end_packet;
         }
 
-        if (value_string[i] == '/' || value_string[i] == '>') {
-            if (!temporary.empty()) {
-                if (temporary.find("CH=", 0) == 0) {
-                    result.channels = stin(temporary.substr(3));
-                }
-                else if (temporary.find("ST=", 0) == 0) {
-                    result.status = StringToDatasetStatus(temporary.substr(3, 1).c_str());
-                }
-                else if (temporary.find("O2=", 0) == 0) {
-                    result.oxygen_levels = unpack_arrays_float(temporary);
-                }
-                else if (temporary.find("FL=", 0) == 0) {
-                    result.oxygen_speed = unpack_arrays_float(temporary);
-                }
-                else if (temporary.find("II=", 0) == 0) {
-                    result.inputs = shtin(temporary.substr(3));
-                }
-                else if (temporary.find("IO=", 0) == 0) {
-                    result.outputs = shtin(temporary.substr(3));
-                }
-                else if (temporary.find("ER=", 0) == 0) {
-                    result.errors = shtul(temporary.substr(3));
-                }
-                else if (temporary.find("PS=", 0) == 0) {
-                    result.tanks_pressure = unpack_arrays_float(temporary);
+        data_len = current - data_start;
 
-                }
-                else if (temporary.find("HR=", 0) == 0) {
-                    result.moto_hours = temporary.substr(3);
+        if (data_len > 3) {
+            const char* tag_key = data_start;
+
+            const char* tag_value = data_start + 3;
+            size_t value_len = data_len - 3;
+
+            if (strncmp(tag_key, "CH=", 3) == 0) {
+                result.channels = (uint8_t)parse_int(tag_value, value_len);
+            }
+            else if (strncmp(tag_key, "ST=", 3) == 0) {
+                char status_char = tag_value[0];
+                char status_str[2] = {status_char, '\0'};
+                result.status = StringToDatasetStatus(status_str);
+            }
+            else if (strncmp(tag_key, "O2=", 3) == 0) {
+                result.oxygen_levels = unpack_arrays_float(data_start, data_len);
+            }
+            else if (strncmp(tag_key, "FL=", 3) == 0) {
+                result.oxygen_speed = unpack_arrays_float(data_start, data_len);
+            }
+            else if (strncmp(tag_key, "II=", 3) == 0) {
+                result.inputs = (uint8_t)parse_hex_to_int(tag_value, value_len);
+            }
+            else if (strncmp(tag_key, "IO=", 3) == 0) {
+                result.outputs = (uint8_t)parse_hex_to_int(tag_value, value_len);
+            }
+            else if (strncmp(tag_key, "ER=", 3) == 0) {
+                result.errors = parse_hex_to_ul(tag_value, value_len);
+            }
+            else if (strncmp(tag_key, "PS=", 3) == 0) {
+                result.tanks_pressure = unpack_arrays_float(data_start, data_len);
+            }
+            else if (strncmp(tag_key, "HR=", 3) == 0) {
+                if (value_len < sizeof(result.moto_hours)) {
+                    strncpy(result.moto_hours, tag_value, value_len);
+                    result.moto_hours[value_len] = '\0';
                 }
             }
-            temporary.clear();
-            locked = false;
         }
 
-        if (value_string[i] == '/') {
-            locked = true;
+        if (*current == '/') {
+            current++;
         }
     }
 
-    result.crc = std::stoi(value_string.substr(value_string.length() - 2), nullptr, 16);
+    const char* crc_start = value_string.c_str() + value_string.length() - 2;
+    result.crc = static_cast<uint8_t>(parse_hex_to_int(crc_start, 2));
 
     return result;
 }

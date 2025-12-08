@@ -1,102 +1,63 @@
-//
-// Created by evgeniy on 4/28/25.
-//
-
 #include <cstring>
 #include <string>
 
-bool contains_substring(const char* haystack, const char* needle) {
-  if (!*needle) return true;
+inline int parse_hex_to_int(const char* start, size_t len, int def = 0) {
+  if (len == 0) return def;
 
-  const char* p1 = haystack;
-  const char* p2 = needle;
+  char buffer[16];
+  if (len >= sizeof(buffer)) len = sizeof(buffer) - 1;
 
-  while (*p1) {
-      const char* h = p1;
-      const char* n = p2;
+  strncpy(buffer, start, len);
+  buffer[len] = '\0';
 
-      while (*h && *n && (*h == *n)) {
-          ++h;
-          ++n;
-      }
-
-      if (!*n) {
-          return true;
-      }
-
-      ++p1;
-  }
-
-  return false;
-}
-
-static bool starts_with(const char* str, const char* prefix) {
-  if (!str || !prefix) return false;
-
-  size_t len_str = strlen(str);
-  size_t len_prefix = strlen(prefix);
-
-  if (len_prefix > len_str) {
-      return false;
-  }
-
-  for (size_t i = 0; i < len_prefix; ++i) {
-      if (str[i] != prefix[i]) {
-          return false;
-      }
-  }
-
-  return true;
-}
-
-char* substring(const char* str, size_t start, size_t length) {
-  if (!str) return nullptr;
-
-  size_t str_len = strlen(str);
-
-  if (start >= str_len) return nullptr;
-
-  if (start + length > str_len) {
-      length = str_len - start;
-  }
-
-  char* result = (char*)malloc(length + 1); // +1 для '\0'
-  if (!result) return nullptr;
-
-  strncpy(result, str + start, length);
-  result[length] = '\0';
-
-  return result;
-}
-
-inline int shtin(const std::string& s, int def = 0) {
-  if (s.empty()) return def;
   char* end;
-  long v = strtol(s.c_str(), &end, 16);
-  if (end == s.c_str()) return def;
+  long v = strtol(buffer, &end, 16);
+  if (end == buffer) return def;
   return (int)v;
 }
 
-inline unsigned long shtul(const std::string& s, unsigned long def = 0) {
-  if (s.empty()) return def;
+inline unsigned long parse_hex_to_ul(const char* start, size_t len, unsigned long def = 0) {
+  if (len == 0) return def;
+
+  char buffer[16];
+  if (len >= sizeof(buffer)) len = sizeof(buffer) - 1;
+
+  strncpy(buffer, start, len);
+  buffer[len] = '\0';
+
   char* end;
-  unsigned long v = strtoul(s.c_str(), &end, 16);
-  if (end == s.c_str()) return def;
+  unsigned long v = strtoul(buffer, &end, 16);
+  if (end == buffer) return def;
   return v;
 }
 
-inline int stin(const std::string& s, int def = 0) {
-  if (s.empty()) return def;
+inline int parse_int(const char* start, size_t len, int def = 0) {
+  if (len == 0) return def;
+
+  char buffer[16];
+  if (len >= sizeof(buffer)) len = sizeof(buffer) - 1;
+
+  strncpy(buffer, start, len);
+  buffer[len] = '\0';
+
   char* end;
-  long v = strtol(s.c_str(), &end, 10);
-  if (end == s.c_str()) return def;
+  long v = strtol(buffer, &end, 10);
+  if (end == buffer) return def;
   return (int)v;
 }
 
-inline float stfl(const std::string& s, float def = 0.f) {
-  if (s.empty()) return def;
+inline float parse_float(const char* start, size_t len, float def = 0.f) {
+  if (len == 0) return def;
+
+  char buffer[16];
+  if (len >= sizeof(buffer)) len = sizeof(buffer) - 1;
+
+  strncpy(buffer, start, len);
+  buffer[len] = '\0';
+
   char* end;
-  float v = strtof(s.c_str(), &end);
-  if (end == s.c_str()) return def;
+  float v = strtof(buffer, &end);
+  if (end == buffer) return def;
   return v;
 }
+

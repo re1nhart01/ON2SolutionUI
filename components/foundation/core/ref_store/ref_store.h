@@ -9,37 +9,40 @@ namespace foundation
   class SharedRefStore
   {
     private:
-    StaticHashMap<std::string, Ref<VNode>, N> refs;
+    StaticHashMap<std::string, std::shared_ptr<RefBase>, N> refs;
+
     public:
+    SharedRefStore() = default;
+    ~SharedRefStore() = default;
 
     template<typename C>
-    std::shared_ptr<Ref<C>> create(std::string k)
+    std::shared_ptr<Ref<C>> create(const std::string &key)
     {
+      auto base_ref_ptr = refs.get(key);
 
-      Ref<VNode> base_ref(k);
-      base_ref.set(nullptr);
+      if (base_ref_ptr) {
+        return std::static_pointer_cast<Ref<C>>(*base_ref_ptr);
+      }
 
-      refs.put(k, base_ref);
+      auto new_ref = std::make_shared<Ref<C>>(key);
 
-      auto* storedRef = refs.get(k);
-      auto typedRef = std::make_shared<Ref<C>>();
+      refs.put(key, new_ref);
 
-      typedRef->ptr = static_cast<C*>(storedRef->ptr);
-
-      return typedRef;
+      return new_ref;
     }
 
     template<typename C>
-    void set(const std::string& key, C* node)
+    std::shared_ptr<Ref<C>> get(const std::string& key) const
     {
-      auto* ref = refs.get(key);
-      if (ref)
-        ref->ptr = static_cast<VNode*>(node);
+      auto base_ref_ptr = refs.get(key);
+
+      if (!base_ref_ptr) return nullptr;
+
+      return std::static_pointer_cast<Ref<C>>(*base_ref_ptr);
     }
 
-    Ref<VNode>* get(const std::string& key)
-    {
-      return refs.get(key);
+    void remove(const std::string& key) {
+        refs.remove(key);
     }
   };
 }

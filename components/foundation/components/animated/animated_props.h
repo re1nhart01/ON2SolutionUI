@@ -1,13 +1,10 @@
 #pragma once
 
+#include "lvgl.h"
+
 namespace foundation
 {
   class Animated;
-  enum AnimatedType {
-    single_animation = 0xff,
-    parallel_animation = 0xf1,
-    chained_animation = 0xf2,
-  };
 
   struct AnimatedProps final : BaseProps<AnimatedProps, Animated> {
     int32_t start_value = 0;
@@ -61,28 +58,6 @@ namespace foundation
 
     AnimatedProps& prop(Property p) {
       property = p;
-      return *this;
-    }
-  };
-
-  struct AnimatedSubConfig {
-    AnimatedType type_anim = AnimatedType::single_animation;
-    std::vector<AnimatedProps> configs = {};
-
-    static AnimatedSubConfig up() { return AnimatedSubConfig{}; }
-
-    AnimatedSubConfig& type(AnimatedType t) {
-      type_anim = t;
-      return *this;
-    }
-
-    AnimatedSubConfig& add(const AnimatedProps& p) {
-      configs.push_back(p);
-      return *this;
-    }
-
-    AnimatedSubConfig& set(const std::vector<AnimatedProps>& v) {
-      configs = v;
       return *this;
     }
   };
