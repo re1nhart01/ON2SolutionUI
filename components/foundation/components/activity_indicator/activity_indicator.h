@@ -33,8 +33,6 @@ namespace foundation
       set_component(lv_spinner_create(this->parent, this->props.spin_time, this->props.arc_length));
       lv_obj_t* obj = this->get_component();
 
-      lv_obj_set_size(obj, props.size, props.size);
-
       if (props.style) {
           lv_obj_add_style(obj, props.style->getStyle(), 0);
       }
@@ -47,7 +45,17 @@ namespace foundation
     void do_rebuild() override
     {
       lv_obj_t* obj = this->get_component();
+
+      lv_obj_set_size(obj, props.size, props.size);
+      lv_obj_set_style_arc_color(obj, this->props.color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+      lv_obj_set_style_arc_opa(obj, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+
       this->set_active(this->props.is_visible);
+
+      if (props.style) {
+          lv_obj_add_style(obj, props.style->getStyle(), 0);
+      }
+
     }
 
     std::shared_ptr<Styling> styling() override

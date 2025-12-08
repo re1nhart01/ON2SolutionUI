@@ -16,6 +16,15 @@ class State {
 
     const T& get() const { return value; }
 
+    void set(Delegate<T(T)> cb)
+    {
+      T newValue = cb(value);
+      if (!std::equal_to<T>()(value, newValue)) {
+          value = newValue;
+          force_notify();
+      }
+    }
+
     void set(const T& newValue)
     {
       if (!std::equal_to<T>()(value, newValue)) {

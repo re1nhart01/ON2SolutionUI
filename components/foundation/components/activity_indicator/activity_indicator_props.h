@@ -8,10 +8,10 @@ namespace foundation
   class ActivityIndicator;
   struct ActivityIndicatorProps final : BaseProps<ActivityIndicatorProps, ActivityIndicator>
   {
+    lv_color_t color = lv_color_hex(0xFF0000);
     int spin_time = 1000;
     int arc_length = 60;
     int size = 40;
-
 
     ActivityIndicatorProps& time(int t) {
       this->spin_time = t;
@@ -25,6 +25,12 @@ namespace foundation
 
     ActivityIndicatorProps& sz(int s) {
       this->size = s;
+      return *this;
+    }
+
+    ActivityIndicator& set_color(lv_color_t color)
+    {
+      this->color = color;
       return *this;
     }
 

@@ -92,7 +92,7 @@ DatasetDTO parse_into_dataset(const std::string& value_string) {
             size_t value_len = data_len - 3;
 
             if (strncmp(tag_key, "CH=", 3) == 0) {
-                result.channels = (uint8_t)parse_int(tag_value, value_len);
+                result.channels = static_cast<uint8_t>(parse_int(tag_value, value_len));
             }
             else if (strncmp(tag_key, "ST=", 3) == 0) {
                 char status_char = tag_value[0];
