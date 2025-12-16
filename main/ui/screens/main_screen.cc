@@ -148,7 +148,7 @@ public:
                     }
 
                     GlobalStore::getInstance()->getMotoHoursState()->set(
-                      [ctx, status_bar_lvgl_ref](uint32_t prev) {
+                      [ctx, status_bar_lvgl_ref](const uint32_t prev) {
                       if(prev == UINT32_MAX) return prev;
                       const auto newValue = prev + 1;
 

@@ -7,11 +7,10 @@ namespace foundation
   private:
     using Component::props;
     const std::string* base64_source = nullptr;
-    lv_img_dsc_t img_dsc;
 
   public:
-    explicit Image(const lv_img_dsc_t &source, const ImageProps& props)
-      : Component(nullptr, nullptr, std::move(props)), img_dsc(source) {
+    explicit Image(const ImageProps& props)
+      : Component(nullptr, nullptr, std::move(props)) {
       set_style(props.style);
 
       if (this->props.ref != nullptr) {
@@ -29,13 +28,20 @@ namespace foundation
     lv_obj_t* render() override
     {
       Component::render();
-
       if (get_component() == nullptr || this->parent == nullptr) {
           this->set_component(this->create_initial(this->parent));
       }
-
       lv_obj_t* comp = get_component();
-      lv_img_set_src(comp, &this->img_dsc);
+
+      if (this->props.img_src != nullptr)
+      {
+        lv_img_set_src(comp, this->props.img_src);
+      } else
+      {
+        lv_img_set_src(comp, &this->props.img_dsc);
+      }
+      lv_obj_set_width(comp, this->props.real_width);
+      lv_obj_set_height(comp, this->props.real_height);
       lv_obj_align(comp, LV_ALIGN_CENTER, 0, 0);
 
       std::shared_ptr<Styling> style = this->styling();

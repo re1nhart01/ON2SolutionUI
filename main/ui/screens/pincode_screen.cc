@@ -33,6 +33,7 @@ public:
                         StatusBarProps::up()
                             .set_style(nullptr)
                     ),
+                  $Image(ImageProps::up().source("S:/logo.bin").width(400).height(400)),
                   $Button(ButtonProps::up()
                                     .set_child(
                                         $Text(

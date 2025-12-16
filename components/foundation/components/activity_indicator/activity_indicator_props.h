@@ -28,7 +28,7 @@ namespace foundation
       return *this;
     }
 
-    ActivityIndicator& set_color(lv_color_t color)
+    ActivityIndicatorProps& set_color(lv_color_t color)
     {
       this->color = color;
       return *this;
