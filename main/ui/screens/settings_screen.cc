@@ -17,7 +17,7 @@ class SettingsScreen final : public NavigationScreen<SettingsScreenProps>
   std::unique_ptr<StyleStorage> styles;
 
 public:
-  explicit SettingsScreen(const std::shared_ptr<StackNavigator> &stack, const SettingsScreenProps &props)
+  explicit SettingsScreen(StackNavigator* stack, const SettingsScreenProps &props)
   : NavigationScreen(stack, props),
     styles(std::make_unique<StyleStorage>())
   {

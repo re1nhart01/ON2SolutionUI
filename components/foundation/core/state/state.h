@@ -8,7 +8,7 @@ namespace foundation {
 class State {
   private:
     T value;
-    std::function<void(const T&)> listeners[MaxListeners];
+    Delegate<void(const T&)> listeners[MaxListeners];
     int count = 0;
 
   public:

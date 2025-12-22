@@ -17,7 +17,7 @@ struct PinCodeScreenProps final : BaseProps<PinCodeScreenProps, PinCodeScreen>{}
 
 class PinCodeScreen : public NavigationScreen<PinCodeScreenProps>
 {
-  KeyboardManager keyboard;
+  std::shared_ptr<KeyboardManager> keyboard;
   State<std::string> password_state = State<std::string>("");
   State<std::string> login_state = State<std::string>("");
   PinCodeScreenProps props;
@@ -25,9 +25,9 @@ class PinCodeScreen : public NavigationScreen<PinCodeScreenProps>
   std::shared_ptr<Modal> info_modal = nullptr;
 
 public:
-  explicit PinCodeScreen(const std::shared_ptr<StackNavigator> &stack, const PinCodeScreenProps &props)
+  explicit PinCodeScreen(StackNavigator* stack, const PinCodeScreenProps &props)
   : NavigationScreen(stack, props),
-    keyboard(KeyboardManager{}),
+    keyboard(std::make_shared<KeyboardManager>()),
     props(props),
     styles(std::make_unique<StyleStorage>())
   {
@@ -81,7 +81,6 @@ public:
 
   lv_obj_t *render() override {
     VNode::render();
-    auto navigator_ref = this->navigation_ref;
     auto password_v = &this->password_state;
     auto login_v = &this->login_state;
 
@@ -103,8 +102,8 @@ public:
                                  .value("Back")
                          )
                        )
-                       .click([navigator_ref](lv_event_t* e){
-                           navigator_ref->goBack();
+                       .click([this](lv_event_t* e){
+                             navigation_ref->goBack();
                        }))
                     })
                   .set_style($s("header.container"))
@@ -112,7 +111,7 @@ public:
                   $View(ViewProps::up().set_children(Children{
                     $TextInput(TextInputProps::up()
                           .set_is_one_line(true)
-                          .set_keyboard(&keyboard)
+                          .set_keyboard(keyboard)
                           .hint("Login")
                           .set_length(32)
                           .on_changed_h([login_v](const std::string& value) {
@@ -121,7 +120,7 @@ public:
                     $TextInput(TextInputProps::up()
                           .set_is_secure(true)
                           .set_is_one_line(true)
-                          .set_keyboard(&keyboard)
+                          .set_keyboard(keyboard)
                           .hint("Password")
                           .set_length(64)
                           .on_changed_h([password_v](const std::string& value) {
@@ -135,7 +134,7 @@ public:
                          )
                        )
                        .click([this](lv_event_t* e){
-                         validate_and_login();
+                            validate_and_login();
                        }))
                   })
                   .set_style($s("header.container"))

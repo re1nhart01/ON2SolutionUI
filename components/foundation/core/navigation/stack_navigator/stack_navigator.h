@@ -10,6 +10,7 @@
 #include <stack>
 #include <string>
 #include <unordered_map>
+#include <esp_log.h>
 
 namespace foundation {
 
@@ -23,18 +24,24 @@ struct StackNavigatorConfig {
     std::string initial_route;
 };
 
+struct StackHistoryRoute
+{
+  int id;
+  std::string name;
+};
+
 using ScreenFactory = Delegate<std::shared_ptr<VNode>()>;
 
 class StackNavigator : public std::enable_shared_from_this<StackNavigator> {
-private:
+public:
     std::optional<StackCurrentScreen> current;
     lv_obj_t* parent;
     StackNavigatorConfig config;
     std::unordered_map<std::string, ScreenFactory> factories;
-    std::stack<StackCurrentScreen> history;
+    std::vector<StackHistoryRoute> history{};
     int id_counter = 0;
+    int history_counter = 0;
 
-public:
     explicit StackNavigator(const StackNavigatorConfig& cfg, lv_obj_t* parent)
         : parent(parent), config(cfg) {}
 
@@ -43,96 +50,81 @@ public:
     }
 
     void start() {
-      const std::string initial = this->config.initial_route;
-      if (const auto it = factories.find(initial); it != factories.end())
-        {
-          const std::shared_ptr<VNode>& component =  it->second();
-          current = StackCurrentScreen{
-            .id = id_counter++,
-            .name = initial,
-            .instance = component
-        };
-
-          if (auto* s = dynamic_cast<NavigationScreenBase*>(component.get()))
-            {
-              s->on_focus();
-            }
-        }
+      const auto initial_route = config.initial_route;
+      history.clear();
+      _mount_screen(initial_route, false);
     }
 
-    void reset_to(const std::string& name)
-    {
-      //TODO: implement it
-    }
+    void _mount_screen(const std::string& name, bool save_to_history) {
+      auto self_lock = shared_from_this();
 
-    void navigate(const std::string& name) {
-        const auto it = factories.find(name);
-        if (it == factories.end()) return;
+      std::string target_name = name;
 
-        if (current) {
-            if (auto* ns = dynamic_cast<NavigationScreenBase*>(current->instance.get())) {
-                ns->on_blur();
-            }
+      auto it = factories.find(target_name);
+      if (it == factories.end()) return;
 
-            history.push(std::move(*current));
-            current.reset();
-        }
+      if (current.has_value()) {
+          if (auto* ns = dynamic_cast<NavigationScreenBase*>(current->instance.get())) {
+              ns->on_blur();
+          }
 
-        lv_obj_t* active = parent ? parent : lv_scr_act();
-        lv_obj_clean(active);
+          if (save_to_history) {
+              history.push_back(StackHistoryRoute{.id = history_counter++, .name = current->name});
+          }
+      }
 
-        const auto screen = it->second();
-        screen->set_parent(active);
+      lv_obj_t* active_parent = parent ? parent : lv_scr_act();
+      lv_obj_clean(active_parent);
 
-        const auto obj = screen->render();
-        screen->set_component(obj);
+      auto screen_instance = it->second();
 
-        current = StackCurrentScreen {
-            .id = id_counter++,
-            .name = name,
-            .instance = screen
-        };
+      current.reset();
 
-        if (auto* ns = dynamic_cast<NavigationScreenBase*>(screen.get())) {
-            ns->on_focus();
-        }
-    }
+      current = StackCurrentScreen {
+        .id = id_counter++,
+        .name = target_name,
+        .instance = screen_instance
+    };
 
-    void goBack() {
-        if (history.empty()) return;
+      screen_instance->set_parent(active_parent);
+      auto ui_obj = screen_instance->render();
+      screen_instance->set_component(ui_obj);
 
-        if (current) {
-            if (auto* ns = dynamic_cast<NavigationScreenBase*>(current->instance.get())) {
-                ns->on_blur();
-            }
-        }
+      if (auto* ns = dynamic_cast<NavigationScreenBase*>(screen_instance.get())) {
+          ns->on_focus();
+      }
+      }
 
-        lv_obj_clean(parent);
+  void navigate(const std::string& name) {
+      _mount_screen(name, true);
+  }
 
-        auto prev = std::move(history.top());
-        history.pop();
+  void goBack() {
+      if(history.empty())
+      return;
 
-        auto screen = prev.instance;
-        auto obj = screen->render();
-        screen->set_component(obj);
+      auto prev = history.back();
+      if (history.size() == 0) return;
+      history.pop_back();
 
-        current = std::move(prev);
+      _mount_screen(prev.name, false);
+  }
 
-        if (auto* ns = dynamic_cast<NavigationScreenBase*>(screen.get())) {
-            ns->on_focus();
-        }
-    }
+  void reset_to(const std::string& name) {
+      history.clear();
+      _mount_screen(name, false);
+  }
 
-    const std::string& getCurrentRoute() const {
+    const std::string& get_current_route() const {
         static const std::string empty = "";
         return current ? current->name : empty;
     }
 
-    bool hasScreen(const std::string& name) const {
+    bool has_screen(const std::string& name) const {
         return factories.contains(name);
     }
 
-    std::shared_ptr<VNode> getCurrentComponent() const {
+    std::shared_ptr<VNode> get_current_component() const {
         return current ? current->instance : nullptr;
     }
 };

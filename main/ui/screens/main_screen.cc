@@ -30,7 +30,7 @@ class MainScreen final : public NavigationScreen<MainScreenProps> {
   std::unique_ptr<SharedRefStore<12>> ref_store;
   std::shared_ptr<Modal> info_modal = nullptr;
 public:
-  explicit MainScreen(const std::shared_ptr<StackNavigator> &stack, const MainScreenProps &props)
+  explicit MainScreen(StackNavigator* stack, const MainScreenProps &props)
     : NavigationScreen(stack, props),
       props(props),
       styles(std::make_unique<StyleStorage>()),

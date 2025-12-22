@@ -8,96 +8,44 @@ namespace foundation
 {
 
   template <typename Signature, size_t Capacity = 32>
-class Delegate;
+ class Delegate;
 
-template <typename R, typename... Args, size_t Capacity>
-class Delegate<R(Args...), Capacity> {
-private:
+  template <typename R, typename... Args, size_t Capacity>
+  class Delegate<R(Args...), Capacity> {
     using InvokeFn = R (*)(void*, Args&&...);
 
-    alignas(std::max_align_t) unsigned char storage[Capacity];
+    alignas(void*) unsigned char storage[Capacity];
     InvokeFn invoke = nullptr;
     void (*deleter)(void*) = nullptr;
 
-public:
+  public:
     Delegate() = default;
-
-    ~Delegate() {
-        reset();
-    }
-
-    Delegate(const Delegate& other) {
-        if (other.invoke) {
-            std::memcpy(storage, other.storage, Capacity);
-            invoke = other.invoke;
-            deleter = other.deleter;
-        }
-    }
-
-    Delegate& operator=(const Delegate& other) {
-        if (this != &other) {
-            reset();
-            if (other.invoke) {
-                std::memcpy(storage, other.storage, Capacity);
-                invoke = other.invoke;
-                deleter = other.deleter;
-            }
-        }
-        return *this;
-    }
+    ~Delegate() { reset(); }
 
     template <typename Callable>
     Delegate(Callable c) {
-        static_assert(sizeof(Callable) <= Capacity,
-                      "Callable too large for StaticFunction buffer");
-
-        new (storage) Callable(std::move(c));
-
-        invoke = [](void* ptr, Args&&... args) -> R {
-            return (*reinterpret_cast<Callable*>(ptr))(
-                std::forward<Args>(args)...);
-        };
-
-        deleter = [](void* ptr) {
-            reinterpret_cast<Callable*>(ptr)->~Callable();
-        };
-    }
-
-    template <typename Callable>
-    Delegate& operator=(Callable c) {
-        reset();
-
-        static_assert(sizeof(Callable) <= Capacity,
-                      "Callable too large for StaticFunction buffer");
-
-        new (storage) Callable(std::move(c));
-
-        invoke = [](void* ptr, Args&&... args) -> R {
-            return (*reinterpret_cast<Callable*>(ptr))(
-                std::forward<Args>(args)...);
-        };
-
-        deleter = [](void* ptr) {
-            reinterpret_cast<Callable*>(ptr)->~Callable();
-        };
-
-        return *this;
+      static_assert(sizeof(Callable) <= Capacity);
+      new (storage) Callable(std::move(c));
+      invoke = [](void* p, Args&&... args) -> R {
+        return (*reinterpret_cast<Callable*>(p))(std::forward<Args>(args)...);
+      };
+      deleter = [](void* p) {
+        reinterpret_cast<Callable*>(p)->~Callable();
+      };
     }
 
     void reset() {
-        if (deleter) {
-            deleter(storage);
-        }
-        invoke = nullptr;
-        deleter = nullptr;
+      if (deleter) deleter(storage);
+      invoke = nullptr;
+      deleter = nullptr;
     }
 
     R operator()(Args... args) {
-        return invoke(storage, std::forward<Args>(args)...);
+      return invoke(storage, std::forward<Args>(args)...);
     }
 
     explicit operator bool() const { return invoke != nullptr; }
-};
+  };
 }
 
 

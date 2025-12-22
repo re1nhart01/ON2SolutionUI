@@ -13,7 +13,7 @@ class PreloaderScreen final : public NavigationScreen<PreloaderScreenProps> {
 private:
   PreloaderScreenProps props;
 public:
-  explicit PreloaderScreen(const std::shared_ptr<StackNavigator> &stack, const PreloaderScreenProps &props) : NavigationScreen(stack, props) {
+  explicit PreloaderScreen(StackNavigator* stack, const PreloaderScreenProps &props) : NavigationScreen(stack, props) {
     this->props = props;
   }
 
@@ -27,23 +27,20 @@ public:
 
   void navigate_after() const
   {
-    auto* nav_ptr = new std::shared_ptr(this->navigation_ref);
 
     TimerHandle_t timeout_handle = xTimerCreate(
         "navigate_timer",
         pdMS_TO_TICKS(4000),
         pdFALSE,
-        nav_ptr,
+        this->navigation_ref,
         [](TimerHandle_t timer) {
             lv_async_call(
                 [](void* data) {
                     auto* navigator =
-                        static_cast<std::shared_ptr<StackNavigator>*>(data);
+                        static_cast<StackNavigator*>(data);
 
                     ESP_LOGI("preloader_screen", "Preloading screen after timeout callback");
-                    (*navigator)->navigate("/main");
-
-                    delete navigator;
+                    navigator->navigate("/main");
                 },
                 pvTimerGetTimerID(timer)
             );

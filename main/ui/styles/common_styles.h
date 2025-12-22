@@ -62,7 +62,7 @@ inline void header_labels_container_props(foundation::ViewProps & p) {
 
 inline void pincode_screen_sign_form_props(foundation::ViewProps & p) {
   p.w(LV_PCT(100))
-  .h(LV_PCT(60))
+  .h(LV_PCT(50))
   .justify(LV_FLEX_ALIGN_CENTER)
   .items(LV_FLEX_ALIGN_CENTER)
   .track_cross(LV_FLEX_ALIGN_CENTER)

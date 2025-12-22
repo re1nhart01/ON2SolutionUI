@@ -10,79 +10,59 @@ extern "C" {
 #include "internals/lvgl_port.h"
 #include "esp_log.h"
 }
-namespace foundation {
+  namespace foundation {
     class Application {
     protected:
-        lv_obj_t* screen = nullptr;
-        VNode* root = nullptr;
+      lv_obj_t* screen = nullptr;
+      std::shared_ptr<VNode> root_node = nullptr;
 
     public:
-        Application(lv_obj_t* screen_v) {
-            this->screen = screen_v;
-        };
-        virtual ~Application() = default;
+      Application(lv_obj_t* screen_v) : screen(screen_v) {};
+      virtual ~Application() = default;
 
-        virtual VNode* root_component() = 0;
-        virtual void before_load_application() = 0;
-        virtual void after_load_application() = 0;
+      virtual std::shared_ptr<VNode> root_component() { return nullptr; }
 
+      virtual void on_init() {}
 
-        void set_root(VNode *root_component);
-        void renderApp();
-        void tick(lv_obj_t* scr, std::function<void()> callback);
-        void turnOnBacklight();
-        void turnOffBacklight();
-    };
+      virtual void before_load_application() = 0;
+      virtual void after_load_application() = 0;
 
-    inline void Application::set_root(VNode* root_component) {
-        this->root = root_component;
-    }
-
-
-    inline void Application::turnOnBacklight() {
-        // waveshare_rgb_lcd_bl_on();
-    }
-
-    inline void Application::turnOffBacklight() {
-        // waveshare_rgb_lcd_bl_off();
-    }
-
-    inline void Application::renderApp() {
+      void renderApp() {
         if (this->screen == nullptr) return;
-        if (this->root == nullptr) {
-            this->before_load_application();
 
-            VNode* root_component_view = this->root_component();
-            this->set_root(root_component_view);
-        }
+        this->before_load_application();
 
-        if (this->root != nullptr) {
-            this->root->set_parent(this->screen);
-
-            if (lvgl_port_lock(-1)) {
-                lv_obj_t* rendered = this->root->render();
-                this->root->set_component(rendered);
-
-                this->after_load_application();
-
-#if IS_MULTITHREAD
-                ESP_LOGI(APP_LOG_TAG, "Running on single-threaded LVGL loop");
-#endif
-#if DISPLAY_BASE_TYPE_WAVESHARE_DISPLAY
-                ESP_LOGI(APP_LOG_TAG, "Running waveshare display");
-#endif
-
-                lvgl_port_unlock();
-            }
-        }
-    }
-
-
-    inline void Application::tick(lv_obj_t* scr, std::function<void()> callback) {
         if (lvgl_port_lock(-1)) {
-    #if IS_MULTITHREAD
+
+            this->on_init();
+  #if IS_MULTITHREAD
             ESP_LOGI(APP_LOG_TAG, "Running on single-threaded LVGL loop");
-    #endif
+  #endif
+  #if DISPLAY_BASE_TYPE_WAVESHARE_DISPLAY
+            ESP_LOGI(APP_LOG_TAG, "Running waveshare display");
+  #endif
+            if (!this->root_node) {
+                this->root_node = this->root_component();
+
+                if (this->root_node) {
+                    this->root_node->set_parent(this->screen);
+                    lv_obj_t* rendered = this->root_node->render();
+                    this->root_node->set_component(rendered);
+                }
+            }
+
+            lvgl_port_unlock();
+        }
+
+        this->after_load_application();
+      }
+
+      void tick(lv_obj_t* scr, std::function<void()> callback) const
+      {
+        if (lvgl_port_lock(-1)) {
+  #if IS_MULTITHREAD
+            ESP_LOGI(APP_LOG_TAG, "Running on single-threaded LVGL loop");
+  #endif
 
             std::time_t result = std::time(nullptr);
             std::string timeStr = std::asctime(std::localtime(&result));
@@ -90,6 +70,6 @@ namespace foundation {
             lvgl_port_unlock();
         }
 
-    }
-
-} // namespace foundation
+      }
+    };
+  }

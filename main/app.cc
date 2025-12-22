@@ -22,31 +22,32 @@ public:
     this->stack_navigator = std::make_shared<StackNavigator>(StackNavigatorConfig{.initial_route = "/preloader"}, screen);
   }
 
-  VNode *root_component() override {
-    auto root = stack_navigator->getCurrentComponent().get();
-    return root;
-  }
-
-  void before_load_application() override {
+  void on_init() override
+  {
     auto navigator = this->stack_navigator;
 
     navigator->register_screen("/main", [navigator]() {
-      return std::make_shared<MainScreen>(navigator, MainScreenProps{});
+        return std::make_shared<MainScreen>(navigator.get(), MainScreenProps{});
     });
 
     navigator->register_screen("/pin_code", [navigator]() {
-        return std::make_shared<PinCodeScreen>(navigator, PinCodeScreenProps{});
+        return std::make_shared<PinCodeScreen>(navigator.get(), PinCodeScreenProps{});
     });
 
     navigator->register_screen("/preloader", [navigator]() {
-      return std::make_shared<PreloaderScreen>(navigator, PreloaderScreenProps{});
+        return std::make_shared<PreloaderScreen>(navigator.get(), PreloaderScreenProps{});
     });
 
     navigator->register_screen("/settings", [navigator]() {
-      return std::make_shared<SettingsScreen>(navigator, SettingsScreenProps{});
+        return std::make_shared<SettingsScreen>(navigator.get(), SettingsScreenProps{});
     });
 
     navigator->start();
+  };
+
+  void before_load_application() override {
+    ESP_LOGI("MyApp", "before_load_application called");
+
   }
 
   void after_load_application() override {

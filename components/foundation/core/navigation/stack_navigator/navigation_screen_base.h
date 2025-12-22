@@ -9,7 +9,7 @@ namespace foundation
   class NavigationScreenBase
   {
   protected:
-    std::shared_ptr<StackNavigator> navigation_ref = nullptr;
+    StackNavigator* navigation_ref = nullptr;
 
   public:
     virtual ~NavigationScreenBase() = default;
@@ -32,6 +32,6 @@ namespace foundation
 
     void set_focused(bool focused) { is_focused = focused; }
 
-    std::shared_ptr<StackNavigator> get_navigation_ref() const { return navigation_ref; }
+    StackNavigator* get_navigation_ref() const { return navigation_ref; }
   };
 }

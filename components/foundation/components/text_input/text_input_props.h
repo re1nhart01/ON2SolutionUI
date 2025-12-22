@@ -17,7 +17,7 @@ namespace foundation
     char* text = {};
     short secure_timeout = 1500;
     short length = 500;
-    KeyboardManager* kbManager = nullptr;
+    std::shared_ptr<KeyboardManager> kbManager = nullptr;
 
 
     static TextInputProps up() { return TextInputProps{}; }
@@ -34,7 +34,7 @@ namespace foundation
       return *this;
     }
 
-    TextInputProps& set_keyboard(KeyboardManager* v)
+    TextInputProps& set_keyboard(std::shared_ptr<KeyboardManager> v)
     {
       kbManager = v;
       return *this;
