@@ -1,29 +1,27 @@
 #include "../../components/foundation/components/component.h"
 #include "../../components/foundation/core/shortcuts.h"
 
+#include "ui/styles/common_styles.h"
+#include "esp_log.h"
+
+
 class SettingsScreen;
-extern "C" {
-  #include "esp_log.h"
-}
 
 using namespace foundation;
 
-struct SettingsScreenProps final
-    : BaseProps<SettingsScreenProps, SettingsScreen>
-{};
-
-auto admin_keyboard
-  = std::make_unique<KeyboardManager>();
-auto imageStyle = std::make_shared<Styling>();
+struct SettingsScreenProps final : BaseProps<SettingsScreenProps, SettingsScreen> {};
 
 class SettingsScreen final : public NavigationScreen<SettingsScreenProps>
 {
   SettingsScreenProps props;
+  std::unique_ptr<StyleStorage> styles;
 
 public:
-  explicit SettingsScreen(const std::shared_ptr<StackNavigator> &stack, const SettingsScreenProps &props) : NavigationScreen(stack, props)
+  explicit SettingsScreen(const std::shared_ptr<StackNavigator> &stack, const SettingsScreenProps &props)
+  : NavigationScreen(stack, props),
+    styles(std::make_unique<StyleStorage>())
   {
-    this->props = props;
+    style_screen_register(*this->styles);
   }
 
   ~SettingsScreen() override = default;
@@ -37,41 +35,34 @@ public:
     {
         auto navigator_ref = this->navigation_ref;
 
-         return this->delegate($View(
+         return this->delegate(
+           $View(
             ViewProps::up()
-                .set_style(style)
+                .set_style(this->styling())
                 .set_children(Children{
                     $StatusBar(
                         StatusBarProps::up()
                             .set_style(nullptr)
                     ),
-                    $Text(
-                        TextProps::up()
-                            .value("text")
-                    ),
-                    $Button(
-                        ButtonProps::up()
-                            .label("navigate to admin")
-                            .click([navigator_ref](lv_event_t* e){
-                                navigator_ref->navigate("/main");
-                            })
-                    ),
-                    $Input(
-                        TextInputProps::up()
-                            .hint("text")
-                            .submit([](const std::string& value){
-                                ESP_LOGI("LOG", "%s", value.c_str());
-                                admin_keyboard->hide();
-                            }),
-                        admin_keyboard.get()
-                    ),
+                  $View(ViewProps::up()
+                  .set_children(Children{
+                    $Button(ButtonProps::up()
+                     .set_child(
+                       $Text(
+                           TextProps::up()
+                               .value("Back")
+                       )
+                     )
+                     .click([navigator_ref](lv_event_t* e){
+                       navigator_ref->navigate("/main");
+                     }))
+                  })
+                .set_style($s("header.container"))
+                .merge(header_container_left_props)),
+                  $View(ViewProps::up()),
+                  $View(ViewProps::up()),
                 })
-                .w(LV_PCT(100))
-                .h(LV_PCT(100))
-                .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
-                .items(LV_FLEX_ALIGN_CENTER)
-                .track_cross(LV_FLEX_ALIGN_CENTER)
-                .direction(LV_FLEX_FLOW_COLUMN)
+            .merge(screen_container_props)
         ));
     }
 

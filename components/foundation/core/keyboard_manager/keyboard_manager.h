@@ -13,7 +13,7 @@ namespace foundation {
     class KeyboardManager {
     private:
         lv_obj_t* keyboard = nullptr;
-        std::function<void(std::string)> on_submit_callback;
+        Delegate<void(std::string)> on_submit_callback{};
         callback_keyboard lambda = nullptr;
     public:
         void create(lv_obj_t* parent) {
@@ -37,7 +37,8 @@ namespace foundation {
             }
         }
 
-      void attach_on_submit_event(const std::function<void(std::string value)> on_submit = nullptr) {
+      void attach_on_submit_event(
+          const Delegate<void(std::string value)> &on_submit) {
           if (this->keyboard == nullptr) return;
 
           this->on_submit_callback = on_submit;

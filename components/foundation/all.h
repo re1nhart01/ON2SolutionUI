@@ -32,6 +32,9 @@
 #include "components/circular_progress/circular_progress.h"
 #include "components/circular_progress/circular_progress_props.h"
 
+#include "components/modal/modal.h"
+#include "components/modal/modal_props.h"
+
 #include "components/status_bar/status_bar.h"
 #include "components/status_bar/status_bar_props.h"
 
@@ -39,6 +42,7 @@
 
 #include "core/navigation/stack_navigator/stack_navigator.h"
 #include "core/navigation/stack_navigator/navigation_screen.h"
+
 
 #include "core/styling/styling.h"
 

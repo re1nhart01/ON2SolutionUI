@@ -1,4 +1,7 @@
 
+
+#pragma once
+
 #include "core/style_store/style_store.h"
 #include "components/view/view_props.h"
 
@@ -25,6 +28,15 @@ inline void header_container_props(foundation::ViewProps & p) {
   p.direction(LV_FLEX_FLOW_ROW);
 }
 
+inline void header_container_left_props(foundation::ViewProps & p) {
+  p.w(LV_PCT(100));
+  p.h(55);
+  p.justify(LV_FLEX_ALIGN_START);
+  p.items(LV_FLEX_ALIGN_START);
+  p.track_cross(LV_FLEX_ALIGN_START);
+  p.direction(LV_FLEX_FLOW_ROW);
+}
+
 // ---------------------------- HEADER RIGHT ----------------------------
 
 inline void header_container_right_props(foundation::ViewProps & p) {
@@ -46,10 +58,18 @@ inline void header_labels_container_props(foundation::ViewProps & p) {
   p.track_cross(LV_FLEX_ALIGN_CENTER);
   p.direction(LV_FLEX_FLOW_ROW);
 }
-//----------------------------------- Styles ------------------------------------------------
 
 
-void style_main_screen_register(foundation::StyleStorage& storage) {
+inline void pincode_screen_sign_form_props(foundation::ViewProps & p) {
+  p.w(LV_PCT(100))
+  .h(LV_PCT(60))
+  .justify(LV_FLEX_ALIGN_CENTER)
+  .items(LV_FLEX_ALIGN_CENTER)
+  .track_cross(LV_FLEX_ALIGN_CENTER)
+  .direction(LV_FLEX_FLOW_COLUMN);
+}
+
+inline void style_screen_register(foundation::StyleStorage& storage) {
   storage.set("header.button", make_style([](Styling& style) {
     style.setBackgroundColor(lv_color_hex(0x5B5AFF));
     style.setBorderRadius(24);

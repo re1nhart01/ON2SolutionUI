@@ -1,6 +1,7 @@
 #pragma once
 
 #include "all.h"
+#include "components/activity_indicator/activity_indicator.h"
 
 using VNodePtr = std::shared_ptr<foundation::VNode>;
 
@@ -16,7 +17,7 @@ using VNodePtr = std::shared_ptr<foundation::VNode>;
     return std::make_shared<foundation::Button>(std::forward<decltype(args)>(args)...);
   }
 
-  inline std::shared_ptr<foundation::TextInput> $Input(auto&&... args) {
+  inline std::shared_ptr<foundation::TextInput> $TextInput(auto&&... args) {
     return std::make_shared<foundation::TextInput>(std::forward<decltype(args)>(args)...);
   }
 
@@ -38,6 +39,14 @@ using VNodePtr = std::shared_ptr<foundation::VNode>;
 
   inline std::shared_ptr<foundation::CircularProgress> $Circular(auto&&... args) {
     return std::make_shared<foundation::CircularProgress>(std::forward<decltype(args)>(args)...);
+  }
+
+  inline std::shared_ptr<foundation::ActivityIndicator> $Activity(auto&&... args) {
+    return std::make_shared<foundation::ActivityIndicator>(std::forward<decltype(args)>(args)...);
+  }
+
+  inline std::shared_ptr<foundation::Modal> $Modal(auto&&... args) {
+    return std::make_shared<foundation::Modal>(std::forward<decltype(args)>(args)...);
   }
 
   inline std::shared_ptr<foundation::Fragment> $Fragment() {

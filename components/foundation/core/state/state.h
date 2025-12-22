@@ -39,7 +39,7 @@ class State {
       return *this;
     }
 
-    int subscribe(std::function<void(const T&)> cb)
+    int subscribe(Delegate<void(const T&)> cb)
     {
       if (count < MaxListeners) {
           listeners[count] = std::move(cb);
@@ -48,7 +48,7 @@ class State {
       return -1;
     }
 
-    int subscribe_once(std::function<void(const T&)> cb)
+    int subscribe_once(Delegate<void(const T&)> cb)
     {
       if (count < MaxListeners) {
           int id = count;

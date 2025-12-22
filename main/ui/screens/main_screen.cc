@@ -4,15 +4,18 @@
 #include "../../components/foundation/core/state/state.h"
 #include "../../components/foundation/core/style_store/style_store.h"
 #include "components/button/button_props.h"
+#include "components/modal/modal_props.h"
 #include "components/text/text_props.h"
 #include "components/view/view.h"
 #include "components/view/view_props.h"
 #include "core/ref_store/ref_store.h"
 #include "lg/dataset/parser.cc"
+#include "lg/store/global_store.h"
 #include "protocols/uart/uart_proto.h"
 #include "ui/localization.hh"
-#include "ui/styles/main_screen_styles.cc"
-#include "lg/store/global_store.h"
+#include "ui/styles/common_styles.h"
+
+#include <algorithm>
 
 struct PinCodeScreenProps;
 using namespace foundation;
@@ -25,18 +28,18 @@ class MainScreen final : public NavigationScreen<MainScreenProps> {
   std::unique_ptr<StyleStorage> styles;
   std::unique_ptr<UartHandler> uart_handler = nullptr;
   std::unique_ptr<SharedRefStore<12>> ref_store;
+  std::shared_ptr<Modal> info_modal = nullptr;
 public:
   explicit MainScreen(const std::shared_ptr<StackNavigator> &stack, const MainScreenProps &props)
     : NavigationScreen(stack, props),
       props(props),
       styles(std::make_unique<StyleStorage>()),
       ref_store(std::make_unique<SharedRefStore<12>>())
-{
-    style_main_screen_register(*this->styles);
-}
+    {
+        style_screen_register(*this->styles);
+    }
 
   ~MainScreen() override {
-    NavigationScreen::~NavigationScreen();
     ESP_LOGI("main_screen", "Main screen destroyed");
   };
 
@@ -73,6 +76,32 @@ public:
       [value](CircularProgressProps& props) {
         props.value(value);
     });
+  }
+
+  void show_info_modal()
+  {
+    info_modal = $Modal(
+        ModalProps::up()
+            .set_content(
+                $View(ViewProps::up().set_children(Children{
+                    $Text(TextProps::up().value("I am modal")),
+                    $Button(
+                        ButtonProps::up()
+                            .set_style($s("header.button"))
+                            .label("Press")
+                            .click([this](lv_event_t*) {
+                              this->info_modal->close();
+                            })
+                    ),
+                })
+            .justify(LV_FLEX_ALIGN_CENTER)
+            .items(LV_FLEX_ALIGN_CENTER)
+            .track_cross(LV_FLEX_ALIGN_CENTER)
+            .direction(LV_FLEX_FLOW_COLUMN))
+            )
+    );
+
+    info_modal->show();
   }
 
   void add_uart_data_event()
@@ -199,8 +228,8 @@ public:
                                                 .value(locales::en::header_information)
                                         )
                                     )
-                                    .click([navigator_ref](lv_event_t* e){
-                                        navigator_ref->navigate("/pincode");
+                                    .click([this](lv_event_t* e){
+                                      this->show_info_modal();
                                     })
                             ),
 

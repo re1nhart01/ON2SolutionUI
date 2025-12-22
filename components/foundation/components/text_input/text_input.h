@@ -6,21 +6,10 @@
 namespace foundation
 {
   class TextInput final : public Component<TextInputProps> {
-  private:
-    mutable lv_obj_t* keyboard = nullptr;
-    KeyboardManager* kbManager = nullptr;
-
   public:
     using Component::props;
-
-    explicit TextInput(const TextInputProps& props, KeyboardManager* kbManager) : Component(nullptr, nullptr, std::move(props)) {
-      this->props = props;
-      this->kbManager = kbManager;
-
-      if (this->props.on_submit != nullptr && this->kbManager != nullptr) {
-          this->kbManager->attach_on_submit_event(this->props.on_submit);
-      }
-
+    bool is_init = true;
+    explicit TextInput(const TextInputProps& props) : Component(nullptr, nullptr, std::move(props)) {
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }
@@ -40,28 +29,6 @@ namespace foundation
 
       set_component(lv_textarea_create(parent));
       lv_obj_t* obj = this->get_component();
-
-      if (kbManager != nullptr)
-        {
-          lv_obj_add_event_cb(obj, [](lv_event_t* e) {
-            auto* instance = static_cast<TextInput*>(lv_event_get_user_data(e));
-            if (!instance || !instance->kbManager) return;
-
-            instance->kbManager->create(lv_scr_act());
-
-            if (instance->props.on_submit != nullptr) {
-              instance->kbManager->attach_on_submit_event(instance->props.on_submit);
-            }
-
-            instance->kbManager->attach(lv_event_get_target(e));
-          }, LV_EVENT_FOCUSED, this);
-
-          lv_obj_add_event_cb(obj, [](lv_event_t* e) {
-            auto* instance = static_cast<TextInput*>(lv_event_get_user_data(e));
-            if (!instance || !instance->kbManager) return;
-            instance->kbManager->hide();
-          }, LV_EVENT_DEFOCUSED, this);
-        }
 
       do_rebuild();
 
@@ -92,10 +59,35 @@ namespace foundation
 
       lv_obj_remove_event_cb(obj, nullptr);
 
-      if (props.on_click)          lv_obj_add_event_cb(obj, props.on_click, LV_EVENT_CLICKED, nullptr);
-      if (props.on_focused)        lv_obj_add_event_cb(obj, props.on_focused, LV_EVENT_FOCUSED, nullptr);
-      if (props.on_defocused)      lv_obj_add_event_cb(obj, props.on_defocused, LV_EVENT_DEFOCUSED, nullptr);
-      if (props.on_value_changed)  lv_obj_add_event_cb(obj, props.on_value_changed, LV_EVENT_VALUE_CHANGED, nullptr);
+      if (this->props.kbManager != nullptr)
+        {
+          lv_obj_add_event_cb(obj, [](lv_event_t* e) {
+            auto* instance = static_cast<TextInput*>(lv_event_get_user_data(e));
+            if (!instance) return;
+
+            instance->props.kbManager->create(lv_scr_act());
+
+            if (instance->props.on_submit) {
+              instance->props.kbManager->attach_on_submit_event(instance->props.on_submit);
+            }
+
+            if (instance->get_component() != nullptr)
+              {
+                instance->props.kbManager->attach(instance->get_component());
+              }
+          }, LV_EVENT_FOCUSED, this);
+
+          lv_obj_add_event_cb(obj, [](lv_event_t* e) {
+            auto* instance = static_cast<TextInput*>(lv_event_get_user_data(e));
+            if (!instance) return;
+            instance->props.kbManager->hide();
+          }, LV_EVENT_DEFOCUSED, this);
+        }
+
+      if (props.on_click)          lv_obj_add_event_cb(obj, event_adapter, LV_EVENT_CLICKED, this);
+      if (props.on_focused)        lv_obj_add_event_cb(obj, event_adapter, LV_EVENT_FOCUSED, this);
+      if (props.on_defocused)      lv_obj_add_event_cb(obj, event_adapter, LV_EVENT_DEFOCUSED, this);
+      if (props.on_value_changed)  lv_obj_add_event_cb(obj, event_adapter, LV_EVENT_VALUE_CHANGED, this);
     }
 
     std::shared_ptr<Styling> styling() override
@@ -123,5 +115,34 @@ namespace foundation
       if (this->get_component() == nullptr) return;
       lv_textarea_set_text(get_component(), txt);
     };
+
+    static void event_adapter(lv_event_t *event) {
+      auto *instance = static_cast<TextInput *>(lv_event_get_user_data(event));
+      if (!instance) return;
+
+      auto &events = instance->props;
+
+      switch (event->code) {
+        case LV_EVENT_CLICKED:
+          if (events.on_click) events.on_click(event);
+          break;
+        case LV_EVENT_FOCUSED:
+          if (events.on_focused) events.on_focused(event);
+          break;
+        case LV_EVENT_DEFOCUSED:
+          if (events.on_defocused) events.on_defocused(event);
+          break;
+        case LV_EVENT_VALUE_CHANGED:
+          if (events.on_value_changed)
+            {
+              lv_obj_t* ta = lv_event_get_target(event);
+              const char* txt = lv_textarea_get_text(ta);
+              events.on_value_changed(std::string(txt));
+            };
+          break;
+        default:
+          ESP_LOGW("button", "Unknown event code %d", event->code);
+      }
+    }
   };
 }

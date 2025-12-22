@@ -60,8 +60,13 @@ public:
         }
     }
 
+    void reset_to(const std::string& name)
+    {
+      //TODO: implement it
+    }
+
     void navigate(const std::string& name) {
-        auto it = factories.find(name);
+        const auto it = factories.find(name);
         if (it == factories.end()) return;
 
         if (current) {
@@ -76,10 +81,10 @@ public:
         lv_obj_t* active = parent ? parent : lv_scr_act();
         lv_obj_clean(active);
 
-        auto screen = it->second();
+        const auto screen = it->second();
         screen->set_parent(active);
 
-        auto obj = screen->render();
+        const auto obj = screen->render();
         screen->set_component(obj);
 
         current = StackCurrentScreen {

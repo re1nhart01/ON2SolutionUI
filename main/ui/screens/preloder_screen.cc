@@ -1,6 +1,7 @@
 #include "../../components/foundation/components/component.h"
 #include "../../components/foundation/core/application.h"
 #include "../../components/foundation/core/shortcuts.h"
+#include "ui/styles/theme.h"
 
 class PreloaderScreen;
 using namespace foundation;
@@ -8,14 +9,9 @@ using namespace foundation;
 struct PreloaderScreenProps final
     : BaseProps<PreloaderScreenProps, PreloaderScreen> {};
 
-int i = 0;
-bool flag = false;
-
 class PreloaderScreen final : public NavigationScreen<PreloaderScreenProps> {
 private:
   PreloaderScreenProps props;
-  std::shared_ptr<Ref<Text>> label_ref = std::make_shared<Ref<Text>>("label");
-  std::shared_ptr<Ref<View>> view_ref = std::make_shared<Ref<View>>("zxc");
 public:
   explicit PreloaderScreen(const std::shared_ptr<StackNavigator> &stack, const PreloaderScreenProps &props) : NavigationScreen(stack, props) {
     this->props = props;
@@ -26,10 +22,39 @@ public:
   void component_did_mount() override
   {
     ESP_LOGI("preloader_screen", "Preloading screen");
+    this->navigate_after();
   }
 
+  void navigate_after() const
+  {
+    auto* nav_ptr = new std::shared_ptr(this->navigation_ref);
+
+    TimerHandle_t timeout_handle = xTimerCreate(
+        "navigate_timer",
+        pdMS_TO_TICKS(4000),
+        pdFALSE,
+        nav_ptr,
+        [](TimerHandle_t timer) {
+            lv_async_call(
+                [](void* data) {
+                    auto* navigator =
+                        static_cast<std::shared_ptr<StackNavigator>*>(data);
+
+                    ESP_LOGI("preloader_screen", "Preloading screen after timeout callback");
+                    (*navigator)->navigate("/main");
+
+                    delete navigator;
+                },
+                pvTimerGetTimerID(timer)
+            );
+        }
+    );
+
+    xTimerStart(timeout_handle, 0);
+  }
 
   lv_obj_t* render() override {
+    NavigationScreen::render();
     auto navigator_ref = this->navigation_ref;
 
     return this->delegate(
@@ -37,55 +62,12 @@ public:
             ViewProps::up()
                 .set_style(this->styling())
                 .set_children(Children{
-                    $View(ViewProps::up().w(600).h(240).set_ref(this->view_ref).set_children(Children{})),
-
-                    $Text(
-                        TextProps::up()
-                            .set_ref(this->label_ref)
-                            .value(std::format("count: {}", i))
-                    ),
-
-                    $Button(
-                        ButtonProps::up()
-                            .label("mmm")
-                            .click([this](lv_event_t* e) {
-                              auto component_f = this->label_ref->get();
-                                auto component_g = this->view_ref->get();
-
-                                component_f->set_state([component_f](TextProps& props) {
-                                  auto tex = props.text.c_str();
-
-                                    ESP_LOGI("problem", "%s", tex);
-                                    props.text = "count: " + std::to_string(i++);
-                                });
-
-                              component_g->set_state([](ViewProps& p, VNode* v) {
-                                  const auto self = dynamic_cast<View*>(v);
-
-                                  if (flag)
-                                  {
-                                    p.children.push_back($Text(TextProps::up().value(std::format("Hello", i))));
-                                  }
-                                  else
-                                  {
-                                      if (!p.children.empty()) {
-                                          p.children.pop_back();
-                                      }
-                                  }
-
-                                  flag = !flag;
-
-                                  self->refresh_childrens();
-                                });
-
-
-                            })
-                    )
-
+                    $Text(TextProps::up().value("LOADING...")),
+                    $Activity(ActivityIndicatorProps::up().sz(86).arc(80).set_color(PRIMARY_COLOR))
                 })
                 .w(LV_PCT(100))
                 .h(LV_PCT(100))
-                .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
+                .justify(LV_FLEX_ALIGN_CENTER)
                 .items(LV_FLEX_ALIGN_CENTER)
                 .track_cross(LV_FLEX_ALIGN_CENTER)
                 .direction(LV_FLEX_FLOW_COLUMN)

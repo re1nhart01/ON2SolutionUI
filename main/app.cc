@@ -19,7 +19,7 @@ public:
   explicit WaveApplication(lv_obj_t *screen)
       : Application(screen)
   {
-    this->stack_navigator = std::make_shared<StackNavigator>(StackNavigatorConfig{.initial_route = "/main"}, screen);
+    this->stack_navigator = std::make_shared<StackNavigator>(StackNavigatorConfig{.initial_route = "/preloader"}, screen);
   }
 
   VNode *root_component() override {
