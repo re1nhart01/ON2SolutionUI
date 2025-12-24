@@ -59,8 +59,38 @@ public:
                   })
                 .set_style($s("header.container"))
                 .merge(header_container_left_props)),
-                  $View(ViewProps::up()),
-                  $View(ViewProps::up()),
+                  $Stepper(StepperProps::up()
+                    .range(0, 255)
+                    .value(128)
+                    .size(200, 50)
+                    .btn_width(50)
+                    .format(3, 0)
+                    .on_change([](long v) {
+                      ESP_LOGI("TAG", "tagagaga %d", v);
+                    })
+                  ),
+                  $Stepper(StepperProps::up()
+                   .range(0, 255)
+                   .value(128)
+                   .size(200, 50)
+                   .set_label("Compressor delay")
+                   .btn_width(50)
+                   .format(3, 0)
+                   .on_change([](long v) {
+                     ESP_LOGI("TAG", "tagagaga %d", v);
+                   })),
+                  $Stepper(StepperProps::up()
+                  .range(0, 255)
+                  .value(0)
+                  .set_step(0.5f)
+                  .set_precision(1)
+                  .size(200, 50)
+                  .set_label("Compressor delay 1")
+                  .btn_width(50)
+                  .format(3, 0)
+                  .on_change([](float v) {
+                    ESP_LOGI("TAG", "tagagaga %d", v);
+                  })),
                 })
             .merge(screen_container_props)
         ));

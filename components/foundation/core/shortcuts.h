@@ -49,6 +49,10 @@ using VNodePtr = std::shared_ptr<foundation::VNode>;
     return std::make_shared<foundation::Modal>(std::forward<decltype(args)>(args)...);
   }
 
+  inline std::shared_ptr<foundation::Stepper> $Stepper(auto&&... args) {
+    return std::make_shared<foundation::Stepper>(std::forward<decltype(args)>(args)...);
+  }
+
   inline std::shared_ptr<foundation::Fragment> $Fragment() {
     return std::make_shared<foundation::Fragment>();
   }

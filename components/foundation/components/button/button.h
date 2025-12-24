@@ -49,6 +49,7 @@ namespace foundation
           lv_label_set_text(this->label, props.text.c_str());
       }
 
+
       lv_obj_add_event_cb(obj, event_adapter, LV_EVENT_CLICKED, this);
       lv_obj_add_event_cb(obj, event_adapter, LV_EVENT_PRESSED, this);
       lv_obj_add_event_cb(obj, event_adapter, LV_EVENT_RELEASED, this);

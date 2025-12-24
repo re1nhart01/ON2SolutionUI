@@ -38,6 +38,9 @@
 #include "components/status_bar/status_bar.h"
 #include "components/status_bar/status_bar_props.h"
 
+#include "components/stepper/stepper.h"
+#include "components/stepper/stepper_props.h"
+
 #include "core/keyboard_manager/keyboard_manager.h"
 
 #include "core/navigation/stack_navigator/stack_navigator.h"

@@ -93,7 +93,7 @@ public:
       if (auto* ns = dynamic_cast<NavigationScreenBase*>(screen_instance.get())) {
           ns->on_focus();
       }
-      }
+    }
 
   void navigate(const std::string& name) {
       _mount_screen(name, true);
