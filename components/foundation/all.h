@@ -38,6 +38,9 @@
 #include "components/status_bar/status_bar.h"
 #include "components/status_bar/status_bar_props.h"
 
+#include "components/tab_view/tab_view.h"
+#include "components/tab_view/tab_view_props.h"
+
 #include "components/stepper/stepper.h"
 #include "components/stepper/stepper_props.h"
 

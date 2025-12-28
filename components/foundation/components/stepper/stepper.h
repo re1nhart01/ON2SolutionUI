@@ -60,6 +60,10 @@ namespace foundation
     lv_obj_set_style_border_width(stepper_obj, 0, 0);
     lv_obj_set_style_pad_all(stepper_obj, 0, 0);
     lv_obj_set_style_pad_column(stepper_obj, 5, 0);
+    lv_obj_set_style_pad_all(obj, 0, 0);
+    lv_obj_set_style_pad_column(obj, 5, 0);
+    lv_obj_set_style_shadow_width(obj, 0, 0);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_add_flag(stepper_obj, LV_OBJ_FLAG_CLICKABLE);
     this->set_active(this->props.is_visible);

@@ -18,6 +18,7 @@ using $$Activity  = std::shared_ptr<foundation::ActivityIndicator>;
 using $$Modal = std::shared_ptr<foundation::Modal>;
 using $$Stepper = std::shared_ptr<foundation::Stepper>;
 using $$Fragment = std::shared_ptr<foundation::Fragment>;
+using $$TabView = std::shared_ptr<foundation::TabView>;
 
 using $$Styling = std::shared_ptr<Styling>;
 
@@ -72,6 +73,10 @@ using $$Styling = std::shared_ptr<Styling>;
 
   inline std::shared_ptr<foundation::Fragment> $Fragment(auto&&... args) {
     return std::make_shared<foundation::Fragment>(std::forward<decltype(args)>(args)...);
+  }
+
+  inline std::shared_ptr<foundation::TabView> $TabView(auto&&... args) {
+    return std::make_shared<foundation::TabView>(std::forward<decltype(args)>(args)...);
   }
 
   using Children = std::vector<std::shared_ptr<foundation::VNode>>;
