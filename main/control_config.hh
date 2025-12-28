@@ -11,7 +11,7 @@
 #define USER_NAME "re1nhart"
 
 
-#define USER_PASSWORD "12345678"
+#define USER_PASSWORD "1111"
 #define USER_LOGIN "admin"
 
 #define default_pincode "0000"

@@ -21,7 +21,7 @@ inline void screen_container_props(foundation::ViewProps & p) {
 
 inline void header_container_props(foundation::ViewProps & p) {
   p.w(LV_PCT(100));
-  p.h(55);
+  p.h(45);
   p.justify(LV_FLEX_ALIGN_SPACE_BETWEEN);
   p.items(LV_FLEX_ALIGN_CENTER);
   p.track_cross(LV_FLEX_ALIGN_CENTER);
@@ -30,7 +30,7 @@ inline void header_container_props(foundation::ViewProps & p) {
 
 inline void header_container_left_props(foundation::ViewProps & p) {
   p.w(LV_PCT(100));
-  p.h(55);
+  p.h(45);
   p.justify(LV_FLEX_ALIGN_START);
   p.items(LV_FLEX_ALIGN_START);
   p.track_cross(LV_FLEX_ALIGN_START);
@@ -41,7 +41,7 @@ inline void header_container_left_props(foundation::ViewProps & p) {
 
 inline void header_container_right_props(foundation::ViewProps & p) {
   p.w(LV_PCT(40));
-  p.h(55);
+  p.h(45);
   p.justify(LV_FLEX_ALIGN_END);
   p.items(LV_FLEX_ALIGN_CENTER);
   p.track_cross(LV_FLEX_ALIGN_CENTER);
@@ -90,12 +90,19 @@ inline void style_screen_register(foundation::StyleStorage& storage) {
   }));
 
   storage.set("footer.button", make_style([](Styling& style) {
-    style.setFont(&lv_font_montserrat_16);
+     style.setFont(&lv_font_montserrat_16);
      style.setBackgroundColor(lv_color_hex(0x000000));
      style.setBorderRadius(12);
      style.setSize(LV_PCT(96), 50);
      style.setBorder(lv_color_hex(0x5B5AFF), 0, 0);
      style.setPadding(8, 8, 16, 16);
+  }));
+
+  storage.set("common.no_padding", make_style([](Styling& style) {
+      style.setBackgroundColor(lv_color_hex(0xffffffFF));
+      style.setBorder(lv_color_make(0, 0, 0), 0, LV_OPA_TRANSP);
+      style.setBorderRadius(0);
+      style.setPadding(0, 0, 0, 0);
   }));
 
   storage.set("footer.container", make_style([](Styling& style) {

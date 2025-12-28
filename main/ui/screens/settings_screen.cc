@@ -1,9 +1,9 @@
 #include "../../components/foundation/components/component.h"
 #include "../../components/foundation/core/shortcuts.h"
 
-#include "ui/styles/common_styles.h"
 #include "esp_log.h"
-
+#include "ui/localization.hh"
+#include "ui/styles/common_styles.h"
 
 class SettingsScreen;
 
@@ -31,74 +31,292 @@ public:
   };
 
 
+  $$View make_row(const char* prefix)
+  {
+    return $View(
+        ViewProps::up()
+            .set_children(Children{
+                make_stepper(prefix),
+                make_stepper(prefix),
+                make_stepper(prefix),
+                make_stepper(prefix),
+            })
+              .set_style($s("common.no_padding"))
+              .direction(LV_FLEX_FLOW_ROW)
+              .justify(LV_FLEX_ALIGN_SPACE_AROUND)
+              .items(LV_FLEX_ALIGN_CENTER)
+              .track_cross(LV_FLEX_ALIGN_CENTER)
+              .w(LV_PCT(100))
+              .h(110)
+    );
+  }
+
+  $$View render_other_settings()
+  {
+    return $View(
+        ViewProps::up()
+            .set_style($s("header.container"))
+            .set_children(Children{
+                $Text(
+                    TextProps::up()
+                        .set_style($s("header.label"))
+                        .value(locales::en::other)
+                ),
+
+                make_row("Compressor delay 1"),
+                make_row("Compressor delay 2"),
+                make_row("Compressor delay 3"),
+                make_row("Compressor delay 4"),
+            })
+            .direction(LV_FLEX_FLOW_COLUMN)
+            .justify(LV_FLEX_ALIGN_START)
+            .items(LV_FLEX_ALIGN_CENTER)
+            .track_cross(LV_FLEX_ALIGN_START)
+            .w(LV_PCT(100))
+    );
+  }
+
+
+  $$Stepper make_stepper(const char* label)
+  {
+      return $Stepper(
+          StepperProps::up()
+              .range(0, 255)
+              .value(0)
+              .set_step(0.5f)
+              .set_precision(1)
+              .btn_width(30)
+              .size(150, 50)
+              .set_label(label)
+              .btn_width(30)
+              .format(3, 0)
+              .on_change([](float v) {
+                  ESP_LOGI("STEPPER", "value = %.1f", v);
+              })
+      );
+  }
+
+
+  $$View render_oxygen_offset()
+  {
+    return $View(
+        ViewProps::up()
+            .set_style($s("header.container"))
+            .set_children(Children{
+                $Text(
+                    TextProps::up()
+                        .set_style($s("header.label"))
+                        .value(locales::en::oxygen_offset)
+                ),
+                $View(
+                    ViewProps::up()
+                        .set_style($s("header.labels.container"))
+                        .set_children(Children{
+                          $Stepper(StepperProps::up()
+                            .range(0, 255)
+                            .value(0)
+                            .set_step(0.5f)
+                            .set_precision(1)
+                            .size(150, 50)
+                            .set_label("Compressor delay 1")
+                            .btn_width(30)
+                            .format(3, 0)
+                            .on_change([](float v) {
+                              ESP_LOGI("TAG", "tagagaga %d", v);
+                            })
+                          ),
+                          $Stepper(StepperProps::up()
+                            .range(0, 255)
+                            .value(0)
+                            .set_step(0.5f)
+                            .set_precision(1)
+                            .size(150, 50)
+                            .set_label("Compressor delay 1")
+                            .btn_width(30)
+                            .format(3, 0)
+                            .on_change([](float v) {
+                              ESP_LOGI("TAG", "tagagaga %d", v);
+                            })
+                          ),
+                          $Stepper(StepperProps::up()
+                            .range(0, 255)
+                            .value(0)
+                            .set_step(0.5f)
+                            .set_precision(1)
+                            .size(150, 50)
+                            .set_label("Compressor delay 1")
+                            .btn_width(30)
+                            .format(3, 0)
+                            .on_change([](float v) {
+                              ESP_LOGI("TAG", "tagagaga %d", v);
+                            })
+                          ),
+                          $Stepper(StepperProps::up()
+                            .range(0, 255)
+                            .value(0)
+                            .set_step(0.5f)
+                            .set_precision(1)
+                            .size(150, 50)
+                            .set_label("Compressor delay 1")
+                            .btn_width(30)
+                            .format(3, 0)
+                            .on_change([](float v) {
+                              ESP_LOGI("TAG", "tagagaga %d", v);
+                            })
+                          ),
+                        })
+                        .set_style($s("common.no_padding"))
+                        .w(LV_PCT(100))
+                        .h(90)
+                        .justify(LV_FLEX_ALIGN_SPACE_AROUND)
+                        .items(LV_FLEX_ALIGN_CENTER)
+                        .track_cross(LV_FLEX_ALIGN_CENTER)
+                        .direction(LV_FLEX_FLOW_ROW)
+                ),
+            })
+            .w(LV_PCT(100))
+            .h(110)
+            .justify(LV_FLEX_ALIGN_START)
+            .items(LV_FLEX_ALIGN_CENTER)
+            .track_cross(LV_FLEX_ALIGN_START)
+            .direction(LV_FLEX_FLOW_COLUMN)
+    );
+  }
+
+  $$View render_flow_offset()
+  {
+    return $View(
+        ViewProps::up()
+            .set_style($s("header.container"))
+            .set_children(Children{
+                $Text(
+                    TextProps::up()
+                        .set_style($s("header.label"))
+                        .value(locales::en::flow_offset)
+                ),
+                $View(
+                    ViewProps::up()
+                        .set_style($s("header.labels.container"))
+                        .set_children(Children{
+                          $Stepper(StepperProps::up()
+                            .range(0, 255)
+                            .value(0)
+                            .set_step(0.5f)
+                            .set_precision(1)
+                            .size(150, 50)
+                            .set_label("Compressor delay 1")
+                            .btn_width(30)
+                            .format(3, 0)
+                            .on_change([](float v) {
+                              ESP_LOGI("TAG", "tagagaga %d", v);
+                            })
+                          ),
+                          $Stepper(StepperProps::up()
+                            .range(0, 255)
+                            .value(0)
+                            .set_step(0.5f)
+                            .set_precision(1)
+                            .size(150, 50)
+                            .set_label("Compressor delay 1")
+                            .btn_width(30)
+                            .format(3, 0)
+                            .on_change([](float v) {
+                              ESP_LOGI("TAG", "tagagaga %d", v);
+                            })
+                          ),
+                          $Stepper(StepperProps::up()
+                            .range(0, 255)
+                            .value(0)
+                            .set_step(0.5f)
+                            .set_precision(1)
+                            .size(150, 50)
+                            .set_label("Compressor delay 1")
+                            .btn_width(30)
+                            .format(3, 0)
+                            .on_change([](float v) {
+                              ESP_LOGI("TAG", "tagagaga %d", v);
+                            })
+                          ),
+                          $Stepper(StepperProps::up()
+                            .range(0, 255)
+                            .value(0)
+                            .set_step(0.5f)
+                            .set_precision(1)
+                            .size(150, 50)
+                            .set_label("Compressor delay 1")
+                            .btn_width(30)
+                            .format(3, 0)
+                            .on_change([](float v) {
+                              ESP_LOGI("TAG", "tagagaga %d", v);
+                            })
+                          ),
+                        })
+                        .set_style($s("common.no_padding"))
+                        .w(LV_PCT(100))
+                        .h(90)
+                        .justify(LV_FLEX_ALIGN_SPACE_AROUND)
+                        .items(LV_FLEX_ALIGN_CENTER)
+                        .track_cross(LV_FLEX_ALIGN_CENTER)
+                        .direction(LV_FLEX_FLOW_ROW)
+                ),
+            })
+            .w(LV_PCT(100))
+            .h(110)
+            .justify(LV_FLEX_ALIGN_START)
+            .items(LV_FLEX_ALIGN_CENTER)
+            .track_cross(LV_FLEX_ALIGN_START)
+            .direction(LV_FLEX_FLOW_COLUMN)
+    );
+  }
+
+
   lv_obj_t* render() override
     {
         auto navigator_ref = this->navigation_ref;
 
          return this->delegate(
-           $View(
-            ViewProps::up()
+           $ScrollView(
+            ScrollViewProps::up()
                 .set_style(this->styling())
                 .set_children(Children{
-                    $StatusBar(
-                        StatusBarProps::up()
-                            .set_style(nullptr)
-                    ),
+                    $StatusBar(StatusBarProps::up()),
                   $View(ViewProps::up()
                   .set_children(Children{
-                    $Button(ButtonProps::up()
-                     .set_child(
-                       $Text(
-                           TextProps::up()
-                               .value("Back")
+                    $View(ViewProps::up().set_children(Children{
+                      $Button(ButtonProps::up()
+                       .set_child(
+                         $Text(
+                             TextProps::up()
+                                 .value("Back")
+                         )
                        )
-                     )
-                     .click([navigator_ref](lv_event_t* e){
-                       navigator_ref->navigate("/main");
-                     }))
+                       .click([navigator_ref](lv_event_t* e){
+                         navigator_ref->reset_to("/main");
+                       })),
+                    })
+                    .set_style($s("common.no_padding"))
+                    .w(LV_PCT(20))
+                    .direction(LV_FLEX_FLOW_ROW)
+                    .items(LV_FLEX_ALIGN_CENTER)
+                    .justify(LV_FLEX_ALIGN_START)
+                  ),
+                    $Text(TextProps::up().value(locales::en::header_settings)),
+                    $View(ViewProps::up().set_children(Children{$Fragment(FragmentProps::up())}).w(LV_PCT(20)).set_style($s("common.no_padding"))),
                   })
                 .set_style($s("header.container"))
-                .merge(header_container_left_props)),
-                  $Stepper(StepperProps::up()
-                    .range(0, 255)
-                    .value(128)
-                    .size(200, 50)
-                    .btn_width(50)
-                    .format(3, 0)
-                    .on_change([](long v) {
-                      ESP_LOGI("TAG", "tagagaga %d", v);
-                    })
-                  ),
-                  $Stepper(StepperProps::up()
-                   .range(0, 255)
-                   .value(128)
-                   .size(200, 50)
-                   .set_label("Compressor delay")
-                   .btn_width(50)
-                   .format(3, 0)
-                   .on_change([](long v) {
-                     ESP_LOGI("TAG", "tagagaga %d", v);
-                   })),
-                  $Stepper(StepperProps::up()
-                  .range(0, 255)
-                  .value(0)
-                  .set_step(0.5f)
-                  .set_precision(1)
-                  .size(200, 50)
-                  .set_label("Compressor delay 1")
-                  .btn_width(50)
-                  .format(3, 0)
-                  .on_change([](float v) {
-                    ESP_LOGI("TAG", "tagagaga %d", v);
-                  })),
+                .merge(header_container_props)),
+                  render_oxygen_offset(),
+                  render_flow_offset(),
+                  render_other_settings(),
                 })
-            .merge(screen_container_props)
+            .scrollbar(LV_SCROLLBAR_MODE_OFF)
+            .w(LV_PCT(100))
         ));
     }
 
 
 
-  std::shared_ptr<Styling> styling() override {
+  $$Styling styling() override {
     this->style = std::make_shared<Styling>();
 
     this->style->setTextColor(lv_color_make(255, 255, 255));

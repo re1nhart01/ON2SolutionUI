@@ -1,95 +1,165 @@
-
 #pragma once
+#include "components/component.h"
 #include "scroll_view_props.h"
 
 namespace foundation
 {
-  class ScrollView final : public Component<ScrollViewProps> {
-  private:
-    using Component::props;
-
+  class ScrollView final : public Component<ScrollViewProps>
+  {
   public:
     explicit ScrollView(lv_obj_t* parent, const ScrollViewProps& props)
-      : Component(this->create_initial(parent), parent, std::move(props)) {
-      set_style(props.style);
+        : Component(nullptr, parent, props)
+    {
+        set_style(props.style);
 
-      if (this->props.ref != nullptr) {
-          this->props.ref->set(this);
-      }
-    };
+        if (this->props.ref != nullptr) {
+            this->props.ref->set(this);
+        }
+    }
+
+    explicit ScrollView(const ScrollViewProps& props)
+        : Component(nullptr, nullptr, std::move(props))
+    {
+        set_style(props.style);
+
+        if (this->props.ref != nullptr) {
+            this->props.ref->set(this);
+        }
+    }
 
     ~ScrollView() override
     {
-      if (this->props.ref != nullptr) {
-          this->props.ref->unlink();
-      }
-    };
+        if (this->props.ref != nullptr) {
+            this->props.ref->unlink();
+        }
+    }
 
     lv_obj_t* render() override
     {
-      Component::render();
+        if (get_component() == nullptr || this->parent == nullptr) {
+            this->set_component(this->create_initial(this->parent));
+        }
 
-      if (get_component() == nullptr || this->parent == nullptr) {
-          this->set_component(this->create_initial(this->parent));
-      }
-      lv_obj_t* comp = get_component();
+        lv_obj_t* comp = get_component();
 
-      this->do_rebuild();
+        // Layout
+        lv_obj_set_layout(comp, LV_LAYOUT_FLEX);
+        lv_obj_set_size(comp, props.width, props.height);
+        lv_obj_set_flex_flow(comp, props.flex_direction);
+        lv_obj_set_flex_align(
+            comp,
+            props.justify_content,
+            props.align_items,
+            props.track_cross_place
+        );
+      lv_obj_set_scroll_snap_y(comp, LV_SCROLL_SNAP_NONE);
+      lv_obj_set_scroll_snap_x(comp, LV_SCROLL_SNAP_NONE);
+      lv_obj_clear_flag(comp, LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM);
 
-      for (const auto& child : this->props.children) {
-          if (child != nullptr) {
-              child->set_active(true);
-              child->set_parent(comp);
-              child->render();
-          }
-      }
+        if (props.disabled)
+        {
+          lv_obj_set_scroll_dir(comp, LV_DIR_NONE);
+          lv_obj_set_scrollbar_mode(comp, LV_SCROLLBAR_MODE_OFF);
+        }
+        else
+        {
+          lv_obj_set_scroll_dir(comp, props.scroll_dir);
+          lv_obj_set_scrollbar_mode(comp, props.scrollbar_mode);
+        }
 
-      return comp;
-    };
 
+        // Render children
+        for (const auto& child : props.children) {
+            if (child != nullptr) {
+                child->set_active(true);
+                child->set_parent(comp);
+                child->render();
+            }
+        }
+
+        // Styling
+        if (auto style = styling()) {
+            lv_obj_add_style(comp, style->getStyle(), LV_PART_MAIN);
+        }
+
+        return comp;
+    }
 
     void do_rebuild() override
     {
-      lv_obj_t* obj = this->get_component();
-      if (!obj) return;
+        lv_obj_t* comp = get_component();
+        if (!comp) return;
 
-      this->set_active(this->props.is_visible);
+        this->set_active(props.is_visible);
 
-      lv_obj_set_layout(obj, LV_LAYOUT_FLEX);
-      lv_obj_set_size(obj, props.width, props.height);
-      lv_obj_set_flex_flow(obj, props.flex_direction);
-      lv_obj_set_flex_align(obj, props.justify_content, props.align_items, props.track_cross_place);
+        lv_obj_set_layout(comp, LV_LAYOUT_FLEX);
+        lv_obj_set_size(comp, props.width, props.height);
+        lv_obj_set_flex_flow(comp, props.flex_direction);
+        lv_obj_set_flex_align(
+            comp,
+            props.justify_content,
+            props.align_items,
+            props.track_cross_place
+        );
 
-      lv_obj_set_scroll_dir(obj, props.horizontal ? LV_DIR_HOR : LV_DIR_VER);
-      lv_obj_set_scrollbar_mode(obj, props.disabled ? LV_SCROLLBAR_MODE_OFF : LV_SCROLLBAR_MODE_ACTIVE);
+        lv_obj_set_scroll_snap_y(comp, LV_SCROLL_SNAP_NONE);
+        lv_obj_set_scroll_snap_x(comp, LV_SCROLL_SNAP_NONE);
+        lv_obj_clear_flag(comp, LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM);
 
-      if (std::shared_ptr<Styling> style = this->styling(); style != nullptr) {
-          style->applyTo(this->get_component());
-      }
+        if (props.disabled)
+        {
+          lv_obj_set_scroll_dir(comp, LV_DIR_NONE);
+          lv_obj_set_scrollbar_mode(comp, LV_SCROLLBAR_MODE_OFF);
+        }
+        else
+        {
+          lv_obj_set_scroll_dir(comp, props.scroll_dir);
+          lv_obj_set_scrollbar_mode(comp,  props.scrollbar_mode);
+        }
 
-      for (const auto &child : this->props.children) {
-          child->do_rebuild();
-      }
-    };
+        if (auto style = styling()) {
+            style->applyTo(comp);
+        }
+
+        for (const auto& child : props.children) {
+            child->do_rebuild();
+        }
+    }
+
+    void refresh_childrens() const
+    {
+        lv_obj_t* obj = get_component();
+        if (!obj) return;
+
+        lv_obj_clean(obj);
+
+        for (const auto& child : props.children) {
+            if (child) {
+                child->set_component(nullptr);
+                child->set_active(true);
+                child->set_parent(obj);
+                child->render();
+            }
+        }
+
+        lv_obj_update_layout(obj);
+    }
 
     std::shared_ptr<Styling> styling() override
     {
-      if (this->props.style) {
-          return this->props.style;
-      }
-      return {};
-    };
+        return props.style ? props.style : nullptr;
+    }
 
     ScrollView* append(lv_obj_t* obj) override
     {
-      lv_obj_set_parent(obj, get_component());
-      return this;
-    };
+        lv_obj_set_parent(obj, get_component());
+        return this;
+    }
 
   private:
-    lv_obj_t* create_initial(lv_obj_t* parental) const
+    lv_obj_t* create_initial(lv_obj_t* parent) const
     {
-      return lv_obj_create(parental);
-    };
+        return lv_obj_create(parent);
+    }
   };
 }

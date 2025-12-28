@@ -11,7 +11,7 @@ namespace foundation
   class Fragment final : public Component<FragmentProps> {
   using Component::props;
   public:
-    explicit Fragment()
+    explicit Fragment(const FragmentProps& props)
       : Component(nullptr, nullptr, std::move(props)) {
       this->parent = nullptr;
     };

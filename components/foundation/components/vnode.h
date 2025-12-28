@@ -26,10 +26,10 @@ namespace foundation {
       this->style = nullptr;
     }
 
-    virtual void component_did_mount()    { ESP_LOGI("VNode", "componentDidMount"); }
-    virtual void component_will_unmount() { ESP_LOGI("VNode", "componentWillUnmount"); }
-    virtual void component_did_update()   { ESP_LOGI("VNode", "componentDidUpdate"); }
-    virtual void component_did_rebuild()  { ESP_LOGI("VNode", "componentDidRebuild"); }
+    virtual void component_did_mount()    {  }
+    virtual void component_will_unmount() {  }
+    virtual void component_did_update()   {  }
+    virtual void component_did_rebuild()  {  }
 
     virtual lv_obj_t* render() { component_did_mount(); return nullptr; }
     virtual void do_rebuild() {}

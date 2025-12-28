@@ -5,6 +5,23 @@
 
 using VNodePtr = std::shared_ptr<foundation::VNode>;
 
+using $$View = std::shared_ptr<foundation::View>;
+using $$Text = std::shared_ptr<foundation::Text>;
+using $$Button = std::shared_ptr<foundation::Button>;
+using $$TextInput = std::shared_ptr<foundation::TextInput>;
+using $$StatusBar = std::shared_ptr<foundation::StatusBar>;
+using $$Animated = std::shared_ptr<foundation::Animated>;
+using $$Image = std::shared_ptr<foundation::Image>;
+using $$ScrollView = std::shared_ptr<foundation::ScrollView>;
+using $$Circular = std::shared_ptr<foundation::CircularProgress>;
+using $$Activity  = std::shared_ptr<foundation::ActivityIndicator>;
+using $$Modal = std::shared_ptr<foundation::Modal>;
+using $$Stepper = std::shared_ptr<foundation::Stepper>;
+using $$Fragment = std::shared_ptr<foundation::Fragment>;
+
+using $$Styling = std::shared_ptr<Styling>;
+
+
   inline std::shared_ptr<foundation::View> $View(auto&&... args) {
     return std::make_shared<foundation::View>(std::forward<decltype(args)>(args)...);
   }
@@ -53,8 +70,8 @@ using VNodePtr = std::shared_ptr<foundation::VNode>;
     return std::make_shared<foundation::Stepper>(std::forward<decltype(args)>(args)...);
   }
 
-  inline std::shared_ptr<foundation::Fragment> $Fragment() {
-    return std::make_shared<foundation::Fragment>();
+  inline std::shared_ptr<foundation::Fragment> $Fragment(auto&&... args) {
+    return std::make_shared<foundation::Fragment>(std::forward<decltype(args)>(args)...);
   }
 
   using Children = std::vector<std::shared_ptr<foundation::VNode>>;

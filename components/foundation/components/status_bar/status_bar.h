@@ -27,7 +27,8 @@ namespace foundation
 
     lv_obj_t * render() override
     {
-      std::shared_ptr<Styling> styleV = this->styling();
+      Component::render();
+      const std::shared_ptr<Styling> styleV = this->styling();
 
       return this->delegate(
         std::make_shared<View>(

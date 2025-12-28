@@ -1,5 +1,4 @@
 #pragma once
-#include "scroll_view.h"
 
 namespace foundation
 {
@@ -13,7 +12,8 @@ namespace foundation
     lv_flex_align_t track_cross_place = LV_FLEX_ALIGN_START;
     lv_flex_flow_t flex_direction = LV_FLEX_FLOW_COLUMN;
 
-    bool horizontal = false;
+    lv_dir_t scroll_dir = LV_DIR_VER;
+    lv_scrollbar_mode_t scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
     bool disabled = false;
 
     static ScrollViewProps up() { return ScrollViewProps{}; }
@@ -58,24 +58,20 @@ namespace foundation
       return *this;
     }
 
-    ScrollViewProps& scroll_x(bool v = true) {
-      horizontal = v;
+    ScrollViewProps& scroll(lv_dir_t dir) {
+      scroll_dir = dir;
       return *this;
     }
 
-    ScrollViewProps& scroll_y(bool v = true) {
-      horizontal = !v;
+    ScrollViewProps& scrollbar(lv_scrollbar_mode_t mode) {
+      scrollbar_mode = mode;
       return *this;
     }
 
-    ScrollViewProps& disable(bool v = true) {
+    ScrollViewProps& disable(bool v = false) {
       disabled = v;
       return *this;
     }
 
-    ScrollViewProps& enable() {
-      disabled = false;
-      return *this;
-    }
   };
 }

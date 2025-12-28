@@ -16,6 +16,10 @@ namespace locales::en {
   inline constexpr const char* oxygen_level = "Oxygen Level";
   inline constexpr const char* oxygen_rate = "Oxygen flow rate";
 
+  inline constexpr const char* oxygen_offset = "Oxygen offset";
+  inline constexpr const char* flow_offset = "Flow offset";
+  inline constexpr const char* other = "Other";
+
 
   inline constexpr const char* status = "PROCESSING";
 

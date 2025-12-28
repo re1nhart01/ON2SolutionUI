@@ -48,9 +48,9 @@ public:
     NavigationScreen::on_focus();
     this->uart_handler = std::make_unique<UartHandler>(UART_NUM_1, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
     ESP_LOGI("main_screen", "on_FOCUS");
-      this->uart_handler->init();
-      this->uart_handler->enable_rx(true);
-      this->add_uart_data_event();
+      // this->uart_handler->init();
+      // this->uart_handler->enable_rx(true);
+      // this->add_uart_data_event();
   };
 
   void on_blur() override
@@ -197,7 +197,7 @@ public:
     });
   }
 
-    std::shared_ptr<View> render_header() {
+    $$View render_header() {
     auto navigator_ref = this->navigation_ref;
 
     return $View(
@@ -257,7 +257,7 @@ public:
 
 
 
-  std::shared_ptr<Button> render_footer() {
+  $$Button render_footer() {
     return $Button(
         ButtonProps::up()
             .set_style($s("footer.button"))
@@ -272,7 +272,7 @@ public:
     );
   }
 
-  std::shared_ptr<View> render_body() {
+  $$View render_body() {
     auto make_circle = [&](const std::string& ref_name) {
         return $Circular(
             CircularProgressProps::up()
@@ -370,7 +370,7 @@ public:
 
 
 
-  std::shared_ptr<Styling> styling() override {
+  $$Styling styling() override {
     this->style = std::make_shared<Styling>();
 
     this->style->setTextColor(lv_color_make(255, 255, 255));
