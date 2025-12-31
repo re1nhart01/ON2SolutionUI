@@ -63,9 +63,11 @@ public:
           style.setBorder(lv_color_make(255, 255, 255), 0, 0);
         })
         .set_children(Children{
-          $Text(TextProps::up().value("LOADING...").set_style([](Styling& style) {
-            style.setTextColor(lv_color_make(0, 0, 0));
-          })),
+          $Image(ImageProps::up()
+            .source("S:on2_logo_300_192.bin")
+            .width(310)
+            .height(192)
+          ),
           $Activity(ActivityIndicatorProps::up().sz(86).arc(80).set_color(
             PRIMARY_COLOR))})
         .w(LV_PCT(100))

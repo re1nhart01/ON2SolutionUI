@@ -14,6 +14,7 @@ std::shared_ptr<WaveApplication> application;
 [[foundation::entrypoint]]
 void start() {
   littlefs_init();
+  lvgl_littlefs_driver_init();
   waveshare_esp32_s3_rgb_lcd_init();
 
   if (lvgl_port_lock(-1)) {
