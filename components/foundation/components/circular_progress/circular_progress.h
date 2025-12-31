@@ -52,12 +52,13 @@ namespace foundation
 
       this->is_show_label = this->props.show_label_default;
 
-      if (this->props.style != nullptr) {
+      if (props.style_override) {
+          props.style_override(style);
           lv_obj_add_style(
-              this->arc_reference,
-              this->props.style->getStyle(),
-              LV_PART_MAIN
-          );
+             arc_reference,
+             style.getStyle(),
+             LV_PART_MAIN
+         );
       }
 
       if (props.show_label_default)
@@ -108,12 +109,14 @@ namespace foundation
       lv_obj_set_style_bg_opa(arc_reference, LV_OPA_TRANSP, LV_PART_MAIN);
       lv_obj_remove_style(arc_reference, nullptr, LV_PART_KNOB);
 
-      if (props.style != nullptr) {
+
+      if (props.style_override) {
+          props.style_override(style);
           lv_obj_add_style(
-              arc_reference,
-              props.style->getStyle(),
-              LV_PART_MAIN
-          );
+             arc_reference,
+             style.getStyle(),
+             LV_PART_MAIN
+         );
       }
 
       lv_obj_center(arc_reference);
@@ -127,13 +130,18 @@ namespace foundation
       this->update(props.default_dy);
     }
 
-    std::shared_ptr<Styling> styling() override
+    const Styling* styling() const override
     {
-      if (this->props.style != nullptr) {
-          lv_style_set_arc_color(this->props.style->getStyle(), lv_color_hex(0x000000));
+      style.reset();
+
+      apply_base_style(style);
+
+      if (props.style_override) {
+          props.style_override(style);
       }
-      return this->props.style;
-    };
+
+      return &style;
+    }
 
     CircularProgress* append(lv_obj_t* obj) override
     {

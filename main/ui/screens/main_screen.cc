@@ -14,6 +14,7 @@
 #include "protocols/uart/uart_proto.h"
 #include "ui/localization.hh"
 #include "ui/styles/common_styles.h"
+#include "ui/components/info_modal/info_modal.h"
 
 #include <algorithm>
 
@@ -30,7 +31,7 @@ class MainScreen final : public NavigationScreen<MainScreenProps>
   std::unique_ptr<StyleStorage> styles;
   std::unique_ptr<UartHandler> uart_handler = nullptr;
   std::unique_ptr<SharedRefStore<12>> ref_store;
-  std::shared_ptr<Modal> info_modal = nullptr;
+  $$InfoModal info_modal = nullptr;
 
 public:
   explicit MainScreen(StackNavigator *stack, const MainScreenProps &props)
@@ -68,8 +69,7 @@ public:
     ref->get()->set_state([value](TextProps &props) { props.value(value); });
   }
 
-  void
-  update_specific_circular(short value,
+  void update_specific_circular(short value,
                            const std::shared_ptr<Ref<CircularProgress>> &ref)
   {
     if(ref->get() == nullptr && !ref->is_ready())
@@ -80,20 +80,21 @@ public:
 
   void show_info_modal()
   {
-    info_modal = $Modal(ModalProps::up().set_content($View(
-      ViewProps::up()
-        .set_children(Children{
-          $Text(TextProps::up().value("I am modal")),
-          $Button(
-            ButtonProps::up()
-              .set_style($s("header.button"))
-              .label("Press")
-              .click([this](lv_event_t *) { this->info_modal->close(); })),
-        })
-        .justify(LV_FLEX_ALIGN_CENTER)
-        .items(LV_FLEX_ALIGN_CENTER)
-        .track_cross(LV_FLEX_ALIGN_CENTER)
-        .direction(LV_FLEX_FLOW_COLUMN))));
+    info_modal = $InfoModal(InfoModalProps::up()
+      .set_device("ON2SYSTEMS")
+      .set_loader("ON2SYS_RevB 1.9")
+      .set_fw("1.6.2.4")
+      .set_fw_checksum("D29FD7E0")
+      .set_module_name("Eport_E20")
+      .set_module_fw("1.40.5")
+      .set_serial_number("34EAE706A006")
+      .set_ethernet_ip("192.168.1.128")
+      .set_wifi_ip("10.10.10.10")
+      .set_lcd_fw("x.x.x")
+      .set_lcd_loader("x.x.x")
+      .set_lcd_partition("x.x.x")
+      .set_restart_seconds(99)
+    );
 
     info_modal->show();
   }
@@ -314,8 +315,13 @@ public:
   {
     return this->delegate($View(
       ViewProps::up()
-        .set_style(this->styling())
-        .set_children(Children{
+            .set_style([](Styling& style) {
+              style.setTextColor(lv_color_make(255, 255, 255));
+              style.setPadding(0, 0, 0, 0);
+              style.setBorderRadius(0);
+              style.setBorder(lv_color_make(255, 255, 255), 0, 0);
+            })
+            .set_children(Children{
           $StatusBar(
             StatusBarProps::up()
               .set_background_color(lv_color_hex(0x2A2A2A))
@@ -340,16 +346,14 @@ public:
         .merge(screen_container_props)));
   }
 
-  $$Styling styling() override
+  const Styling* styling() const override
   {
-    this->style = std::make_shared<Styling>();
+    this->style.setTextColor(lv_color_make(255, 255, 255));
+    this->style.setPadding(0, 0, 0, 0);
+    this->style.setBorderRadius(0);
+    this->style.setBorder(lv_color_make(255, 255, 255), 0, 0);
 
-    this->style->setTextColor(lv_color_make(255, 255, 255));
-    this->style->setPadding(0, 0, 0, 0);
-    this->style->setBorderRadius(0);
-    this->style->setBorder(lv_color_make(255, 255, 255), 0, 0);
-
-    return this->style;
+    return &this->style;
   }
 
   MainScreen *append(lv_obj_t *obj) override

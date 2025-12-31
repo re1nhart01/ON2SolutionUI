@@ -34,14 +34,13 @@ public:
     NavigationScreen::component_did_mount();
   };
 
-  $$Stepper
-  make_param(const char *label, float val, float step = 1.0f, int prec = 0)
+  $$Stepper make_param(const char *label, float val, float step = 1.0f, short precis = 0)
   {
     return $Stepper(StepperProps::up()
                       .set_label(label)
                       .value(val)
                       .set_step(step)
-                      .set_precision(prec)
+                      .set_precision(precis)
                       .size(155, 55)
                       .btn_width(35));
   }
@@ -123,40 +122,44 @@ public:
                   .h(60)
                   .direction(LV_FLEX_FLOW_ROW)
                   .items(LV_FLEX_ALIGN_CENTER)
+                  .track_cross(LV_FLEX_ALIGN_CENTER)
                   .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
                   .set_children(Children{
                     $View(ViewProps::up()
-                            .w(LV_PCT(20))
-                            .h(45)
-                            .direction(LV_FLEX_FLOW_ROW)
-                            .items(LV_FLEX_ALIGN_CENTER)
-                            .justify(LV_FLEX_ALIGN_START)
-                            .set_style($s("common.no_padding"))
-                            .set_children(Children{
-                              $Button(ButtonProps::up()
-                                        .set_child(
-                                          $Text(TextProps::up().value("Back")))
-                                        .click([navigation_ref](lv_event_t *e) {
-                                            navigation_ref->reset_to("/main");
-                                        })),
-                            })),
+                      .w(LV_PCT(30))
+                      .h(60)
+                      .direction(LV_FLEX_FLOW_ROW)
+                      .items(LV_FLEX_ALIGN_CENTER)
+                      .justify(LV_FLEX_ALIGN_START)
+                      .track_cross(LV_FLEX_ALIGN_CENTER)
+                      .set_style($s("common.no_padding"))
+                      .set_children(Children{
+                        $Button(ButtonProps::up()
+                          .set_child(
+                            $Text(TextProps::up().value(locales::en::button_back)))
+                          .click([navigation_ref](lv_event_t *e) {
+                              navigation_ref->reset_to("/main");
+                          })),
+                      })),
                     $View(ViewProps::up()
-                      .w(LV_PCT(78))
+                      .w(LV_PCT(40))
+                      .h(60)
                       .set_style($s("common.no_padding"))
                       .direction(LV_FLEX_FLOW_ROW)
                       .items(LV_FLEX_ALIGN_CENTER)
                       .justify(LV_FLEX_ALIGN_CENTER)
                       .track_cross(LV_FLEX_ALIGN_CENTER)
                       .set_children(Children{
-                        $Text(TextProps::up().value("SYSTEM SETTINGS"))
+                        $Text(TextProps::up().value(locales::en::system_settings_header))
                     })),
                     $View(ViewProps::up()
-                            .w(LV_PCT(20))
-                            .set_style($s("common.no_padding"))
-                            .set_children(
-                              Children{$Fragment(FragmentProps::up())})),
-                  })),
-
+                      .w(LV_PCT(30))
+                      .set_style($s("common.no_padding"))
+                      .set_children(
+                        Children{
+                          $Fragment(FragmentProps::up())}
+                      )),
+          })),
           $TabView(
             TabViewProps::up()
               .set_header_size(45)
@@ -165,16 +168,14 @@ public:
                              render_limits_tab(), render_service_tab()}))})));
   }
 
-  $$Styling styling() override
+  const Styling* styling() const override
   {
-    this->style = std::make_shared<Styling>();
+    this->style.setTextColor(lv_color_make(255, 255, 255));
+    this->style.setPadding(0, 0, 0, 0);
+    this->style.setBorderRadius(0);
+    this->style.setBorder(lv_color_make(255, 255, 255), 0, 0);
 
-    this->style->setTextColor(lv_color_make(255, 255, 255));
-    this->style->setPadding(0, 0, 0, 0);
-    this->style->setBorderRadius(0);
-    this->style->setBorder(lv_color_make(255, 255, 255), 0, 0);
-
-    return this->style;
+    return &this->style;
   }
 
   SettingsScreen *append(lv_obj_t *obj) override

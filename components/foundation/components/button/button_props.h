@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <memory>
+#include "components/props.h";
 
 namespace foundation
 {
@@ -23,13 +24,6 @@ namespace foundation
     Delegate<void(lv_event_t *)> on_released{};
     Delegate<void(lv_event_t *)> on_focused{};
     Delegate<void(lv_event_t *)> on_defocused{};
-
-    static ButtonProps up() { return ButtonProps{}; }
-
-    ButtonProps& set_style(std::shared_ptr<Styling> s) {
-      style = std::move(s);
-      return *this;
-    }
 
     ButtonProps& set_child(std::shared_ptr<VNode> c) {
       child = c;

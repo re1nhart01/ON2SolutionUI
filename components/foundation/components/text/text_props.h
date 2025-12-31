@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "components/props.h";
+
 namespace foundation
 {
   class Text;
@@ -14,8 +16,6 @@ namespace foundation
     lv_event_cb_t on_released = nullptr;
     lv_event_cb_t on_focused = nullptr;
     lv_event_cb_t on_defocused = nullptr;
-
-    static TextProps up() { return TextProps{}; }
 
     TextProps& value(const std::string& v) {
       text = v;

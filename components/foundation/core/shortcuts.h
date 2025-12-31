@@ -20,8 +20,6 @@ using $$Stepper = std::shared_ptr<foundation::Stepper>;
 using $$Fragment = std::shared_ptr<foundation::Fragment>;
 using $$TabView = std::shared_ptr<foundation::TabView>;
 
-using $$Styling = std::shared_ptr<Styling>;
-
 
   inline std::shared_ptr<foundation::View> $View(auto&&... args) {
     return std::make_shared<foundation::View>(std::forward<decltype(args)>(args)...);

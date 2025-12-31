@@ -1,5 +1,7 @@
 #pragma once
 
+#include "components/props.h";
+
 namespace foundation
 {
   class TextInput;
@@ -18,9 +20,6 @@ namespace foundation
     short secure_timeout = 1500;
     short length = 500;
     std::shared_ptr<KeyboardManager> kbManager = nullptr;
-
-
-    static TextInputProps up() { return TextInputProps{}; }
 
     TextInputProps& set_is_one_line(const bool v)
     {
@@ -50,11 +49,6 @@ namespace foundation
     TextInputProps& set_length(const short v)
     {
       length = v;
-      return *this;
-    }
-
-    TextInputProps& set_style(std::shared_ptr<Styling> s) {
-      style = std::move(s);
       return *this;
     }
 

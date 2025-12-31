@@ -2,6 +2,8 @@
 
 #include <string>
 #include <vector>
+#include "components/props.h";
+
 
   namespace foundation
   {
@@ -15,8 +17,6 @@
       std::vector<std::shared_ptr<VNode>> childrens;
 
       Delegate<void(uint16_t), 64> on_change_cb{};
-
-      static TabViewProps up() { return TabViewProps{}; }
 
       TabViewProps& set_tabs(const std::vector<std::string>& t) {
         this->tabs = t;

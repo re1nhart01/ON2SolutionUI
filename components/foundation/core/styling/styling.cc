@@ -9,7 +9,7 @@ Styling::~Styling() {
     lv_style_reset(&style);
 }
 
-lv_style_t* Styling::getStyle() {
+lv_style_t* Styling::getStyle() const {
     return &style;
 }
 
@@ -110,9 +110,8 @@ Styling* Styling::setImageOpacity(lv_opa_t opa) {
     return this;
 }
 
-Styling* Styling::applyTo(lv_obj_t* obj) {
+void Styling::applyTo(lv_obj_t* obj) const {
     lv_obj_add_style(obj, &style, LV_PART_MAIN);
-    return this;
 }
 
 Styling* Styling::setClipCorner(bool clip) {
@@ -205,7 +204,13 @@ Styling* Styling::setAlign(lv_flex_align_t align) {
   return this;
 }
 
-Styling* Styling::setFlexGrow(uint8_t grow) {
+Styling *Styling::setFlexGrow(uint8_t grow)
+{
   lv_style_set_flex_grow(&style, grow);
   return this;
+}
+
+void Styling::reset() const {
+  lv_style_reset(&style);
+  lv_style_init(&style);
 }

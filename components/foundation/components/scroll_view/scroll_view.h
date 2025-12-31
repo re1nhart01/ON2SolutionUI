@@ -10,8 +10,6 @@ namespace foundation
     explicit ScrollView(lv_obj_t* parent, const ScrollViewProps& props)
         : Component(nullptr, parent, props)
     {
-        set_style(props.style);
-
         if (this->props.ref != nullptr) {
             this->props.ref->set(this);
         }
@@ -20,8 +18,6 @@ namespace foundation
     explicit ScrollView(const ScrollViewProps& props)
         : Component(nullptr, nullptr, std::move(props))
     {
-        set_style(props.style);
-
         if (this->props.ref != nullptr) {
             this->props.ref->set(this);
         }
@@ -145,9 +141,17 @@ namespace foundation
         lv_obj_update_layout(obj);
     }
 
-    std::shared_ptr<Styling> styling() override
+    const Styling* styling() const override
     {
-        return props.style ? props.style : nullptr;
+      style.reset();
+
+      apply_base_style(style);
+
+      if (props.style_override) {
+          props.style_override(style);
+      }
+
+      return &style;
     }
 
     ScrollView* append(lv_obj_t* obj) override

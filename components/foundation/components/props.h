@@ -2,7 +2,7 @@
 
 #include "core/ref/ref.h"
 #include "core/styling/styling.h"
-
+#include "core/structures/delegate.h"
 #include <memory>
 
 namespace foundation
@@ -11,14 +11,17 @@ namespace foundation
   struct BaseProps
   {
     std::shared_ptr<Ref<RefT>> ref = nullptr;
-    std::shared_ptr<Styling> style = nullptr;
+    Delegate<void(Styling&)> style_override{};
 
     bool is_visible = true;
 
     virtual ~BaseProps() = default;
 
-    Derived& set_style(const std::shared_ptr<Styling> & s) {
-      style = s;
+    static Derived up(){ return Derived{}; }
+
+    Derived& set_style(Delegate<void(Styling&)> fn)
+    {
+      style_override = std::move(fn);
       return static_cast<Derived&>(*this);
     }
 

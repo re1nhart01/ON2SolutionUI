@@ -8,7 +8,7 @@
 class Styling
 {
 private:
-  lv_style_t style{};
+  mutable lv_style_t style{};
   short width = -1;
   short height = -1;
 
@@ -16,11 +16,12 @@ public:
   Styling();
   ~Styling();
 
-  lv_style_t *getStyle();
+  lv_style_t *getStyle() const;
+
+  static Styling create() { return Styling{}; };
 
   Styling *setBackgroundColor(lv_color_t color);
-  Styling *
-  setBackgroundGradient(lv_color_t start, lv_color_t end, lv_grad_dir_t dir);
+  Styling *setBackgroundGradient(lv_color_t start, lv_color_t end, lv_grad_dir_t dir);
   Styling *setBackgroundOpacity(lv_opa_t opa);
   Styling *setBorderRadius(lv_coord_t radius);
   Styling *setBorder(lv_color_t color, lv_coord_t width, lv_opa_t opa);
@@ -38,7 +39,7 @@ public:
   Styling *setLineWidth(lv_coord_t width);
   Styling *setImageColor(lv_color_t color);
   Styling *setImageOpacity(lv_opa_t opa);
-  Styling *applyTo(lv_obj_t *obj);
+  void applyTo(lv_obj_t *obj) const;
   Styling *setClipCorner(bool clip);
   Styling *setBgImgSrc(const void *src);
   Styling *setOutline(lv_color_t color, lv_coord_t width, lv_opa_t opa);
@@ -57,10 +58,11 @@ public:
   Styling* setFlexFlow(lv_flex_flow_t flow);
   Styling* setAlign(lv_flex_align_t align);
   Styling* setFlexGrow(uint8_t grow);
+  void reset() const;
 };
 
-inline std::shared_ptr<Styling> make_style(std::function<void(Styling&)> fn) {
-  auto s = std::make_shared<Styling>();
-  fn(*s);
+inline Styling make_style(std::function<void(Styling&)> fn) {
+  auto s = Styling{};
+  fn(s);
   return s;
 }

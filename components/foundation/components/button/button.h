@@ -80,8 +80,8 @@ namespace foundation
           lv_label_set_text(label, props.text.c_str());
         }
 
-      if (props.style != nullptr) {
-          props.style->applyTo(obj);
+      if (const Styling* s = styling()) {
+          lv_obj_add_style(get_component(), s->getStyle(), LV_PART_MAIN);
       }
 
       if (props.child != nullptr) {
@@ -89,13 +89,18 @@ namespace foundation
       }
     }
 
-    std::shared_ptr<Styling> styling() override
+    const Styling* styling() const override
     {
-      if (this->props.style) {
-          return this->props.style;
+      style.reset();
+
+      apply_base_style(style);
+
+      if (props.style_override) {
+          props.style_override(style);
       }
-      return {};
-    };
+
+      return &style;
+    }
 
     Button *append(lv_obj_t *obj) override
     {

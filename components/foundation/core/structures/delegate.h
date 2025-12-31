@@ -14,7 +14,7 @@ namespace foundation
   class Delegate<R(Args...), Capacity> {
     using InvokeFn = R (*)(void*, Args&&...);
 
-    alignas(void*) unsigned char storage[Capacity];
+    alignas(void*) mutable unsigned char storage[Capacity];
     InvokeFn invoke = nullptr;
     void (*deleter)(void*) = nullptr;
 
@@ -41,6 +41,10 @@ namespace foundation
     }
 
     R operator()(Args... args) {
+      return invoke(storage, std::forward<Args>(args)...);
+    }
+
+    R operator()(Args... args) const {
       return invoke(storage, std::forward<Args>(args)...);
     }
 

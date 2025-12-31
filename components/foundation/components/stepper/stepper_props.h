@@ -1,5 +1,6 @@
 #pragma once
 
+#include "components/props.h";
 
 namespace foundation
 {
@@ -26,8 +27,6 @@ namespace foundation
     bool set_cursor_click_pos = false;
     uint8_t digit_count = 3;
     uint8_t separator_pos = 0;
-
-    static StepperProps up() { return StepperProps{}; }
 
     StepperProps& range(const float min, const float max) {
       this->min_value = min;

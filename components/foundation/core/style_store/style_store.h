@@ -1,50 +1,52 @@
 #pragma once
 
-#include <memory>
 #include <string>
 #include <unordered_map>
+#include <functional>
+
 #include "core/styling/styling.h"
 
 namespace foundation {
+
   class StyleStorage {
+  public:
+    using StyleFn = std::function<void(Styling&)>;
+
   private:
     std::string name;
-    std::unordered_map<std::string, std::shared_ptr<Styling>> storage;
-  public:
-    StyleStorage() : name("STYLE_STORAGE") {};
-    explicit StyleStorage(std::string name) : name(std::move(name)) {};
-
-    ~StyleStorage() = default;
+    std::unordered_map<std::string, StyleFn> storage;
 
   public:
-    StyleStorage* operator=(const StyleStorage*) const = delete;
+    StyleStorage()
+      : name("STYLE_STORAGE") {}
 
-    void set(const std::string& name, std::shared_ptr<Styling> style) {
-      this->storage[name] = std::move(style);
-    };
+    explicit StyleStorage(std::string name)
+      : name(std::move(name)) {}
 
-    std::shared_ptr<Styling> take(const std::string& name) {
-      auto existing = this->get(name);
-      if (!existing) {
-          auto created = std::make_shared<Styling>();
-          this->set(name, created);
-          return created;
-      }
-      return existing;
-    };
+    StyleStorage(const StyleStorage&) = delete;
+    StyleStorage& operator=(const StyleStorage&) = delete;
 
-    bool del(const std::string& name)
+    // === API ===
+
+    void set(const std::string& key, StyleFn fn)
     {
-      return this->storage.erase(name) > 0;
-    };
-    std::shared_ptr<Styling> get(const std::string& name) const
+      storage[key] = std::move(fn);
+    }
+
+    bool del(const std::string& key)
     {
-      const auto it = this->storage.find(name);
-      return it != this->storage.end() ? it->second : nullptr;
-    };
+      return storage.erase(key) > 0;
+    }
+
+    StyleFn get(const std::string& key) const
+    {
+      auto it = storage.find(key);
+      return it != storage.end() ? it->second : StyleFn{};
+    }
 
 #if STYLE_STORE_SINGLETON
-    static StyleStorage& instance() {
+    static StyleStorage& instance()
+    {
       static StyleStorage instance;
       return instance;
     }

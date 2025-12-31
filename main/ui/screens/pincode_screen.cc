@@ -5,8 +5,9 @@
 #include "../../components/foundation/components/component.h"
 #include "../../components/foundation/core/shortcuts.h"
 
-#include "ui/styles/common_styles.h"
 #include "core/state/state.h"
+#include "ui/localization.hh"
+#include "ui/styles/common_styles.h"
 
 #include <esp_log.h>
 
@@ -83,31 +84,62 @@ public:
     VNode::render();
     auto password_v = &this->password_state;
     auto login_v = &this->login_state;
+    auto navigation_ref = this->navigation_ref;
 
     return this->delegate(
         $View(
             ViewProps::up()
-                .set_style(this->styling())
+                .set_style([](Styling& style) {
+                  style.setTextColor(lv_color_make(255, 255, 255));
+                  style.setPadding(0, 0, 0, 0);
+                  style.setBorderRadius(0);
+                  style.setBorder(lv_color_make(255, 255, 255), 0, 0);
+                })
                 .set_children(Children{
-                  $StatusBar(
-                      StatusBarProps::up()
-                          .set_style(nullptr)
-                  ),
+                  $StatusBar(StatusBarProps::up()),
                   $View(ViewProps::up()
-                    .set_children(Children{
-                      $Button(ButtonProps::up()
-                       .set_child(
-                         $Text(
-                             TextProps::up()
-                                 .value("Back")
-                         )
-                       )
-                       .click([this](lv_event_t* e){
-                             navigation_ref->goBack();
-                       }))
-                    })
-                  .set_style($s("header.container"))
-                  .merge(header_container_left_props)),
+                  .w(LV_PCT(98))
+                  .h(60)
+                  .direction(LV_FLEX_FLOW_ROW)
+                  .items(LV_FLEX_ALIGN_CENTER)
+                  .track_cross(LV_FLEX_ALIGN_CENTER)
+                  .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
+                  .set_children(Children{
+                      $View(ViewProps::up()
+                        .w(LV_PCT(20))
+                        .h(60)
+                        .direction(LV_FLEX_FLOW_ROW)
+                        .items(LV_FLEX_ALIGN_CENTER)
+                        .justify(LV_FLEX_ALIGN_START)
+                        .track_cross(LV_FLEX_ALIGN_CENTER)
+                        .set_style($s("common.no_padding"))
+                        .set_children(Children{
+                          $Button(ButtonProps::up()
+                            .set_child(
+                              $Text(TextProps::up().value(locales::en::button_back)))
+                            .click([navigation_ref](lv_event_t *e) {
+                                navigation_ref->goBack();
+                            })),
+                        })),
+                      $View(ViewProps::up()
+                        .w(LV_PCT(78))
+                        .h(60)
+                        .set_style($s("common.no_padding"))
+                        .direction(LV_FLEX_FLOW_ROW)
+                        .items(LV_FLEX_ALIGN_CENTER)
+                        .justify(LV_FLEX_ALIGN_CENTER)
+                        .track_cross(LV_FLEX_ALIGN_CENTER)
+                        .set_children(Children{
+                          $Text(TextProps::up().value(locales::en::system_auth_header))
+                      })),
+                      $View(ViewProps::up()
+                        .w(LV_PCT(20))
+                        .set_style($s("common.no_padding"))
+                        .set_children(
+                          Children{
+                            $Fragment(FragmentProps::up())}
+                        )),
+                  })),
                   $View(ViewProps::up().set_children(Children{
                     $TextInput(TextInputProps::up()
                           .set_is_one_line(true)
@@ -148,15 +180,14 @@ public:
 
 
 
-  std::shared_ptr<Styling> styling() override {
-    this->style = std::make_shared<Styling>();
+  const Styling* styling() const override
+  {
+    this->style.setTextColor(lv_color_make(255, 255, 255));
+    this->style.setPadding(0, 0, 0, 0);
+    this->style.setBorderRadius(0);
+    this->style.setBorder(lv_color_make(255, 255, 255), 0, 0);
 
-    this->style->setTextColor(lv_color_make(255, 255, 255));
-    this->style->setPadding(0, 0, 0, 0);
-    this->style->setBorderRadius(0);
-    this->style->setBorder(lv_color_make(255, 255, 255), 0, 0);
-
-    return this->style;
+    return &this->style;
   }
 
   PinCodeScreen* append(lv_obj_t *obj) override

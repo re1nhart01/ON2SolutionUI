@@ -130,18 +130,18 @@ namespace foundation
     lv_textarea_set_text(ta, buf);
   }
 
-    std::shared_ptr<Styling> styling() override
+    const Styling* styling() const override
     {
-      this->style = std::make_shared<Styling>();
+      style.reset();
 
-      // this->style->setTextColor(lv_color_make(255, 255, 255));
-      // this->style->setPadding(0, 0, 16, 16); // Padding T R B L
-      // this->style->setBorder(lv_color_make(0, 0, 0), 0, 0);
-      // this->style->setFont(&lv_font_montserrat_12);
-      // this->style->setBorderRadius(0);
+      apply_base_style(style);
 
-      return this->style;
-    };
+      if (props.style_override) {
+          props.style_override(style);
+      }
+
+      return &style;
+    }
 
     Stepper* append(lv_obj_t* obj) override
     {

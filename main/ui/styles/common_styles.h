@@ -70,44 +70,44 @@ inline void pincode_screen_sign_form_props(foundation::ViewProps & p) {
 }
 
 inline void style_screen_register(foundation::StyleStorage& storage) {
-  storage.set("header.button", make_style([](Styling& style) {
+  storage.set("header.button", [](Styling& style) {
     style.setBackgroundColor(lv_color_hex(0x5B5AFF));
     style.setBorderRadius(24);
     style.setBorder(lv_color_hex(0x5B5AFF), 0, 0);
     style.setPadding(8, 8, 16, 16);
-  }));
-  storage.set("header.container", make_style([](Styling& style) {
+  });
+  storage.set("header.container", [](Styling& style) {
     style.setPadding(0, 0, 16, 16);
     style.setBorderRadius(0);
     style.setBorder(lv_color_make(255, 255, 255), 0, 0);
-  }));
-  storage.set("header.label", make_style([](Styling& style) {
+  });
+  storage.set("header.label", [](Styling& style) {
     style.setFont(&lv_font_montserrat_12);
-  }));
-  storage.set("header.labels.container", make_style([](Styling& style) {
+  });
+  storage.set("header.labels.container", [](Styling& style) {
     style.setFont(&lv_font_montserrat_12);
     style.setPadding(8, 8, 16, 16);
-  }));
+  });
 
-  storage.set("footer.button", make_style([](Styling& style) {
+  storage.set("footer.button", [](Styling& style) {
      style.setFont(&lv_font_montserrat_16);
      style.setBackgroundColor(lv_color_hex(0x000000));
      style.setBorderRadius(12);
      style.setSize(LV_PCT(96), 50);
      style.setBorder(lv_color_hex(0x5B5AFF), 0, 0);
      style.setPadding(8, 8, 16, 16);
-  }));
+  });
 
-  storage.set("common.no_padding", make_style([](Styling& style) {
+  storage.set("common.no_padding", [](Styling& style) {
       style.setBackgroundColor(lv_color_hex(0xffffffFF));
       style.setBorder(lv_color_make(0, 0, 0), 0, LV_OPA_TRANSP);
       style.setBorderRadius(0);
       style.setPadding(0, 0, 0, 0);
-  }));
+  });
 
-  storage.set("footer.container", make_style([](Styling& style) {
+  storage.set("footer.container", [](Styling& style) {
   // style.setPadding(0, 0, 16, 16);
   // style.setBorderRadius(0);
   // style.setBorder(lv_color_make(255, 255, 255), 0, 0);
-}));
+});
 }

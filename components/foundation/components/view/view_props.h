@@ -5,6 +5,7 @@
 #include <lvgl__lvgl/src/lvgl.h>
 
 #include "components/vnode.h"
+#include "components/props.h";
 #include <memory>
 
 namespace foundation
@@ -23,8 +24,6 @@ namespace foundation
     lv_flex_align_t align_items = LV_FLEX_ALIGN_CENTER;
     lv_flex_align_t track_cross_place = LV_FLEX_ALIGN_START;
     lv_flex_flow_t flex_direction = LV_FLEX_FLOW_COLUMN;
-
-    static ViewProps up() { return ViewProps{}; }
 
     ViewProps& w(const short value)
     {

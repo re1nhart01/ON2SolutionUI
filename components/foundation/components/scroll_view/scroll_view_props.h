@@ -1,4 +1,5 @@
 #pragma once
+#include "components/props.h";
 
 namespace foundation
 {
@@ -15,8 +16,6 @@ namespace foundation
     lv_dir_t scroll_dir = LV_DIR_VER;
     lv_scrollbar_mode_t scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
     bool disabled = false;
-
-    static ScrollViewProps up() { return ScrollViewProps{}; }
 
     ScrollViewProps& add_child(const std::shared_ptr<VNode>& c) {
       children.push_back(c);

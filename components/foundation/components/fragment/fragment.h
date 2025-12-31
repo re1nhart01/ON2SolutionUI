@@ -38,10 +38,20 @@ namespace foundation
 
       return obj;
     };
-    std::shared_ptr<Styling> styling() override
+
+    const Styling* styling() const override
     {
-      return nullptr;
-    };
+      style.reset();
+
+      apply_base_style(style);
+
+      if (props.style_override) {
+          props.style_override(style);
+      }
+
+      return &style;
+    }
+
     Fragment* append(lv_obj_t* obj) override
     {
       lv_obj_set_parent(obj, get_component());

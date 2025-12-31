@@ -57,9 +57,15 @@ public:
 
     return this->delegate($View(
       ViewProps::up()
-        .set_style(this->styling())
+        .set_style([](Styling& style) {
+          style.setPadding(0, 0, 0, 0);
+          style.setBorderRadius(0);
+          style.setBorder(lv_color_make(255, 255, 255), 0, 0);
+        })
         .set_children(Children{
-          $Text(TextProps::up().value("LOADING...")),
+          $Text(TextProps::up().value("LOADING...").set_style([](Styling& style) {
+            style.setTextColor(lv_color_make(0, 0, 0));
+          })),
           $Activity(ActivityIndicatorProps::up().sz(86).arc(80).set_color(
             PRIMARY_COLOR))})
         .w(LV_PCT(100))
@@ -68,13 +74,6 @@ public:
         .items(LV_FLEX_ALIGN_CENTER)
         .track_cross(LV_FLEX_ALIGN_CENTER)
         .direction(LV_FLEX_FLOW_COLUMN)));
-  }
-
-  std::shared_ptr<Styling> styling() override
-  {
-    this->style = std::make_shared<Styling>();
-
-    return this->style;
   }
 
   PreloaderScreen *append(lv_obj_t *obj) override

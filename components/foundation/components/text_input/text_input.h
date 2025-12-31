@@ -53,10 +53,6 @@ namespace foundation
           lv_textarea_set_text(obj, props.text);
       }
 
-      if (props.style) {
-          props.style->applyTo(obj);
-      }
-
       lv_obj_remove_event_cb(obj, nullptr);
 
       if (this->props.kbManager != nullptr)
@@ -90,13 +86,18 @@ namespace foundation
       if (props.on_value_changed)  lv_obj_add_event_cb(obj, event_adapter, LV_EVENT_VALUE_CHANGED, this);
     }
 
-    std::shared_ptr<Styling> styling() override
+    const Styling* styling() const override
     {
-      if (this->props.style) {
-          return this->props.style;
+      style.reset();
+
+      apply_base_style(style);
+
+      if (props.style_override) {
+          props.style_override(style);
       }
-      return {};
-    };
+
+      return &style;
+    }
 
     TextInput* append(lv_obj_t* obj) override
     {

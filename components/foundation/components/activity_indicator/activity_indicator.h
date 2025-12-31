@@ -33,10 +33,6 @@ namespace foundation
       set_component(lv_spinner_create(this->parent, this->props.spin_time, this->props.arc_length));
       lv_obj_t* obj = this->get_component();
 
-      if (props.style) {
-          lv_obj_add_style(obj, props.style->getStyle(), 0);
-      }
-
       do_rebuild();
 
       return this->get_component();
@@ -52,19 +48,24 @@ namespace foundation
 
       this->set_active(this->props.is_visible);
 
-      if (props.style) {
-          lv_obj_add_style(obj, props.style->getStyle(), 0);
+      if (const Styling* s = styling()) {
+          lv_obj_add_style(get_component(), s->getStyle(), LV_PART_MAIN);
       }
 
     }
 
-    std::shared_ptr<Styling> styling() override
+    const Styling* styling() const override
     {
-      if (this->props.style) {
-          return this->props.style;
+      style.reset();
+
+      apply_base_style(style);
+
+      if (props.style_override) {
+          props.style_override(style);
       }
-      return {};
-    };
+
+      return &style;
+    }
 
     ActivityIndicator *append(lv_obj_t *obj) override
     {

@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "components/props.h";
 
 namespace foundation
 {
@@ -10,15 +11,6 @@ namespace foundation
   struct ModalProps final : BaseProps<ModalProps, Modal> {
     std::shared_ptr<VNode> content;
     bool close_on_overlay = true;
-
-    std::shared_ptr<Styling> style;
-
-    static ModalProps up() { return ModalProps{}; }
-
-    ModalProps& set_style(std::shared_ptr<Styling> s) {
-      style = std::move(s);
-      return *this;
-    }
 
     ModalProps& set_content(std::shared_ptr<VNode> v) {
       content = v;

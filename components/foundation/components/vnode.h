@@ -12,19 +12,14 @@ namespace foundation {
     lv_obj_t* component = nullptr;
     lv_obj_t* parent = nullptr;
 
-    std::shared_ptr<Styling> style = nullptr;
+    mutable Styling style{};
     std::shared_ptr<VNode> renderer_view = nullptr;
 
   public:
     virtual ~VNode() { VNode::component_will_unmount(); }
 
-    VNode() {
-      this->style = nullptr;
-    }
-
-    VNode(lv_obj_t* obj, lv_obj_t* parent) : component(obj), parent(parent) {
-      this->style = nullptr;
-    }
+    VNode() {}
+    VNode(lv_obj_t* obj, lv_obj_t* parent) : component(obj), parent(parent) {}
 
     virtual void component_did_mount()    {  }
     virtual void component_will_unmount() {  }
@@ -34,7 +29,8 @@ namespace foundation {
     virtual lv_obj_t* render() { component_did_mount(); return nullptr; }
     virtual void do_rebuild() {}
 
-    virtual std::shared_ptr<Styling> styling() = 0;
+    virtual void apply_base_style(Styling& s) const {}
+    virtual const Styling* styling() const { return &this->style; };
     virtual VNode* append(lv_obj_t* obj) = 0;
 
     lv_obj_t* get_component() const { return component; }
@@ -53,10 +49,13 @@ namespace foundation {
       else        lv_obj_add_flag(component, LV_OBJ_FLAG_HIDDEN);
     }
 
-    void set_style(const std::shared_ptr<Styling>& newStyle) {
-      style = newStyle;
-      if (component && style)
-        lv_obj_add_style(component, style->getStyle(), 0);
+    template <typename Fn>
+    void set_style(Fn fn) const {
+      fn(style);
+      if (component)
+      {
+        lv_obj_add_style(component, style.getStyle(), 0);
+      }
     }
 
     void forceUpdate() {

@@ -52,10 +52,18 @@ namespace foundation
       lv_label_set_text(obj, this->props.text.c_str());
     };
 
-    std::shared_ptr<Styling> styling() override
+    const Styling* styling() const override
     {
-      return props.style;
-    };
+      style.reset();
+
+      apply_base_style(style);
+
+      if (props.style_override) {
+          props.style_override(style);
+      }
+
+      return &style;
+    }
 
     Text* append(lv_obj_t* obj) override
     {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lvgl.h"
+#include "components/props.h";
 
 namespace foundation
 {
@@ -18,8 +19,6 @@ namespace foundation
     enum class Property {
       X, Y, Opacity, Zoom, Rotation
     } property = Property::X;
-
-    static AnimatedProps up() { return AnimatedProps{}; }
 
     AnimatedProps& from(int32_t value) {
       start_value = value;

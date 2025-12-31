@@ -78,7 +78,19 @@ namespace foundation
       }
     }
 
-    std::shared_ptr<Styling> styling() override { return {}; }
+    const Styling* styling() const override
+    {
+      style.reset();
+
+      apply_base_style(style);
+
+      if (props.style_override) {
+          props.style_override(style);
+      }
+
+      return &style;
+    }
+
     VNode* append(lv_obj_t*) override { return this; }
   };
 

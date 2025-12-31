@@ -1,4 +1,5 @@
 #pragma once
+#include "components/props.h";
 
 namespace foundation
 {
@@ -12,13 +13,6 @@ namespace foundation
 
     short width = 10;
     short height = 10;
-
-    static CircularProgressProps up() { return CircularProgressProps{}; }
-
-    CircularProgressProps& set_style(std::shared_ptr<Styling> s) {
-      style = std::move(s);
-      return *this;
-    }
 
     CircularProgressProps& label(const std::string& s) {
       label_symbol = s;

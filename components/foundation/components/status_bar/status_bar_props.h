@@ -1,21 +1,16 @@
 #pragma once
+#include "components/props.h";
 
 
 namespace foundation
 {
   class StatusBar;
 
-
   struct StatusBarProps final : BaseProps<StatusBarProps, StatusBar>
   {
     std::vector<std::shared_ptr<VNode>> children;
-
     std::optional<lv_color_t> background_color;
-
     std::optional<lv_coord_t> height;
-
-    static StatusBarProps up() { return StatusBarProps{}; }
-
 
     StatusBarProps& set_children(const std::vector<std::shared_ptr<VNode>>& value)
     {

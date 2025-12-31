@@ -2,6 +2,7 @@
 // Created by evgeniy on 11/23/25.
 //
 #pragma once
+#include "components/props.h";
 
 namespace foundation
 {
@@ -33,7 +34,5 @@ namespace foundation
       this->color = color;
       return *this;
     }
-
-    static ActivityIndicatorProps up() { return ActivityIndicatorProps(); }
   };
 }

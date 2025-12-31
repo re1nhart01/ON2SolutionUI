@@ -85,10 +85,18 @@ namespace foundation
       return nullptr;
     }
 
-    std::shared_ptr<Styling> styling() override {
-      this->style = std::make_shared<Styling>();
-      return this->style;
-    };
+    const Styling* styling() const override
+    {
+      style.reset();
+
+      apply_base_style(style);
+
+      if (props.style_override) {
+          props.style_override(style);
+      }
+
+      return &style;
+    }
 
     TabView* append(lv_obj_t* obj) override {
       uint16_t act = lv_tabview_get_tab_act(get_component());
