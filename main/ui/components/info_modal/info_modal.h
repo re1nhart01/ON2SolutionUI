@@ -1,9 +1,10 @@
 
 
 #pragma once
-#include "ui/localization.hh"
-#include "ui/components/info_modal/info_modal_props.h"
+#include "core/shortcuts.h"
 #include "core/styling/styling.h"
+#include "ui/components/info_modal/info_modal_props.h"
+#include "ui/localization.hh"
 
 using namespace foundation;
 class InfoModal;
@@ -39,7 +40,8 @@ public:
     return $View(ViewProps::up()
       .h(height)
       .set_style([](Styling& style) {
-        style.setBackgroundColor(lv_color_hex(0xffffffFF));
+        style.setBackgroundColor(lv_color_hex(0xffffff));
+        style.setBackgroundOpa(LV_OPA_COVER);
         style.setBorder(lv_color_make(0, 0, 0), 0, LV_OPA_TRANSP);
         style.setBorderRadius(0);
         style.setPadding(0, 0, 0, 0);
@@ -49,7 +51,6 @@ public:
       .track_cross(LV_FLEX_ALIGN_CENTER)
       .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
       .set_children(Children{
-
         $Text(TextProps::up()
           .value(key)
         ),
@@ -62,36 +63,52 @@ public:
   }
 
   lv_obj_t * render() override
-  {
-    Component::render();
+{
+  Component::render();
 
-    this->modal = $Modal(ModalProps::up().set_content($View(
+  this->modal = $Modal(ModalProps::up().set_content($View(
     ViewProps::up()
+      .w(LV_PCT(80))
+      .h(LV_PCT(80))
       .set_children(Children{
-        this->makeRow(locales::en::info_device, this->props.device),
-        this->makeRow(locales::en::info_loader, this->props.loader),
-        this->makeRow(locales::en::info_fw, this->props.fw),
-        this->makeRow(locales::en::info_fw_checksum, this->props.fw_checksum),
-        this->makeRow(locales::en::info_module_name, this->props.module_name),
-        this->makeRow(locales::en::info_module_fw, this->props.module_fw),
-        this->makeRow(locales::en::info_serial_number, this->props.serial_number),
-        this->makeRow(locales::en::info_ethernet_ip, this->props.ethernet_ip),
-        this->makeRow(locales::en::info_wifi_ip, this->props.wifi_ip),
-        this->makeRow(locales::en::info_lcd_fw, this->props.lcd_fw),
-        this->makeRow(locales::en::info_lcd_loader, this->props.lcd_loader),
-        this->makeRow(locales::en::info_lcd_partition, this->props.lcd_partition),
-        $Button(
-          ButtonProps::up()
-            .label(locales::en::button_close)
-            .click([this](lv_event_t *) { this->close(); })),
+        $FlatList(FlatListProps::up()
+          .w(LV_PCT(100))
+          .h(LV_PCT(100))
+          .set_style([](Styling& style) {
+             style.setPadding(10, 10, 10, 10);
+             style.setBorderRadius(0);
+             style.setBorder(lv_color_make(255, 255, 255), 0, 0);
+          })
+          .set_children(Children{
+            $View(ViewProps::up()
+              .direction(LV_FLEX_FLOW_COLUMN)
+              .w(LV_PCT(100))
+              .h(LV_SIZE_CONTENT)
+              .set_children(Children{
+                this->makeRow(locales::en::info_device, this->props.device),
+                this->makeRow(locales::en::info_loader, this->props.loader),
+                this->makeRow(locales::en::info_fw, this->props.fw),
+                this->makeRow(locales::en::info_fw_checksum, this->props.fw_checksum),
+                this->makeRow(locales::en::info_module_name, this->props.module_name),
+                this->makeRow(locales::en::info_module_fw, this->props.module_fw),
+                this->makeRow(locales::en::info_serial_number, this->props.serial_number),
+                this->makeRow(locales::en::info_ethernet_ip, this->props.ethernet_ip),
+                this->makeRow(locales::en::info_wifi_ip, this->props.wifi_ip),
+                this->makeRow(locales::en::info_lcd_fw, this->props.lcd_fw),
+                this->makeRow(locales::en::info_lcd_loader, this->props.lcd_loader),
+                this->makeRow(locales::en::info_lcd_partition, this->props.lcd_partition),
+                $Button(
+                  ButtonProps::up()
+                    .label(locales::en::button_close)
+                    .click([this](lv_event_t *) { this->close(); })),
+              }))
+          }))
       })
-      .justify(LV_FLEX_ALIGN_CENTER)
-      .items(LV_FLEX_ALIGN_CENTER)
-      .track_cross(LV_FLEX_ALIGN_CENTER)
-      .direction(LV_FLEX_FLOW_COLUMN))));
+      .direction(LV_FLEX_FLOW_COLUMN)))
+  );
 
-      return this->modal->get_component();
-  };
+  return this->modal->get_component();
+};
 
   void show() {
     if (this->modal == nullptr) {

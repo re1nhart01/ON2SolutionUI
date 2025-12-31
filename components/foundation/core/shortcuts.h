@@ -19,6 +19,7 @@ using $$Modal = std::shared_ptr<foundation::Modal>;
 using $$Stepper = std::shared_ptr<foundation::Stepper>;
 using $$Fragment = std::shared_ptr<foundation::Fragment>;
 using $$TabView = std::shared_ptr<foundation::TabView>;
+using $$FlatList = std::shared_ptr<foundation::FlatList>;
 
 
   inline std::shared_ptr<foundation::View> $View(auto&&... args) {
@@ -75,6 +76,10 @@ using $$TabView = std::shared_ptr<foundation::TabView>;
 
   inline std::shared_ptr<foundation::TabView> $TabView(auto&&... args) {
     return std::make_shared<foundation::TabView>(std::forward<decltype(args)>(args)...);
+  }
+
+  inline std::shared_ptr<foundation::FlatList> $FlatList(auto&&... args) {
+    return std::make_shared<foundation::FlatList>(std::forward<decltype(args)>(args)...);
   }
 
   using Children = std::vector<std::shared_ptr<foundation::VNode>>;

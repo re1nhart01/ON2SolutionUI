@@ -13,7 +13,7 @@
  *====================*/
 #define LV_COLOR_DEPTH 16
 #define LV_COLOR_16_SWAP 0
-#define LV_COLOR_SCREEN_TRANSP 1
+#define LV_COLOR_SCREEN_TRANSP 0
 #define LV_COLOR_MIX_ROUND_OFS 128
 #define LV_COLOR_CHROMA_KEY lv_color_hex(0x00ff00)
 
@@ -37,8 +37,8 @@
 /*====================
    HAL SETTINGS
  *====================*/
-#define LV_DISP_DEF_REFR_PERIOD 16      /* 60 FPS (1000/60) */
-#define LV_INDEV_DEF_READ_PERIOD 10     /* Touch read period */
+#define LV_DISP_DEF_REFR_PERIOD 16     /* 60 FPS (1000/60) */
+#define LV_INDEV_DEF_READ_PERIOD 30     /* Touch read period */
 #define LV_TICK_CUSTOM 0
 #define LV_DPI_DEF 130
 
@@ -51,13 +51,13 @@
 /* Кэши - все на минимум */
 #define LV_SHADOW_CACHE_SIZE 0         /* Отключи кэш теней */
 #define LV_CIRCLE_CACHE_SIZE 4
-#define LV_LAYER_SIMPLE_BUF_SIZE (12 * 1024)  /* Уменьши буфер слоя */
-#define LV_IMG_CACHE_DEF_SIZE 0        /* Отключи кэш картинок */
+#define LV_LAYER_SIMPLE_BUF_SIZE (12 * 1024)
+#define LV_IMG_CACHE_DEF_SIZE 0
 
 /* Градиенты */
 #define LV_GRADIENT_MAX_STOPS 2
-#define LV_GRAD_CACHE_DEF_SIZE 0       /* Отключи кэш градиентов */
-#define LV_DITHER_GRADIENT 0           /* Отключи dithering */
+#define LV_GRAD_CACHE_DEF_SIZE 0
+#define LV_DITHER_GRADIENT 0
 
 /* Rotation buffer */
 #define LV_DISP_ROT_MAX_BUF (10*1024)
@@ -76,7 +76,7 @@
 /*====================
    LOGGING
  *====================*/
-#define LV_USE_LOG 0                   /* ВЫКЛ для производительности */
+#define LV_USE_LOG 0
 
 #if LV_USE_LOG
     #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
@@ -110,7 +110,7 @@
  *====================*/
 #define LV_BIG_ENDIAN_SYSTEM 0
 #define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
-#define LV_ATTRIBUTE_FAST_MEM_USE_IRAM 1  /* Для ESP32 */
+#define LV_ATTRIBUTE_FAST_MEM_USE_IRAM 0  /* Для ESP32 */
 #define LV_USE_LARGE_COORD 0
 
 /*====================
@@ -237,8 +237,8 @@
    LAYOUTS
  *====================*/
 #define LV_USE_FLEX 1
-#define LV_USE_GRID 1
-
+#define LV_USE_GRID 0
+#define LV_ANTIALIAS 0
 /*====================
    3RD PARTY LIBRARIES
  *====================*/

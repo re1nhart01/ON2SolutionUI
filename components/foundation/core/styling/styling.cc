@@ -210,6 +210,11 @@ Styling *Styling::setFlexGrow(uint8_t grow)
   return this;
 }
 
+Styling* Styling::setBackgroundOpa(lv_opa_t opa) {
+  lv_style_set_bg_opa(&style, opa);
+  return this;
+}
+
 void Styling::reset() const {
   lv_style_reset(&style);
   lv_style_init(&style);

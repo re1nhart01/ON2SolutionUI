@@ -23,6 +23,9 @@
 #include "components/scroll_view/scroll_view.h"
 #include "components/scroll_view/scroll_view_props.h"
 
+#include "components/flat_list/flat_list.h"
+#include "components/flat_list/flat_list_props.h"
+
 #include "components/fragment/fragment.h"
 #include "components/fragment/fragment_props.h"
 

@@ -58,6 +58,7 @@ public:
   Styling* setFlexFlow(lv_flex_flow_t flow);
   Styling* setAlign(lv_flex_align_t align);
   Styling* setFlexGrow(uint8_t grow);
+  Styling* setBackgroundOpa(lv_opa_t opa);
   void reset() const;
 };
 

@@ -91,7 +91,7 @@ extern "C" {
 #define LVGL_PORT_FULL_REFRESH          (1)
 #elif LVGL_PORT_AVOID_TEAR_MODE == 3
 #define LVGL_PORT_LCD_RGB_BUFFER_NUMS   (2)
-#define LVGL_PORT_DIRECT_MODE           (1)
+#define LVGL_PORT_DIRECT_MODE           (0)
 #endif /* LVGL_PORT_AVOID_TEAR_MODE */
 
 #if EXAMPLE_LVGL_PORT_ROTATION_DEGREE == 0

@@ -98,6 +98,7 @@ namespace foundation
             props.track_cross_place
         );
 
+        lv_obj_clear_flag(comp, LV_OBJ_FLAG_GESTURE_BUBBLE);
         lv_obj_set_scroll_snap_y(comp, LV_SCROLL_SNAP_NONE);
         lv_obj_set_scroll_snap_x(comp, LV_SCROLL_SNAP_NONE);
         lv_obj_clear_flag(comp, LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM);

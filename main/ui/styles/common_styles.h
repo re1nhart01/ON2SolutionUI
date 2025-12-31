@@ -99,7 +99,7 @@ inline void style_screen_register(foundation::StyleStorage& storage) {
   });
 
   storage.set("common.no_padding", [](Styling& style) {
-      style.setBackgroundColor(lv_color_hex(0xffffffFF));
+      style.setBackgroundColor(lv_color_hex(0xffffff));
       style.setBorder(lv_color_make(0, 0, 0), 0, LV_OPA_TRANSP);
       style.setBorderRadius(0);
       style.setPadding(0, 0, 0, 0);
