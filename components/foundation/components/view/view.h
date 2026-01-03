@@ -8,13 +8,8 @@ namespace foundation
   private:
 
   public:
-    explicit View(lv_obj_t * parent, const ViewProps &props) : Component(nullptr, parent, props) {
-      if(this->props.ref != nullptr) {
-          this->props.ref->set(this);
-      }
-    };
-
     explicit View(const ViewProps &props) : Component(nullptr, nullptr, std::move(props)) {
+      this->apply_reactive<View>(this, props.reactive_delegates);
       if(this->props.ref != nullptr) {
           this->props.ref->set(this);
       }

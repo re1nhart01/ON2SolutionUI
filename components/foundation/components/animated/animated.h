@@ -12,6 +12,7 @@ namespace foundation
     explicit Animated(const std::shared_ptr<VNode> &component, AnimatedProps props)
       : Component(std::move(props))
     {
+      this->apply_reactive<Animated>(this, props.reactive_delegates);
       this->component = component;
       this->reference = std::make_unique<lv_anim_t>();
 

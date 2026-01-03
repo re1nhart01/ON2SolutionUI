@@ -14,11 +14,20 @@ namespace foundation
     using Component::props;
 
     explicit Modal(const ModalProps& props)
-        : Component(nullptr, nullptr, props) {}
+        : Component(nullptr, nullptr, props)
+    {
+      this->apply_reactive<Modal>(this, props.reactive_delegates);
+        if (this->props.ref != nullptr) {
+            this->props.ref->set(this);
+        }
+    }
 
     ~Modal() override {
       ESP_LOGE("MODAL", "Modal destroyed");
       close();
+      if (this->props.ref != nullptr) {
+          this->props.ref->unlink();
+      }
     }
 
     lv_obj_t* render() override

@@ -32,12 +32,14 @@ class MainScreen final : public NavigationScreen<MainScreenProps>
   std::unique_ptr<UartHandler> uart_handler = nullptr;
   std::unique_ptr<SharedRefStore<12>> ref_store;
   $$InfoModal info_modal = nullptr;
-
+  Reactive<int> reactive_test;
+  TaskHandle_t xHandle = nullptr;
 public:
   explicit MainScreen(StackNavigator *stack, const MainScreenProps &props)
       : NavigationScreen(stack, props), props(props),
         styles(std::make_unique<StyleStorage>()),
-        ref_store(std::make_unique<SharedRefStore<12>>())
+        ref_store(std::make_unique<SharedRefStore<12>>()),
+        reactive_test()
   {
     style_screen_register(*this->styles);
   }
@@ -50,6 +52,7 @@ public:
     this->uart_handler = std::make_unique<UartHandler>(
       UART_NUM_1, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
     ESP_LOGI("main_screen", "on_FOCUS");
+    start_random_updater();
     // this->uart_handler->init();
     // this->uart_handler->enable_rx(true);
     // this->add_uart_data_event();
@@ -58,6 +61,10 @@ public:
   void on_blur() override
   {
     NavigationScreen::on_blur();
+    if (this->xHandle != nullptr)
+    {
+      vTaskDelete(this->xHandle);
+    }
     this->uart_handler->remove_all_event_listeners();
   };
 
@@ -81,22 +88,45 @@ public:
   void show_info_modal()
   {
     info_modal = $InfoModal(InfoModalProps::up()
-      .set_device("ON2SYSTEMS")
-      .set_loader("ON2SYS_RevB 1.9")
-      .set_fw("1.6.2.4")
-      .set_fw_checksum("D29FD7E0")
-      .set_module_name("Eport_E20")
-      .set_module_fw("1.40.5")
-      .set_serial_number("34EAE706A006")
-      .set_ethernet_ip("192.168.1.128")
-      .set_wifi_ip("10.10.10.10")
-      .set_lcd_fw("x.x.x")
-      .set_lcd_loader("x.x.x")
-      .set_lcd_partition("x.x.x")
-      .set_restart_seconds(99)
-    );
+                              .set_device("ON2SYSTEMS")
+                              .set_loader("ON2SYS_RevB 1.9")
+                              .set_fw("1.6.2.4")
+                              .set_fw_checksum("D29FD7E0")
+                              .set_module_name("Eport_E20")
+                              .set_module_fw("1.40.5")
+                              .set_serial_number("34EAE706A006")
+                              .set_ethernet_ip("192.168.1.128")
+                              .set_wifi_ip("10.10.10.10")
+                              .set_lcd_fw("x.x.x")
+                              .set_lcd_loader("x.x.x")
+                              .set_lcd_partition("x.x.x")
+                              .set_restart_seconds(99));
 
     info_modal->show();
+  }
+
+  void start_random_updater() {
+    xTaskCreate(
+        [](void* pvParameters) {
+            auto* self = static_cast<MainScreen*>(pvParameters);
+
+            while (true) {
+                uint32_t rand = esp_random();
+                int val = (static_cast<int>(rand) % 100) + 1;
+
+                ESP_LOGI("main_screen", "start_random_updater 1 %d", val);
+                if (self) {
+                ESP_LOGI("main_screen", "start_random_updater 14341 %d", val);
+                    self->reactive_test.set(val);
+                }
+
+                ESP_LOGI("main_screen", "start_random_updater, 2");
+
+                vTaskDelay(pdMS_TO_TICKS(1000));
+            }
+        },
+        "rand_task", 16384, this, 5, &xHandle
+    );
   }
 
   void add_uart_data_event()
@@ -206,6 +236,9 @@ public:
                     .set_ref(this->ref_store->create<Text>("text_channels"))
                     .value("Channels: 0")),
                 $Text(TextProps::up()
+                        .watch<int>(&this->reactive_test, "inputs", [](Text* self, int value) {
+                          self->set_state([value](TextProps &props) { props.value(std::format("Inputs: {}", value)); });
+                        })
                         .set_ref(this->ref_store->create<Text>("text_inputs"))
                         .value("Inputs: 0")),
                 $Text(TextProps::up()

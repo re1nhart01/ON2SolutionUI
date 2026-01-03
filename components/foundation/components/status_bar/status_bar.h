@@ -11,8 +11,7 @@ namespace foundation
     using Component::props;
 
     explicit StatusBar(const StatusBarProps& props) : Component(nullptr, nullptr, std::move(props)) {
-      this->parent = nullptr;
-
+      this->apply_reactive<StatusBar>(this, props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }
@@ -30,7 +29,6 @@ namespace foundation
       Component::render();
       return this->delegate(
         std::make_shared<View>(
-          this->parent,
           ViewProps::up()
           .set_style([this](Styling& style) {
             style.setBackgroundColor(this->props.background_color.value_or(lv_color_hex(0x303030)));

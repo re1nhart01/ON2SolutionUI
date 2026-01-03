@@ -55,6 +55,7 @@
 
 #include "core/styling/styling.h"
 
+#include "core/state/reactive.h"
 #include "core/style_store/style_store.h"
 #include "components/props.h"
 #include "core/structures/delegate.h"

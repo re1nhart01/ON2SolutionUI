@@ -13,7 +13,8 @@ namespace foundation
   public:
     explicit CircularProgress(CircularProgressProps props)
       : Component(nullptr, nullptr, std::move(props)) {
-      this->parent = nullptr;
+      this->apply_reactive<CircularProgress>(this, props.reactive_delegates);
+
 
       this->is_show_label = props.show_label_default;
 

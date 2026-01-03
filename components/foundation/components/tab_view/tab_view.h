@@ -12,7 +12,7 @@ namespace foundation
     std::vector<lv_obj_t*> tab_pages;
 
     explicit TabView(const TabViewProps& props) : Component(nullptr, nullptr, std::move(props)) {
-      this->parent = nullptr;
+      this->apply_reactive<TabView>(this, props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }

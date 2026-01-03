@@ -1,8 +1,9 @@
 #pragma once
 
 #include "core/ref/ref.h"
-#include "core/styling/styling.h"
+#include "core/state/reactive.h"
 #include "core/structures/delegate.h"
+#include "core/styling/styling.h"
 #include <memory>
 
 namespace foundation
@@ -12,12 +13,29 @@ namespace foundation
   {
     std::shared_ptr<Ref<RefT>> ref = nullptr;
     Delegate<void(Styling&)> style_override{};
+    mutable std::vector<Delegate<void(void*), 40>> reactive_delegates{};
+    std::vector<IReactive*> reactive_link{};
 
     bool is_visible = true;
 
     virtual ~BaseProps() = default;
 
     static Derived up(){ return Derived{}; }
+
+
+    template<typename TVal>
+    Derived& watch(Reactive<TVal>* reactive, std::string key, Delegate<void(RefT*, TVal), 40> updater)
+    {
+      if (!reactive) return static_cast<Derived&>(*this);
+
+      this->reactive_delegates.push_back([reactive, updater, key](void* internal_component) {
+        reactive->attach(key, static_cast<RefT*>(internal_component), updater);
+      });
+
+      this->reactive_link.push_back(reactive);
+
+      return static_cast<Derived&>(*this);
+    }
 
     Derived& set_style(Delegate<void(Styling&)> fn)
     {

@@ -3,7 +3,9 @@
 #include <cstring>
 #include <string>
 
-//ST – Статус (A-StandBy, B-Booster Delay, C-Startup, D-Running, E-Producing, F-Alarm, G-Tank Full, H-Auto Adjusting )
+namespace on2::parser
+{
+  //ST – Статус (A-StandBy, B-Booster Delay, C-Startup, D-Running, E-Producing, F-Alarm, G-Tank Full, H-Auto Adjusting )
 //$AABBCCDDEEFFRQ</CH=2/ST=F/O2=17.4;0.0/FL=10.1;0.0/II=0F/IO=F0/ER=8FFFFF00/PS=51;0/HR=9:42>D6
 
 enum class DatasetStatuses {
@@ -80,3 +82,4 @@ struct DatasetDTO {
   uint32_t errors;
   uint8_t crc;
 };
+}

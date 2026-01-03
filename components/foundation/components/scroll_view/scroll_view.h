@@ -7,17 +7,10 @@ namespace foundation
   class ScrollView final : public Component<ScrollViewProps>
   {
   public:
-    explicit ScrollView(lv_obj_t* parent, const ScrollViewProps& props)
-        : Component(nullptr, parent, props)
-    {
-        if (this->props.ref != nullptr) {
-            this->props.ref->set(this);
-        }
-    }
-
     explicit ScrollView(const ScrollViewProps& props)
         : Component(nullptr, nullptr, std::move(props))
     {
+      this->apply_reactive<ScrollView>(this, props.reactive_delegates);
         if (this->props.ref != nullptr) {
             this->props.ref->set(this);
         }

@@ -16,12 +16,7 @@ private:
   PreloaderScreenProps props;
 
 public:
-  explicit PreloaderScreen(StackNavigator *stack,
-                           const PreloaderScreenProps &props)
-      : NavigationScreen(stack, props)
-  {
-    this->props = props;
-  }
+  explicit PreloaderScreen(StackNavigator *stack, const PreloaderScreenProps &props) : NavigationScreen(stack, props), props(props) {}
 
   ~PreloaderScreen() override = default;
 

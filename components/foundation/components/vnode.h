@@ -11,12 +11,20 @@ namespace foundation {
   protected:
     lv_obj_t* component = nullptr;
     lv_obj_t* parent = nullptr;
+    std::vector<IReactive*> attached_states{};
 
     mutable Styling style{};
     std::shared_ptr<VNode> renderer_view = nullptr;
 
   public:
-    virtual ~VNode() { VNode::component_will_unmount(); }
+    virtual ~VNode()
+    {
+      VNode::component_will_unmount();
+      for (auto* state : attached_states) {
+          if (state) state->detach(this);
+      }
+      attached_states.clear();
+    }
 
     VNode() {}
     VNode(lv_obj_t* obj, lv_obj_t* parent) : component(obj), parent(parent) {}
@@ -49,6 +57,13 @@ namespace foundation {
       else        lv_obj_add_flag(component, LV_OBJ_FLAG_HIDDEN);
     }
 
+    template<typename T>
+    void apply_reactive(T* instance, const std::vector<Delegate<void(void*)>>& delegates) {
+      for (auto& binder : delegates) {
+          if (binder) binder(static_cast<void*>(instance));
+      }
+    }
+
     template <typename Fn>
     void set_style(Fn fn) const {
       fn(style);
@@ -59,9 +74,8 @@ namespace foundation {
     }
 
     void forceUpdate() {
-        ESP_LOGI("problem", "%s", this->get_component() == nullptr ? "null" : "not null");
       if (this->get_component() != nullptr) {
-        lv_obj_invalidate(component);
+        lv_obj_invalidate(this->get_component());
         rebuild();
       }
       component_did_update();

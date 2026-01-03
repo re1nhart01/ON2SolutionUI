@@ -10,6 +10,7 @@ namespace foundation
     using Component::props;
     bool is_init = true;
     explicit TextInput(const TextInputProps& props) : Component(nullptr, nullptr, std::move(props)) {
+      this->apply_reactive<TextInput>(this, props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }

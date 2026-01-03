@@ -6,6 +6,11 @@ namespace foundation
   class Text final : public Component<TextProps> {
   public:
     explicit Text(const TextProps& props) : Component(props) {
+      this->apply_reactive<Text>(this, props.reactive_delegates);
+
+      for (auto& binder : props.reactive_delegates) {
+          if (binder) binder(this);
+      }
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }

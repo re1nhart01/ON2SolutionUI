@@ -1,14 +1,26 @@
 
+#include "helpers.cc"
+#include "types.cc"
 #include <string>
-#include "dataset.dto.cc"
-#include "fun_helpers.cc"
 
 #include "esp_random.h"
 
+#include "store/dataset.store.h"
 
-static const std::string packets[10] = {
-  "$AABBCCDDEEFFRQ</CH=3/ST=4/O2=18.2;0.1/FL=11.3;0.2/II=1A/IO=0F/ER=7ABCDE10/PS=49;1/HR=8:21>D5",
-  "$AABBCCDDEEFFRQ</CH=1/ST=7/O2=16.9;0.3/FL=12.0;0.5/II=2B/IO=1E/ER=6F00AA33/PS=52;2/HR=7:58>C1",
+using namespace on2::parser::helpers;
+using namespace on2::parser;
+
+
+// operative data example - $</CH=2/ST=F/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/HR=123456789:42>
+// settings  data example - #</OS=+2.2;+3.3;-2.2;+3.3/FS=+2.2;+3.3;-2.2;+3.3/CD=3/RU=480/PS=40/WC=94.0/LL=93.8/LT=30/EC=4/TH=60/TL=50/VH=7.0/VL=5.0/PT=A/TO=50/FE=1.0/CV=2>
+// sysinfo   data example - #</GN=ON2SYS_RevB/GV=1.6.2.4/GL=1.9/MN=EPORT-E20/MV=1.40.5/GF=D29FD7E0/EH=192.168.1.128/WF=10.10.10.10/GD=34EAE706A006>
+//`$</CH=2/ST=F/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/HR=123456789:42>`.replaceAll("$", "").replaceAll("<", "").replaceAll("/", " ").replaceAll(">", "")
+
+static const std::string packets[10]
+  = {"$AABBCCDDEEFFRQ</CH=3/ST=4/O2=18.2;0.1/FL=11.3;0.2/II=1A/IO=0F/"
+     "ER=7ABCDE10/PS=49;1/HR=8:21>D5",
+     "$AABBCCDDEEFFRQ</CH=1/ST=7/O2=16.9;0.3/FL=12.0;0.5/II=2B/IO=1E/"
+     "ER=6F00AA33/PS=52;2/HR=7:58>C1",
   "$AABBCCDDEEFFRQ</CH=5/ST=2/O2=19.7;0.2/FL=14.4;0.4/II=3C/IO=2D/ER=55FF1020/PS=45;3/HR=9:07>AF",
   "$AABBCCDDEEFFRQ</CH=4/ST=1/O2=20.3;0.6/FL=13.1;0.1/II=4D/IO=3C/ER=442211AA/PS=56;4/HR=10:11>BB",
   "$AABBCCDDEEFFRQ</CH=6/ST=3/O2=21.8;0.8/FL=15.5;0.7/II=5E/IO=4B/ER=33C0F0A1/PS=43;5/HR=11:22>E3",
@@ -134,4 +146,13 @@ DatasetDTO parse_into_dataset(const std::string& value_string) {
     result.crc = static_cast<uint8_t>(parse_hex_to_int(crc_start, 2));
 
     return result;
+}
+
+
+
+
+
+namespace on2::parser
+{
+
 }

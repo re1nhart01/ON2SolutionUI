@@ -10,7 +10,15 @@ namespace foundation
     explicit FlatList(const FlatListProps& props)
         : Component(nullptr, nullptr, std::move(props))
     {
+      this->apply_reactive<FlatList>(this, props.reactive_delegates);
         if (this->props.ref != nullptr) this->props.ref->set(this);
+    }
+
+    ~FlatList()
+    {
+      if (this->props.ref != nullptr) {
+          this->props.ref->unlink();
+      }
     }
 
     lv_obj_t* render() override
