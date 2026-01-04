@@ -18,6 +18,10 @@ namespace foundation
 
     ~ScrollView() override
     {
+        if (!this->props.reactive_link.empty())
+        {
+            this->detach_reactives<ScrollView>(this, this->props.reactive_link);
+        }
         if (this->props.ref != nullptr) {
             this->props.ref->unlink();
         }

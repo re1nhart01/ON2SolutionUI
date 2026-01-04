@@ -4,6 +4,7 @@
 #include "core/state/reactive.h"
 #include "core/structures/delegate.h"
 #include "core/styling/styling.h"
+#include <core/state/thread_reactive.h>
 #include <memory>
 
 namespace foundation
@@ -24,7 +25,21 @@ namespace foundation
 
 
     template<typename TVal>
-    Derived& watch(Reactive<TVal>* reactive, std::string key, Delegate<void(RefT*, TVal), 40> updater)
+    Derived& watch(Reactive<TVal>* reactive, std::string key, Delegate<void(RefT*, const TVal&)> updater)
+    {
+      if (!reactive) return static_cast<Derived&>(*this);
+
+      this->reactive_delegates.push_back([reactive, updater, key](void* internal_component) {
+        reactive->attach(key, static_cast<RefT*>(internal_component), updater);
+      });
+
+      this->reactive_link.push_back(reactive);
+
+      return static_cast<Derived&>(*this);
+    }
+
+    template<typename TVal>
+    Derived& watch(ThreadReactive<TVal> * reactive, std::string key, Delegate<void(RefT*, const TVal&)> updater)
     {
       if (!reactive) return static_cast<Derived&>(*this);
 

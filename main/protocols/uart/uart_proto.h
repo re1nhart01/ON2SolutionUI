@@ -49,7 +49,7 @@ namespace UartTypes
 {
   struct UartData
   {
-    std::string packet;
+    char packet[256];
     size_t len;
     bool flag;
   };
@@ -253,8 +253,10 @@ public:
                       data[len] = '\0';
 
                       UartTypes::UartData uart_data;
+                      memcpy(uart_data.packet, data, len);
+                      uart_data.packet[len] = 0;
                       uart_data.len = len;
-                      uart_data.packet.assign(reinterpret_cast<const char*>(data), len);
+
                       uart_data.flag = true;
 
                       execute_callback_event(UART_DATA, { .response = uart_data });

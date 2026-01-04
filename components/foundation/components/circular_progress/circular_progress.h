@@ -25,6 +25,10 @@ namespace foundation
 
     ~CircularProgress() override
     {
+      if (!this->props.reactive_link.empty())
+      {
+        this->detach_reactives<CircularProgress>(this, this->props.reactive_link);
+      }
       if (this->props.ref != nullptr) {
           this->props.ref->unlink();
       }

@@ -9,7 +9,7 @@
 #include "components/view/view.h"
 #include "components/view/view_props.h"
 #include "core/ref_store/ref_store.h"
-#include "lg/dataset/parser.cc"
+#include "lg/dataset/deserializer.cc"
 #include "lg/store/global_store.h"
 #include "protocols/uart/uart_proto.h"
 #include "ui/localization.hh"
@@ -17,6 +17,7 @@
 #include "ui/components/info_modal/info_modal.h"
 
 #include <algorithm>
+#include <lg/dataset/store/dataset.store.h>
 
 struct PinCodeScreenProps;
 using namespace foundation;
@@ -25,21 +26,20 @@ class MainScreen;
 struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen>
 {};
 
+static SemaphoreHandle_t mutex = xSemaphoreCreateMutex();
+
+
 class MainScreen final : public NavigationScreen<MainScreenProps>
 {
   MainScreenProps props;
   std::unique_ptr<StyleStorage> styles;
   std::unique_ptr<UartHandler> uart_handler = nullptr;
-  std::unique_ptr<SharedRefStore<12>> ref_store;
   $$InfoModal info_modal = nullptr;
-  Reactive<int> reactive_test;
   TaskHandle_t xHandle = nullptr;
 public:
   explicit MainScreen(StackNavigator *stack, const MainScreenProps &props)
       : NavigationScreen(stack, props), props(props),
-        styles(std::make_unique<StyleStorage>()),
-        ref_store(std::make_unique<SharedRefStore<12>>()),
-        reactive_test()
+        styles(std::make_unique<StyleStorage>())
   {
     style_screen_register(*this->styles);
   }
@@ -50,9 +50,9 @@ public:
   {
     NavigationScreen::on_focus();
     this->uart_handler = std::make_unique<UartHandler>(
-      UART_NUM_1, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
-    ESP_LOGI("main_screen", "on_FOCUS");
+      UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
     start_random_updater();
+    ESP_LOGI("main_screen", "on_FOCUS");
     // this->uart_handler->init();
     // this->uart_handler->enable_rx(true);
     // this->add_uart_data_event();
@@ -61,15 +61,15 @@ public:
   void on_blur() override
   {
     NavigationScreen::on_blur();
-    if (this->xHandle != nullptr)
-    {
-      vTaskDelete(this->xHandle);
-    }
     this->uart_handler->remove_all_event_listeners();
+    if (xHandle != nullptr) {
+        vTaskDelete(xHandle);
+        xHandle = nullptr;
+    }
   };
 
   void update_specific_label(const std::string &value,
-                             const std::shared_ptr<Ref<Text>> &ref)
+                             const std::shared_ptr<Ref<Text>> &ref) const
   {
     if(ref->get() == nullptr && !ref->is_ready())
       return;
@@ -112,12 +112,17 @@ public:
 
             while (true) {
                 uint32_t rand = esp_random();
-                int val = (static_cast<int>(rand) % 100) + 1;
+                int val = static_cast<int>(rand % 15);
 
                 ESP_LOGI("main_screen", "start_random_updater 1 %d", val);
                 if (self) {
-                ESP_LOGI("main_screen", "start_random_updater 14341 %d", val);
-                    self->reactive_test.set(val);
+
+                    Dataset dataset{};
+                    parse(&dataset, CH_PACKETS[val], strlen(CH_PACKETS[val]));
+                    xSemaphoreTake(mutex, pdMS_TO_TICKS(100));
+                    ESP_LOGI("main_screen", "%s", CH_PACKETS[val]);
+                    DatasetStore::getInstance()->set(dataset);
+                    xSemaphoreGive(mutex);
                 }
 
                 ESP_LOGI("main_screen", "start_random_updater, 2");
@@ -135,87 +140,12 @@ public:
       .key_v = const_cast<char *>("read_data_dto"),
       .event = UART_DATA,
       .delegate = [this](const UartTypes::UartCallbackResponse &uart_data) {
-        if(uart_data.response.packet.empty())
-          return;
+        if(uart_data.response.packet == nullptr) return;
 
-        const DatasetDTO unpacked_uart_data
-          = parse_into_dataset(uart_data.response.packet);
+        Dataset dataset{};
+        parse(&dataset, uart_data.response.packet, sizeof(uart_data.response.packet));
 
-        struct AsyncUpdateContext
-        {
-          MainScreen *screen = nullptr;
-          DatasetDTO data{};
-        };
-
-        auto *ctx
-          = new AsyncUpdateContext{.screen = this, .data = unpacked_uart_data};
-
-        lv_async_call(
-          [](void *user_data) {
-            auto *ctx = static_cast<AsyncUpdateContext *>(user_data);
-
-            const auto text_channels_ref
-              = ctx->screen->ref_store->get<Text>("text_channels");
-            const auto text_inputs_ref
-              = ctx->screen->ref_store->get<Text>("text_inputs");
-            const auto text_outputs_ref
-              = ctx->screen->ref_store->get<Text>("text_outputs");
-            const auto main_button_ref
-              = ctx->screen->ref_store->get<Text>("main_button");
-            const auto status_bar_ref
-              = ctx->screen->ref_store->get<Text>("status_bar_moto");
-            const auto status_bar_lvgl_ref
-              = ctx->screen->ref_store->get<Text>("status_bar_lvgl");
-
-            ctx->screen->update_specific_label(
-              std::format("Channels: {}", ctx->data.channels),
-              text_channels_ref);
-
-            ctx->screen->update_specific_label(
-              std::format("Inputs: {}", ctx->data.channels), text_inputs_ref);
-
-            ctx->screen->update_specific_label(
-              std::format("Outputs: {}", ctx->data.channels),
-              text_outputs_ref);
-
-            ctx->screen->update_specific_label(ctx->data.moto_hours,
-                                               status_bar_ref);
-
-            ctx->screen->update_specific_label(
-              GetTextValueFromStatus(ctx->data.status), main_button_ref);
-
-            for(size_t i = 0; i < 3; i++)
-              {
-                auto oxygen_level
-                  = static_cast<short>(std::round(ctx->data.oxygen_levels[i]));
-                auto oxygen_rate
-                  = static_cast<short>(std::round(ctx->data.oxygen_speed[i]));
-
-                ctx->screen->update_specific_circular(
-                  oxygen_level, ctx->screen->ref_store->get<CircularProgress>(
-                                  std::format("oxygen_level_{}", i)));
-
-                ctx->screen->update_specific_circular(
-                  oxygen_rate, ctx->screen->ref_store->get<CircularProgress>(
-                                 std::format("oxygen_rate_{}", i)));
-              }
-
-            GlobalStore::getInstance()->getMotoHoursState()->set(
-              [ctx, status_bar_lvgl_ref](const uint32_t prev) {
-                if(prev == UINT32_MAX)
-                  return prev;
-                const auto newValue = prev + 1;
-
-                ctx->screen->update_specific_label(
-                  std::format("LVGL Seconds: {}", newValue),
-                  status_bar_lvgl_ref);
-
-                return newValue;
-              });
-
-            delete ctx;
-          },
-          ctx);
+        DatasetStore::getInstance()->set(dataset);
       }});
   }
 
@@ -233,16 +163,28 @@ public:
               .set_children(Children{
                 $Text(
                   TextProps::up()
-                    .set_ref(this->ref_store->create<Text>("text_channels"))
+                    .watch<Dataset>(DatasetStore::getInstance(), "channels", [](Text* self, const Dataset& value) {
+                      int count = value.operative_data.channels_count;
+                      self->set_state([count](TextProps &props) {
+                          props.value(std::format("Channels: {}", count));
+                      });
+                    })
                     .value("Channels: 0")),
                 $Text(TextProps::up()
-                        .watch<int>(&this->reactive_test, "inputs", [](Text* self, int value) {
-                          self->set_state([value](TextProps &props) { props.value(std::format("Inputs: {}", value)); });
+                        .watch<Dataset>(DatasetStore::getInstance(), "inputs", [](Text* self, const Dataset& value) {
+                          int inputs = value.operative_data.inputs;
+                          self->set_state([inputs](TextProps &props) {
+                             props.value(std::format("Inputs: {}", inputs));
+                          });
                         })
-                        .set_ref(this->ref_store->create<Text>("text_inputs"))
                         .value("Inputs: 0")),
                 $Text(TextProps::up()
-                        .set_ref(this->ref_store->create<Text>("text_outputs"))
+                        .watch<Dataset>(DatasetStore::getInstance(), "outputs", [](Text* self, const Dataset& value) {
+                          int outputs = value.operative_data.outputs;
+                          self->set_state([outputs](TextProps &props) {
+                              props.value(std::format("Outputs: {}", outputs));
+                          });
+                        })
                         .value("Outputs: 0")),
               })
               .merge(header_labels_container_props)),
@@ -280,17 +222,30 @@ public:
                      .set_style($s("footer.button"))
                      .set_child($Text(
                        TextProps::up()
-                         .set_ref(this->ref_store->create<Text>("main_button"))
+                         .watch<Dataset>(DatasetStore::getInstance(), "main_button", [](Text* self, const Dataset& value) {
+                            std::string status_str = GetTextValueFromStatus(GetStatusFromTextValue(value.operative_data.status.data()));
+                            self->set_state([status_str](TextProps &props) {
+                                props.value(status_str);
+                            });
+                          })
                          .set_style($s("header.label"))
                          .value(locales::en::status))));
   }
 
   $$View render_body()
   {
-    auto make_circle = [&](const std::string &ref_name) {
+    auto make_circle = [&](const std::string &ref_name, int index) {
       return $Circular(
         CircularProgressProps::up()
-          .set_ref(this->ref_store->create<CircularProgress>(ref_name))
+          .watch<Dataset>(DatasetStore::getInstance(), "outputs", [index, ref_name](CircularProgress* self, const Dataset& value) {
+            short val = (ref_name == "oxygen_level")
+                        ? value.operative_data.oxygen_levels[index]
+                        : value.operative_data.oxygen_speed[index];
+
+            self->set_state([val](CircularProgressProps &props) {
+                props.value(val);
+            });
+          })
           .label("%")
           .show_label(true)
           .min(0)
@@ -309,9 +264,9 @@ public:
                      $View(ViewProps::up()
                              .set_style($s("header.labels.container"))
                              .set_children(Children{
-                               make_circle("oxygen_level_0"),
-                               make_circle("oxygen_level_1"),
-                               make_circle("oxygen_level_2"),
+                               make_circle("oxygen_level", 0),
+                               make_circle("oxygen_level", 1),
+                               make_circle("oxygen_level", 2),
                              })
                              .w(LV_PCT(100))
                              .h(110)
@@ -325,9 +280,9 @@ public:
                      $View(ViewProps::up()
                              .set_style($s("header.labels.container"))
                              .set_children(Children{
-                               make_circle("oxygen_rate_0"),
-                               make_circle("oxygen_rate_1"),
-                               make_circle("oxygen_rate_2"),
+                               make_circle("oxygen_rate", 0),
+                               make_circle("oxygen_rate", 1),
+                               make_circle("oxygen_rate", 2),
                              })
                              .w(LV_PCT(100))
                              .h(110)
@@ -361,14 +316,18 @@ public:
               .set_height(30)
               .set_children(Children{
                 $Text(TextProps::up()
-                        .set_ref(ref_store->create<Text>("status_bar_moto"))
+                        .watch<Dataset>(DatasetStore::getInstance(), "moto_hours", [](Text* self, const Dataset& value) {
+                          std::string hours = value.operative_data.moto_hours.data();
+                          self->set_state([hours](TextProps &props) {
+                          props.value(hours);
+                        });
+                        })
                         .value("06:10 AM")
                         .set_style($s("status_bar.time"))),
                 $Text(TextProps::up()
                         .value("ON2 Solution")
                         .set_style($s("status_bar.logo"))),
                 $Text(TextProps::up()
-                        .set_ref(ref_store->create<Text>("status_bar_lvgl"))
                         .value("LVGL Seconds: 0")
                         .set_style($s("status_bar.battery"))),
               })),

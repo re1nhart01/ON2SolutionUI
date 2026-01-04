@@ -25,6 +25,10 @@ namespace foundation
 
     ~Animated() override
     {
+      if (!this->props.reactive_link.empty())
+      {
+        this->detach_reactives<Animated>(this, this->props.reactive_link);
+      }
       if (this->props.ref != nullptr) {
           this->props.ref->unlink();
       }

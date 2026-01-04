@@ -21,6 +21,10 @@ namespace foundation
       if (this->props.ref != nullptr) {
           this->props.ref->unlink();
       }
+      if (!this->props.reactive_link.empty())
+      {
+        this->detach_reactives<TextInput>(this, this->props.reactive_link);
+      }
     };
 
     lv_obj_t* render() override

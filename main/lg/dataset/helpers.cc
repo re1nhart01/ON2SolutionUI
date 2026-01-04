@@ -1,66 +1,107 @@
+#include <charconv>
 #include <cstring>
 #include <string>
 
 namespace on2::parser::helpers
 {
-  inline int parse_hex_to_int(const char* start, size_t len, int def = 0) {
-    if (len == 0) return def;
+  template <typename T>
+   bool parse_value(const char* p, int len, T& out)
+  {
+    static_assert(std::is_unsigned<T>::value, "T must be unsigned integer");
 
-    char buffer[16];
-    if (len >= sizeof(buffer)) len = sizeof(buffer) - 1;
+    if (!p || len <= 0) return false;
 
-    strncpy(buffer, start, len);
-    buffer[len] = '\0';
+    long long tmp = 0;
 
-    char* end;
-    long v = strtol(buffer, &end, 16);
-    if (end == buffer) return def;
-    return (int)v;
+    auto res = std::from_chars(p, p + len, tmp);
+    if (res.ec != std::errc()) return false;
+
+    if (tmp > std::numeric_limits<T>::max())
+      return false;
+
+    out = static_cast<T>(tmp);
+    return true;
   }
 
-  inline unsigned long parse_hex_to_ul(const char* start, size_t len, unsigned long def = 0) {
-    if (len == 0) return def;
+  bool parse_value(const char* p, int len, float& out)
+  {
+    if (!p || len <= 0) return false;
 
-    char buffer[16];
-    if (len >= sizeof(buffer)) len = sizeof(buffer) - 1;
+    int i = 0;
+    bool neg = false;
 
-    strncpy(buffer, start, len);
-    buffer[len] = '\0';
+    if (p[i] == '-') {
+        neg = true;
+        i++;
+    } else if (p[i] == '+') {
+        i++;
+    }
 
-    char* end;
-    unsigned long v = strtoul(buffer, &end, 16);
-    if (end == buffer) return def;
-    return v;
+    int ip = 0;
+    bool has_digits = false;
+
+    while (i < len && p[i] >= '0' && p[i] <= '9') {
+        ip = ip * 10 + (p[i] - '0');
+        i++;
+        has_digits = true;
+    }
+
+    float fp = 0.0f;
+    float div = 1.0f;
+
+    if (i < len && p[i] == '.') {
+        i++;
+        while (i < len && p[i] >= '0' && p[i] <= '9') {
+            fp = fp * 10.0f + (p[i] - '0');
+            div *= 10.0f;
+            i++;
+            has_digits = true;
+        }
+    }
+
+    if (!has_digits) return false;
+
+    float v = ip + fp / div;
+    out = neg ? -v : v;
+    return true;
   }
 
-  inline int parse_int(const char* start, size_t len, int def = 0) {
-    if (len == 0) return def;
+  template <typename T, size_t N>
+  int parse_list(
+    const char* p,
+    int len,
+    std::array<T, N>& out
+  ) {
+    int count = 0;
+    int start = 0;
 
-    char buffer[16];
-    if (len >= sizeof(buffer)) len = sizeof(buffer) - 1;
-
-    strncpy(buffer, start, len);
-    buffer[len] = '\0';
-
-    char* end;
-    long v = strtol(buffer, &end, 10);
-    if (end == buffer) return def;
-    return (int)v;
+    for (int i = 0; i <= len && count < N; i++) {
+        if (i == len || p[i] == ';') {
+            if (!parse_value(p + start, i - start, out[count])) {
+                return count;
+            }
+            count++;
+            start = i + 1;
+        }
+    }
+    return count;
   }
 
-  inline float parse_float(const char* start, size_t len, float def = 0.f) {
-    if (len == 0) return def;
+  void copy_string(
+    void* dest,
+    size_t dest_len,
+    const void* src,
+    size_t src_len
+) {
+    if (!dest || !src || dest_len == 0)
+      return;
 
-    char buffer[16];
-    if (len >= sizeof(buffer)) len = sizeof(buffer) - 1;
+    size_t n = (src_len < dest_len - 1)
+        ? src_len
+        : dest_len - 1;
 
-    strncpy(buffer, start, len);
-    buffer[len] = '\0';
-
-    char* end;
-    float v = strtof(buffer, &end);
-    if (end == buffer) return def;
-    return v;
+    memset(dest, 0, dest_len);
+    memcpy(dest, src, n);
   }
 }
 

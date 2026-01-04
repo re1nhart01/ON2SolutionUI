@@ -69,7 +69,7 @@ namespace foundation
         }
       }
 
-      void set(T newValue)
+      void set(const T& newValue)
       {
         if (value_store && value_store->compare(&newValue)) return;
 

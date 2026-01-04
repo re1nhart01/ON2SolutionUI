@@ -25,6 +25,10 @@ namespace foundation
 
     ~Button() override
     {
+       if (!this->props.reactive_link.empty())
+       {
+         this->detach_reactives<Button>(this, this->props.reactive_link);
+       }
       if (this->props.ref != nullptr) {
           this->props.ref->unlink();
       }

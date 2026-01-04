@@ -23,10 +23,13 @@ namespace foundation
     }
 
     ~Modal() override {
-      ESP_LOGE("MODAL", "Modal destroyed");
       close();
       if (this->props.ref != nullptr) {
           this->props.ref->unlink();
+      }
+      if (!this->props.reactive_link.empty())
+      {
+        this->detach_reactives<Modal>(this, this->props.reactive_link);
       }
     }
 

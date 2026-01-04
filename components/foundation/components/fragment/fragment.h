@@ -15,7 +15,17 @@ namespace foundation
       : Component(nullptr, nullptr, std::move(props)) {
       this->apply_reactive<Fragment>(this, props.reactive_delegates);
     };
-    ~Fragment() override = default;
+    ~Fragment() override
+    {
+      if (this->props.ref != nullptr)
+      {
+          this->props.ref->unlink();
+      }
+      if (!this->props.reactive_link.empty())
+      {
+        this->detach_reactives<Fragment>(this, this->props.reactive_link);
+      }
+    };
 
     lv_obj_t* render() override
     {

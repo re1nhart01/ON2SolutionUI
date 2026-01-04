@@ -19,7 +19,11 @@ namespace foundation
     ~Text() override
     {
       if (this->props.ref != nullptr) {
-          this->props.ref->unlink();
+        this->props.ref->unlink();
+      }
+      if (!this->props.reactive_link.empty())
+      {
+        this->detach_reactives<Text>(this, this->props.reactive_link);
       }
     };
 

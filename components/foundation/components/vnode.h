@@ -11,7 +11,6 @@ namespace foundation {
   protected:
     lv_obj_t* component = nullptr;
     lv_obj_t* parent = nullptr;
-    std::vector<IReactive*> attached_states{};
 
     mutable Styling style{};
     std::shared_ptr<VNode> renderer_view = nullptr;
@@ -20,10 +19,6 @@ namespace foundation {
     virtual ~VNode()
     {
       VNode::component_will_unmount();
-      for (auto* state : attached_states) {
-          if (state) state->detach(this);
-      }
-      attached_states.clear();
     }
 
     VNode() {}
@@ -55,6 +50,15 @@ namespace foundation {
       if (!component) return;
       if (active) lv_obj_clear_flag(component, LV_OBJ_FLAG_HIDDEN);
       else        lv_obj_add_flag(component, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    template<typename T>
+    void detach_reactives(T* instance, std::vector<IReactive*>& states)
+    {
+      for (auto* state : states) {
+          if (state) state->detach(instance);
+      }
+      states.clear();
     }
 
     template<typename T>
