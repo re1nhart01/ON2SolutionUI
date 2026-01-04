@@ -5,3 +5,5 @@ build/esp-idf/main/
 
 .idea
 .vscode
+.cache
+
