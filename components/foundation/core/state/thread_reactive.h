@@ -26,7 +26,7 @@ namespace foundation
 
       std::unique_ptr<TypedValue<T>> value_store;
       std::vector<Binding> bindings;
-      SemaphoreHandle_t _mutex;
+      volatile SemaphoreHandle_t _mutex;
 
       struct Lock {
           SemaphoreHandle_t m;
@@ -39,9 +39,17 @@ namespace foundation
       };
 
     public:
-      ThreadReactive() : value_store(nullptr) {
+      ThreadReactive() : value_store(std::make_unique<TypedValue<T>>(T{}))
+      {
+        _mutex = xSemaphoreCreateMutex();
+        if(_mutex == nullptr)
+          {
+            ESP_LOGE("REACTIVE", "Failed to create mutex!");
+          }
+      }
+      explicit ThreadReactive(const T& default_val) : value_store(std::make_unique<TypedValue<T>>(default_val)) {
           _mutex = xSemaphoreCreateMutex();
-          if (_mutex == NULL) {
+          if (_mutex == nullptr) {
               ESP_LOGE("REACTIVE", "Failed to create mutex!");
           }
       }
@@ -51,6 +59,7 @@ namespace foundation
               {
                   Lock lock(_mutex);
                   bindings.clear();
+                  value_store.reset();
               }
               vSemaphoreDelete(_mutex);
               _mutex = nullptr;
@@ -88,20 +97,31 @@ namespace foundation
         }
       }
 
+      void set(Delegate<T(const T&)> fn) {
+        if (!_mutex || !fn) return;
+        T prev = get();
+        T next = fn(prev);
+        set(next);
+      }
+
       void set(const T& newValue)
       {
         if (!_mutex) return;
-        Lock lock(_mutex);
 
-        if (value_store && value_store->data == newValue) return;
+        std::vector<Binding> temp_bindings;
+        T data_to_send;
 
-        value_store = std::make_unique<TypedValue<T>>(newValue);
+        {
+          Lock lock(_mutex);
+          value_store = std::make_unique<TypedValue<T>>(newValue);
+          data_to_send = value_store->data;
+          temp_bindings = bindings;
+        }
 
-        for (auto &b : bindings) {
-          if (b.component != nullptr && b.updater)
-          {
-            b.updater(b.component, value_store->data);
-          }
+        for (auto &b : temp_bindings) {
+            if (b.component != nullptr && b.updater) {
+                b.updater(b.component, data_to_send);
+            }
         }
       }
 

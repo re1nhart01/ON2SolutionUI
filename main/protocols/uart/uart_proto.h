@@ -47,9 +47,14 @@ extern "C" {
 
 namespace UartTypes
 {
+  template<typename T>
+  struct UartAsyncData {
+    std::string packet;
+    T* screen;
+  };
   struct UartData
   {
-    char packet[256];
+    char packet[512];
     size_t len;
     bool flag;
   };
@@ -63,6 +68,10 @@ namespace UartTypes
     char* key_v;
     uart_event_type_t event;
     foundation::Delegate<void(UartCallbackResponse)> delegate;
+  };
+  struct ProtocolConfig {
+    char start_marker;
+    char end_marker;
   };
 }
 
@@ -80,6 +89,8 @@ private:
   size_t size = 0;
   std::array<UartTypes::UartHandlerEvent, 32> list{};
   TaskHandle_t task_handle = nullptr;
+  std::string rx_buffer;
+  bool is_recording = false;
 
   bool push_array(const UartTypes::UartHandlerEvent& value)
   {
@@ -227,7 +238,7 @@ public:
 
   void uart_interrupt_handler()
   {
-    uint8_t data[BUF_SIZE];
+    uint8_t temp_data[BUF_SIZE];
     uart_event_t event;
     if (!uart_queue) {
         ESP_LOGE(TAG, "UART queue is NULL!");
@@ -241,26 +252,31 @@ public:
             switch (event.type) {
               case UART_DATA:
                 {
-                  const int len = uart_read_bytes(
-                      this->current_uart_num,
-                      data,
-                      event.size,
-                      pdMS_TO_TICKS(100)
-                  );
+                  int len = uart_read_bytes(current_uart_num, temp_data, BUF_SIZE, pdMS_TO_TICKS(100));
 
-                  if (len > 0)
-                    {
-                      data[len] = '\0';
+                  for (int i = 0; i < len; i++) {
+                      char c = static_cast<char>(temp_data[i]);
 
-                      UartTypes::UartData uart_data;
-                      memcpy(uart_data.packet, data, len);
-                      uart_data.packet[len] = 0;
-                      uart_data.len = len;
+                      if (c == '$' || c == '#' || c == '!') {
+                          rx_buffer.clear();
+                          is_recording = true;
+                      }
 
-                      uart_data.flag = true;
+                      if (is_recording) {
+                          rx_buffer += c;
 
-                      execute_callback_event(UART_DATA, { .response = uart_data });
-                    }
+                          if (c == '>') {
+                              dispatch_packet(rx_buffer);
+                              rx_buffer.clear();
+                              is_recording = false;
+                          }
+
+                          if (rx_buffer.length() > 512) {
+                              rx_buffer.clear();
+                              is_recording = false;
+                          }
+                      }
+                  }
                 }
                 break;
               case UART_FIFO_OVF:
@@ -303,4 +319,16 @@ public:
         }
     }
   }
+
+  void dispatch_packet(const std::string& packet_str) {
+    UartTypes::UartData uart_data;
+    size_t copy_len = std::min(packet_str.length(), sizeof(uart_data.packet) - 1);
+    memcpy(uart_data.packet, packet_str.c_str(), copy_len);
+    uart_data.packet[copy_len] = '\0';
+    uart_data.len = copy_len;
+    uart_data.flag = true;
+
+    execute_callback_event(UART_DATA, { .response = uart_data });
+  }
+
 };

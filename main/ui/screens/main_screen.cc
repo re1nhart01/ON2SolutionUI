@@ -34,10 +34,12 @@ class MainScreen final : public NavigationScreen<MainScreenProps>
   std::unique_ptr<UartHandler> uart_handler = nullptr;
   $$InfoModal info_modal = nullptr;
   TaskHandle_t xHandle = nullptr;
+  Reactive<int> reactive_moto_lvgl;
 public:
   explicit MainScreen(StackNavigator *stack, const MainScreenProps &props)
       : NavigationScreen(stack, props), props(props),
-        styles(std::make_unique<StyleStorage>())
+        styles(std::make_unique<StyleStorage>()),
+        reactive_moto_lvgl(0)
   {
     style_screen_register(*this->styles);
   }
@@ -49,11 +51,11 @@ public:
     NavigationScreen::on_focus();
     this->uart_handler = std::make_unique<UartHandler>(
       UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
-    start_random_updater();
+    // start_random_updater();
     ESP_LOGI("main_screen", "on_FOCUS");
-    // this->uart_handler->init();
-    // this->uart_handler->enable_rx(true);
-    // this->add_uart_data_event();
+    this->uart_handler->init();
+    this->uart_handler->enable_rx(true);
+    this->add_uart_data_event();
   };
 
   void on_blur() override
@@ -111,15 +113,16 @@ public:
             auto* self = static_cast<MainScreen*>(pvParameters);
 
             while (true) {
-                uint32_t rand = esp_random();
-                int val = static_cast<int>(rand % 15);
-
-                ESP_LOGI("main_screen", "start_random_updater 1 %d", val);
                 if (self) {
+                auto* packet_str = new std::string(CH_PACKETS[esp_random() % 15]);
+                  lv_async_call([](void* arg) {
+                      auto* p = static_cast<std::string*>(arg);
+                      Dataset dataset = DatasetStore::getInstance()->get();
+                      parse(&dataset, p->c_str(), p->length());
+                      DatasetStore::getInstance()->set(dataset);
 
-                    Dataset dataset = DatasetStore::getInstance()->get();
-                    parse(&dataset, CH_PACKETS[val], strlen(CH_PACKETS[val]));
-                    DatasetStore::getInstance()->set(dataset);
+                      delete p;
+                }, packet_str);
                 }
 
                 ESP_LOGI("main_screen", "start_random_updater, 2");
@@ -133,16 +136,33 @@ public:
 
   void add_uart_data_event()
   {
+    auto* moto_lvgl = &this->reactive_moto_lvgl;
     this->uart_handler->add_event_listener(UartTypes::UartHandlerEvent{
       .key_v = const_cast<char *>("read_data_dto"),
       .event = UART_DATA,
-      .delegate = [this](const UartTypes::UartCallbackResponse &uart_data) {
-        if(uart_data.response.packet == nullptr) return;
+      .delegate = [moto_lvgl](const UartTypes::UartCallbackResponse &uart_data) {
+        if(strlen(uart_data.response.packet) <= 0) return;
 
-        Dataset dataset = DatasetStore::getInstance()->get();
-        parse(&dataset, uart_data.response.packet, sizeof(uart_data.response.packet));
+          struct AsyncStructure
+          {
+            std::string packet;
+            Reactive<int>* reactive_moto_lvgl;
+          };
 
-        DatasetStore::getInstance()->set(dataset);
+          auto args = new AsyncStructure{ .packet = uart_data.response.packet, .reactive_moto_lvgl = moto_lvgl };
+
+            lv_async_call([](void* arg) {
+                auto* p = static_cast<AsyncStructure*>(arg);
+                Dataset dataset = DatasetStore::getInstance()->get();
+                parse(&dataset, p->packet.c_str(), p->packet.length());
+                DatasetStore::getInstance()->set(dataset);
+              if (p->reactive_moto_lvgl)
+                {
+                  p->reactive_moto_lvgl->set([](const int& prev){ return prev + 1; });
+                }
+                delete p;
+          }, args);
+
       }});
   }
 
@@ -325,6 +345,9 @@ public:
                         .value("ON2 Solution")
                         .set_style($s("status_bar.logo"))),
                 $Text(TextProps::up()
+                        .watch<int>(&reactive_moto_lvgl, "reactive_moto_lvgl", [](Text* self, const int& value) {
+                            self->set_state([value](TextProps& props) { props.value(std::format("LVGL Seconds: {}", value)); });
+                        })
                         .value("LVGL Seconds: 0")
                         .set_style($s("status_bar.battery"))),
               })),

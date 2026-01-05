@@ -17,7 +17,7 @@ namespace foundation
 
   struct ValueContainer {
     virtual ~ValueContainer() = default;
-    virtual bool compare(void* other_val) = 0;
+    virtual bool compare(const void* other_val) const = 0;
   };
 
   template<typename T>
@@ -25,8 +25,8 @@ namespace foundation
     T data;
     explicit TypedValue(T val) : data(val) {}
 
-    bool compare(void* other_val) override {
-      return data == *static_cast<T*>(other_val);
+    bool compare(const void* other_val) const override {
+      return data == *static_cast<const T*>(other_val);
     }
   };
 
@@ -37,28 +37,29 @@ namespace foundation
       struct Binding {
         std::string key;
         void* component;
-        Delegate<void(void*, void*), 40> updater;
+        Delegate<void(void*, const T&), 40> updater;
       };
 
       std::unique_ptr<ValueContainer> value_store;
       std::vector<Binding> bindings;
 
     public:
-      Reactive() : value_store(nullptr) {}
+      Reactive() : value_store(std::make_unique<TypedValue<T>>(T{})) {}
+
+      explicit Reactive(const T& default_val)
+        : value_store(std::make_unique<TypedValue<T>>(default_val)) {}
       ~Reactive() override { bindings.clear(); }
 
       template<typename TComp>
-      void attach(std::string key, TComp* component, Delegate<void(TComp*, T), 40> updater)
+      void attach(std::string key,TComp* component, Delegate<void(TComp*, const T&)> fn)
       {
-        Binding binding;
-        binding.key = key;
-        binding.component = static_cast<void*>(component);
-        binding.updater = [updater](void* comp_ptr, void* val_ptr) {
-          updater(static_cast<TComp*>(comp_ptr), *static_cast<T*>(val_ptr));
-        };
-
-        this->bindings.push_back(binding);
-        ESP_LOGI("REACTIVE", "Attached. Total bindings: %d", this->bindings.size());
+        bindings.push_back(Binding{
+          .key = std::move(key),
+          .component = component,
+          .updater = [fn](void* c, const T& v) {
+            fn(static_cast<TComp*>(c), v);
+          }
+        });
       }
 
       void detach(const void *component) override
@@ -67,6 +68,12 @@ namespace foundation
             if (it->component == component) it = bindings.erase(it);
             else ++it;
         }
+      }
+
+      void set(Delegate<T(const T&)> fn) {
+        T prev = get();
+        T next = fn(prev);
+        set(next);
       }
 
       void set(const T& newValue)
@@ -78,20 +85,21 @@ namespace foundation
         for (auto &b : bindings) {
           if (b.component != nullptr)
           {
-            b.updater(b.component, &newValue);
+            b.updater(b.component, newValue);
           }
         }
       }
 
-      void notify(Delegate<void(std::vector<Binding> bindings), 40> callback)
+      void notify(Delegate<void(const std::vector<Binding>&), 40> cb)
       {
-        if (this->bindings == nullptr) return;
-        callback(this->bindings);
+        cb(bindings);
       }
 
-      T get() const {
-        if (!value_store) return T();
-        return static_cast<TypedValue<T>*>(value_store.get())->data;
+      const T& get() const {
+        static T empty{};
+        return value_store
+          ? static_cast<TypedValue<T>*>(value_store.get())->data
+          : empty;
       }
     };
 };
