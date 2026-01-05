@@ -26,8 +26,6 @@ class MainScreen;
 struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen>
 {};
 
-static SemaphoreHandle_t mutex = xSemaphoreCreateMutex();
-
 
 class MainScreen final : public NavigationScreen<MainScreenProps>
 {
@@ -87,16 +85,18 @@ public:
 
   void show_info_modal()
   {
+    DatasetSystemInfo system_info = DatasetStore::getInstance()->get().system_info;
+
     info_modal = $InfoModal(InfoModalProps::up()
-                              .set_device("ON2SYSTEMS")
-                              .set_loader("ON2SYS_RevB 1.9")
-                              .set_fw("1.6.2.4")
-                              .set_fw_checksum("D29FD7E0")
-                              .set_module_name("Eport_E20")
-                              .set_module_fw("1.40.5")
-                              .set_serial_number("34EAE706A006")
-                              .set_ethernet_ip("192.168.1.128")
-                              .set_wifi_ip("10.10.10.10")
+                              .set_device(system_info.device_name.data())
+                              .set_loader(system_info.loader_version.data())
+                              .set_fw(system_info.firmware_version.data())
+                              .set_fw_checksum(system_info.firmware_checksum.data())
+                              .set_module_name(system_info.module_name.data())
+                              .set_module_fw(system_info.firmware_version.data())
+                              .set_serial_number(system_info.serial_number.data())
+                              .set_ethernet_ip(system_info.lan_ip_address.data())
+                              .set_wifi_ip(system_info.wifi_ip_address.data())
                               .set_lcd_fw("x.x.x")
                               .set_lcd_loader("x.x.x")
                               .set_lcd_partition("x.x.x")
@@ -117,12 +117,9 @@ public:
                 ESP_LOGI("main_screen", "start_random_updater 1 %d", val);
                 if (self) {
 
-                    Dataset dataset{};
+                    Dataset dataset = DatasetStore::getInstance()->get();
                     parse(&dataset, CH_PACKETS[val], strlen(CH_PACKETS[val]));
-                    xSemaphoreTake(mutex, pdMS_TO_TICKS(100));
-                    ESP_LOGI("main_screen", "%s", CH_PACKETS[val]);
                     DatasetStore::getInstance()->set(dataset);
-                    xSemaphoreGive(mutex);
                 }
 
                 ESP_LOGI("main_screen", "start_random_updater, 2");
@@ -142,7 +139,7 @@ public:
       .delegate = [this](const UartTypes::UartCallbackResponse &uart_data) {
         if(uart_data.response.packet == nullptr) return;
 
-        Dataset dataset{};
+        Dataset dataset = DatasetStore::getInstance()->get();
         parse(&dataset, uart_data.response.packet, sizeof(uart_data.response.packet));
 
         DatasetStore::getInstance()->set(dataset);
