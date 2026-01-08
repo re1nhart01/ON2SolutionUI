@@ -14,9 +14,9 @@ namespace foundation
 }
 namespace foundation
 {
-  struct ViewProps final : BaseProps<ViewProps, View>
+  struct ViewProps final : public BaseProps<ViewProps, View>
   {
-    std::vector<std::shared_ptr<VNode>> children;
+    std::vector<std::unique_ptr<VNode>> children;
 
     short width = LV_PCT(100);
     short height = LV_SIZE_CONTENT;
@@ -25,42 +25,42 @@ namespace foundation
     lv_flex_align_t track_cross_place = LV_FLEX_ALIGN_START;
     lv_flex_flow_t flex_direction = LV_FLEX_FLOW_COLUMN;
 
-    ViewProps& w(const short value)
+    ViewProps w(const short value)
     {
       this->width = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ViewProps& h(const short value)
+    ViewProps h(const short value)
     {
       this->height = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ViewProps& set_children(const std::vector<std::shared_ptr<VNode>>& value)
+    ViewProps set_children(std::vector<std::unique_ptr<VNode>>&& value)
     {
       this->children = std::move(value);
-      return *this;
+      return std::move(*this);
     }
 
-    ViewProps& direction(lv_flex_flow_t value) {
+    ViewProps direction(lv_flex_flow_t value) {
       flex_direction = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ViewProps& justify(lv_flex_align_t value) {
+    ViewProps justify(lv_flex_align_t value) {
       justify_content = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ViewProps& items(lv_flex_align_t value) {
+    ViewProps items(lv_flex_align_t value) {
       align_items = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ViewProps& track_cross(lv_flex_align_t value) {
+    ViewProps track_cross(lv_flex_align_t value) {
       track_cross_place = value;
-      return *this;
+      return std::move(*this);
     }
   };
 }

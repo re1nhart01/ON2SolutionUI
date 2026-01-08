@@ -10,7 +10,7 @@ extern "C" {
 
 using namespace foundation;
 
-auto screen = lv_scr_act();
+const auto screen = lv_scr_act();
 
 class WaveApplication final : public Application {
   std::shared_ptr<StackNavigator> stack_navigator;
@@ -27,19 +27,19 @@ public:
     auto navigator = this->stack_navigator;
 
     navigator->register_screen("/main", [navigator]() {
-        return std::make_shared<MainScreen>(navigator.get(), MainScreenProps{});
+        return std::make_unique<MainScreen>(navigator.get(), MainScreenProps{});
     });
 
     navigator->register_screen("/pin_code", [navigator]() {
-        return std::make_shared<PinCodeScreen>(navigator.get(), PinCodeScreenProps{});
+        return std::make_unique<PinCodeScreen>(navigator.get(), PinCodeScreenProps{});
     });
 
     navigator->register_screen("/preloader", [navigator]() {
-        return std::make_shared<PreloaderScreen>(navigator.get(), PreloaderScreenProps{});
+        return std::make_unique<PreloaderScreen>(navigator.get(), PreloaderScreenProps{});
     });
 
     navigator->register_screen("/settings", [navigator]() {
-        return std::make_shared<SettingsScreen>(navigator.get(), SettingsScreenProps{});
+        return std::make_unique<SettingsScreen>(navigator.get(), SettingsScreenProps{});
     });
 
     navigator->start();

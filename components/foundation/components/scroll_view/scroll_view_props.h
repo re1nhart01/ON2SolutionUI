@@ -5,7 +5,7 @@ namespace foundation
 {
   class ScrollView;
   struct ScrollViewProps final : BaseProps<ScrollViewProps, ScrollView> {
-    std::vector<std::shared_ptr<VNode>> children;
+    std::vector<std::unique_ptr<VNode>> children;
     short width = LV_PCT(100);
     short height = LV_SIZE_CONTENT;
     lv_flex_align_t justify_content = LV_FLEX_ALIGN_START;
@@ -17,59 +17,59 @@ namespace foundation
     lv_scrollbar_mode_t scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
     bool disabled = false;
 
-    ScrollViewProps& add_child(const std::shared_ptr<VNode>& c) {
-      children.push_back(c);
-      return *this;
+    ScrollViewProps add_child(std::unique_ptr<VNode> c) {
+      children.push_back(std::move(c));
+      return std::move(*this);
     }
 
-    ScrollViewProps& set_children(const std::vector<std::shared_ptr<VNode>>& ch) {
-      children = ch;
-      return *this;
+    ScrollViewProps set_children(std::vector<std::unique_ptr<VNode>>&& ch) {
+      children = std::move(ch);
+      return std::move(*this);
     }
 
-    ScrollViewProps& w(short v) {
+    ScrollViewProps w(short v) {
       width = v;
-      return *this;
+      return std::move(*this);
     }
 
-    ScrollViewProps& h(short v) {
+    ScrollViewProps h(short v) {
       height = v;
-      return *this;
+      return std::move(*this);
     }
 
-    ScrollViewProps& direction(lv_flex_flow_t value) {
+    ScrollViewProps direction(lv_flex_flow_t value) {
       flex_direction = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ScrollViewProps& justify(lv_flex_align_t value) {
+    ScrollViewProps justify(lv_flex_align_t value) {
       justify_content = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ScrollViewProps& items(lv_flex_align_t value) {
+    ScrollViewProps items(lv_flex_align_t value) {
       align_items = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ScrollViewProps& track_cross(lv_flex_align_t value) {
+    ScrollViewProps track_cross(lv_flex_align_t value) {
       track_cross_place = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ScrollViewProps& scroll(lv_dir_t dir) {
+    ScrollViewProps scroll(lv_dir_t dir) {
       scroll_dir = dir;
-      return *this;
+      return std::move(*this);
     }
 
-    ScrollViewProps& scrollbar(lv_scrollbar_mode_t mode) {
+    ScrollViewProps scrollbar(lv_scrollbar_mode_t mode) {
       scrollbar_mode = mode;
-      return *this;
+      return std::move(*this);
     }
 
-    ScrollViewProps& disable(bool v = false) {
+    ScrollViewProps disable(bool v = false) {
       disabled = v;
-      return *this;
+      return std::move(*this);
     }
 
   };

@@ -14,7 +14,7 @@ namespace foundation
     lv_obj_t* spinbox;
     lv_obj_t* spinbox_label;
 
-    explicit Stepper(const StepperProps& props) : Component(nullptr, nullptr, std::move(props)) {
+    explicit Stepper(StepperProps&& props) : Component(nullptr, nullptr, std::move(props)) {
       this->apply_reactive<Stepper>(this, props.reactive_delegates);
 
       if (this->props.ref != nullptr) {

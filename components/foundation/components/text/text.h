@@ -5,7 +5,7 @@ namespace foundation
 {
   class Text final : public Component<TextProps> {
   public:
-    explicit Text(const TextProps& props) : Component(props) {
+    explicit Text(TextProps&& props) : Component(std::move(props)) {
       this->apply_reactive<Text>(this, props.reactive_delegates);
 
       for (auto& binder : props.reactive_delegates) {

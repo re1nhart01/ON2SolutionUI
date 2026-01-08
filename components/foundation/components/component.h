@@ -9,9 +9,9 @@ namespace foundation {
   public:
     Props props;
 
-    explicit Component(const Props& props) : VNode(nullptr, nullptr), props(props) {}
+    explicit Component(Props&& props) : VNode(nullptr, nullptr), props(std::move(props)) {}
 
-    explicit Component(lv_obj_t* obj, lv_obj_t* parent, const Props& props) : VNode(obj, parent), props(props) {}
+    explicit Component(lv_obj_t* obj, lv_obj_t* parent, Props&& props) : VNode(obj, parent), props(std::move(props)) {}
 
     template<typename Fn>
     void set_state(Fn&& fn) {

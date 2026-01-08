@@ -21,16 +21,14 @@ class PinCodeScreen : public NavigationScreen<PinCodeScreenProps>
   std::shared_ptr<KeyboardManager> keyboard;
   State<std::string> password_state = State<std::string>("");
   State<std::string> login_state = State<std::string>("");
-  PinCodeScreenProps props;
   std::unique_ptr<StyleStorage> styles;
-  std::shared_ptr<Modal> info_modal = nullptr;
+  std::unique_ptr<Modal> info_modal = nullptr;
 
 public:
-  explicit PinCodeScreen(StackNavigator* stack, const PinCodeScreenProps &props)
-  : NavigationScreen(stack, props),
-    keyboard(std::make_shared<KeyboardManager>()),
-    props(props),
-    styles(std::make_unique<StyleStorage>())
+  explicit PinCodeScreen(StackNavigator* stack, PinCodeScreenProps props)
+  :  NavigationScreen(stack, std::move(props)),
+  keyboard(std::make_shared<KeyboardManager>()),
+  styles(std::make_unique<StyleStorage>())
   {
     style_screen_register(*this->styles);
   }
@@ -50,9 +48,9 @@ public:
     info_modal = $Modal(
         ModalProps::up()
             .set_content(
-                $View(ViewProps::up().set_children(Children{
-                    $Text(TextProps::up().value("Login or Password is incorrect, try again")),
-                })
+                $View(ViewProps::up().set_children(children(
+                    $Text(TextProps::up().value("Login or Password is incorrect, try again"))
+                ))
             .w(LV_PCT(40))
             .h(120)
             .justify(LV_FLEX_ALIGN_CENTER)
@@ -95,7 +93,7 @@ public:
                   style.setBorderRadius(0);
                   style.setBorder(lv_color_make(255, 255, 255), 0, 0);
                 })
-                .set_children(Children{
+                .set_children(children(
                   $StatusBar(StatusBarProps::up()),
                   $View(ViewProps::up()
                   .w(LV_PCT(98))
@@ -104,7 +102,7 @@ public:
                   .items(LV_FLEX_ALIGN_CENTER)
                   .track_cross(LV_FLEX_ALIGN_CENTER)
                   .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
-                  .set_children(Children{
+                  .set_children(children(
                       $View(ViewProps::up()
                         .w(LV_PCT(20))
                         .h(60)
@@ -113,14 +111,14 @@ public:
                         .justify(LV_FLEX_ALIGN_START)
                         .track_cross(LV_FLEX_ALIGN_CENTER)
                         .set_style($s("common.no_padding"))
-                        .set_children(Children{
+                        .set_children(children(
                           $Button(ButtonProps::up()
                             .set_child(
                               $Text(TextProps::up().value(locales::en::button_back)))
                             .click([navigation_ref](lv_event_t *e) {
                                 navigation_ref->goBack();
-                            })),
-                        })),
+                            }))
+                        ))),
                       $View(ViewProps::up()
                         .w(LV_PCT(78))
                         .h(60)
@@ -129,18 +127,19 @@ public:
                         .items(LV_FLEX_ALIGN_CENTER)
                         .justify(LV_FLEX_ALIGN_CENTER)
                         .track_cross(LV_FLEX_ALIGN_CENTER)
-                        .set_children(Children{
+                        .set_children(children(
                           $Text(TextProps::up().value(locales::en::system_auth_header))
-                      })),
+                      ))),
                       $View(ViewProps::up()
                         .w(LV_PCT(20))
                         .set_style($s("common.no_padding"))
                         .set_children(
-                          Children{
-                            $Fragment(FragmentProps::up())}
-                        )),
-                  })),
-                  $View(ViewProps::up().set_children(Children{
+                          children(
+                            $Fragment(FragmentProps::up())
+                          )
+                        ))
+                  ))),
+                  $View(ViewProps::up().set_children(children(
                     $TextInput(TextInputProps::up()
                           .set_is_one_line(true)
                           .set_keyboard(keyboard)
@@ -168,11 +167,11 @@ public:
                        .click([this](lv_event_t* e){
                             validate_and_login();
                        }))
-                  })
+                  ))
                   .set_style($s("header.container"))
                   .merge(pincode_screen_sign_form_props)
-                  ),
-                })
+                  )
+                ))
             .merge(screen_container_props)
         )
     );

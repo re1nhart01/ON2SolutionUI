@@ -6,12 +6,12 @@ namespace foundation
   class CircularProgress final : public Component<CircularProgressProps> {
   private:
     using Component::props;
-    std::shared_ptr<Text> label = nullptr;
+    std::unique_ptr<Text> label = nullptr;
     lv_obj_t* arc_reference = nullptr;
     bool is_show_label = false;
 
   public:
-    explicit CircularProgress(CircularProgressProps props)
+    explicit CircularProgress(CircularProgressProps&& props)
       : Component(nullptr, nullptr, std::move(props)) {
       this->apply_reactive<CircularProgress>(this, props.reactive_delegates);
 
@@ -70,7 +70,7 @@ namespace foundation
         {
           if (!this->label)
             {
-              this->label = std::make_shared<Text>(
+              this->label = std::make_unique<Text>(
                   TextProps::up().value(std::format("{}{}", props.default_dy, props.label_symbol))
               );
               this->label->set_parent(container);

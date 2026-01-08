@@ -14,13 +14,13 @@ extern "C" {
     class Application {
     protected:
       lv_obj_t* screen = nullptr;
-      std::shared_ptr<VNode> root_node = nullptr;
+      std::unique_ptr<VNode> root_node = nullptr;
 
     public:
       Application(lv_obj_t* screen_v) : screen(screen_v) {};
       virtual ~Application() = default;
 
-      virtual std::shared_ptr<VNode> root_component() { return nullptr; }
+      virtual std::unique_ptr<VNode> root_component() { return nullptr; }
 
       virtual void on_init() {}
 

@@ -9,10 +9,10 @@
 using namespace foundation;
 class InfoModal;
 
-using $$InfoModal = std::shared_ptr<InfoModal>;
+using $$InfoModal = std::unique_ptr<InfoModal>;
 
-inline $$InfoModal $InfoModal(auto&&... args) {
-  return std::make_shared<InfoModal>(std::forward<decltype(args)>(args)...);
+inline $$InfoModal $InfoModal(InfoModalProps args) {
+  return std::make_unique<InfoModal>(std::move(args));
 }
 
 class InfoModal final : public Component<InfoModalProps> {
@@ -20,7 +20,7 @@ public:
   using Component::props;
   $$Modal modal = nullptr;
 
-  explicit InfoModal(const InfoModalProps& props) : Component(nullptr, nullptr, std::move(props)) {
+  explicit InfoModal(InfoModalProps&& props) : Component(nullptr, nullptr, std::move(props)) {
     this->parent = nullptr;
 
     if (this->props.ref != nullptr) {
@@ -50,15 +50,15 @@ public:
       .items(LV_FLEX_ALIGN_CENTER)
       .track_cross(LV_FLEX_ALIGN_CENTER)
       .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
-      .set_children(Children{
+      .set_children(children(
         $Text(TextProps::up()
           .value(key)
         ),
 
         $Text(TextProps::up()
           .value(value)
-        ),
-      })
+        )
+      ))
     );
   }
 
@@ -70,7 +70,7 @@ public:
     ViewProps::up()
       .w(LV_PCT(80))
       .h(LV_PCT(80))
-      .set_children(Children{
+      .set_children(children(
         $FlatList(FlatListProps::up()
           .w(LV_PCT(100))
           .h(LV_PCT(100))
@@ -79,12 +79,12 @@ public:
              style.setBorderRadius(0);
              style.setBorder(lv_color_make(255, 255, 255), 0, 0);
           })
-          .set_children(Children{
+          .set_children(children(
             $View(ViewProps::up()
               .direction(LV_FLEX_FLOW_COLUMN)
               .w(LV_PCT(100))
               .h(LV_SIZE_CONTENT)
-              .set_children(Children{
+              .set_children(children(
                 this->makeRow(locales::en::info_device, this->props.device),
                 this->makeRow(locales::en::info_loader, this->props.loader),
                 this->makeRow(locales::en::info_fw, this->props.fw),
@@ -100,10 +100,10 @@ public:
                 $Button(
                   ButtonProps::up()
                     .label(locales::en::button_close)
-                    .click([this](lv_event_t *) { this->close(); })),
-              }))
-          }))
-      })
+                    .click([this](lv_event_t *) { this->close(); }))
+              )))
+          )))
+      ))
       .direction(LV_FLEX_FLOW_COLUMN)))
   );
 

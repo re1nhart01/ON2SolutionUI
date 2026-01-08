@@ -13,8 +13,8 @@ namespace foundation
   public:
     using Component::props;
 
-    explicit Modal(const ModalProps& props)
-        : Component(nullptr, nullptr, props)
+    explicit Modal(ModalProps&& props)
+        : Component(nullptr, nullptr, std::move(props))
     {
       this->apply_reactive<Modal>(this, props.reactive_delegates);
         if (this->props.ref != nullptr) {

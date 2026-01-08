@@ -12,11 +12,8 @@ struct PreloaderScreenProps final
 
 class PreloaderScreen final : public NavigationScreen<PreloaderScreenProps>
 {
-private:
-  PreloaderScreenProps props;
-
 public:
-  explicit PreloaderScreen(StackNavigator *stack, const PreloaderScreenProps &props) : NavigationScreen(stack, props), props(props) {}
+  explicit PreloaderScreen(StackNavigator *stack, PreloaderScreenProps props) : NavigationScreen(stack, std::move(props)) {}
 
   ~PreloaderScreen() override = default;
 
@@ -57,14 +54,14 @@ public:
           style.setBorderRadius(0);
           style.setBorder(lv_color_make(255, 255, 255), 0, 0);
         })
-        .set_children(Children{
+        .set_children(children(
           $Image(ImageProps::up()
             .source("S:on2_logo_300_192.bin")
             .width(310)
             .height(192)
           ),
           $Activity(ActivityIndicatorProps::up().sz(86).arc(80).set_color(
-            PRIMARY_COLOR))})
+            PRIMARY_COLOR))))
         .w(LV_PCT(100))
         .h(LV_PCT(100))
         .justify(LV_FLEX_ALIGN_CENTER)

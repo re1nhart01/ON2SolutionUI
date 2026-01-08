@@ -13,7 +13,7 @@ namespace foundation {
     lv_obj_t* parent = nullptr;
 
     mutable Styling style{};
-    std::shared_ptr<VNode> renderer_view = nullptr;
+    std::unique_ptr<VNode> renderer_view = nullptr;
 
   public:
     virtual ~VNode()
@@ -102,8 +102,11 @@ namespace foundation {
       component_did_rebuild();
     }
 
-    lv_obj_t* delegate(const std::shared_ptr<VNode>& component_view) {
-      this->renderer_view = component_view;
+    lv_obj_t* delegate(std::unique_ptr<VNode> component_view) {
+      if (this->parent == nullptr) {
+          ESP_LOGE("VNode", "ERROR: Parent is NULL during delegate() in %s", typeid(*this).name());
+      }
+      this->renderer_view = std::move(component_view);
       this->renderer_view->set_parent(this->parent);
       this->set_component(this->renderer_view->render());
       return this->renderer_view->get_component();

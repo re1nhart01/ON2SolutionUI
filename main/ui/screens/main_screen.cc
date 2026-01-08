@@ -23,21 +23,18 @@ struct PinCodeScreenProps;
 using namespace foundation;
 
 class MainScreen;
-struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen>
-{};
-
+struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen> {};
 
 class MainScreen final : public NavigationScreen<MainScreenProps>
 {
-  MainScreenProps props;
   std::unique_ptr<StyleStorage> styles;
   std::unique_ptr<UartHandler> uart_handler = nullptr;
   $$InfoModal info_modal = nullptr;
   TaskHandle_t xHandle = nullptr;
   Reactive<int> reactive_moto_lvgl;
 public:
-  explicit MainScreen(StackNavigator *stack, const MainScreenProps &props)
-      : NavigationScreen(stack, props), props(props),
+  explicit MainScreen(StackNavigator *stack, MainScreenProps props)
+      : NavigationScreen(stack, std::move(props)),
         styles(std::make_unique<StyleStorage>()),
         reactive_moto_lvgl(0)
   {
@@ -53,9 +50,9 @@ public:
       UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
     // start_random_updater();
     ESP_LOGI("main_screen", "on_FOCUS");
-    this->uart_handler->init();
-    this->uart_handler->enable_rx(true);
-    this->add_uart_data_event();
+    // this->uart_handler->init();
+    // this->uart_handler->enable_rx(true);
+    // this->add_uart_data_event();
   };
 
   void on_blur() override
@@ -89,20 +86,21 @@ public:
   {
     DatasetSystemInfo system_info = DatasetStore::getInstance()->get().system_info;
 
-    info_modal = $InfoModal(InfoModalProps::up()
-                              .set_device(system_info.device_name.data())
-                              .set_loader(system_info.loader_version.data())
-                              .set_fw(system_info.firmware_version.data())
-                              .set_fw_checksum(system_info.firmware_checksum.data())
-                              .set_module_name(system_info.module_name.data())
-                              .set_module_fw(system_info.firmware_version.data())
-                              .set_serial_number(system_info.serial_number.data())
-                              .set_ethernet_ip(system_info.lan_ip_address.data())
-                              .set_wifi_ip(system_info.wifi_ip_address.data())
-                              .set_lcd_fw("x.x.x")
-                              .set_lcd_loader("x.x.x")
-                              .set_lcd_partition("x.x.x")
-                              .set_restart_seconds(99));
+    info_modal = $InfoModal(
+      std::move(InfoModalProps::up()
+                  .set_device(system_info.device_name.data())
+                  .set_loader(system_info.loader_version.data())
+                  .set_fw(system_info.firmware_version.data())
+                  .set_fw_checksum(system_info.firmware_checksum.data())
+                  .set_module_name(system_info.module_name.data())
+                  .set_module_fw(system_info.firmware_version.data())
+                  .set_serial_number(system_info.serial_number.data())
+                  .set_ethernet_ip(system_info.lan_ip_address.data())
+                  .set_wifi_ip(system_info.wifi_ip_address.data())
+                  .set_lcd_fw("x.x.x")
+                  .set_lcd_loader("x.x.x")
+                  .set_lcd_partition("x.x.x")
+                  .set_restart_seconds(99)));
 
     info_modal->show();
   }
@@ -173,11 +171,11 @@ public:
     return $View(
       ViewProps::up()
         .set_style($s("header.container"))
-        .set_children(Children{
+        .set_children(children(
           $View(
             ViewProps::up()
               .set_style($s("header.labels.container"))
-              .set_children(Children{
+              .set_children(children(
                 $Text(
                   TextProps::up()
                     .watch<Dataset>(DatasetStore::getInstance(), "channels", [](Text* self, const Dataset& value) {
@@ -202,12 +200,12 @@ public:
                               props.value(std::format("Outputs: {}", outputs));
                           });
                         })
-                        .value("Outputs: 0")),
-              })
+                        .value("Outputs: 0"))
+              ))
               .merge(header_labels_container_props)),
           $View(ViewProps::up()
                   .set_style($s("header.container"))
-                  .set_children(Children{
+                  .set_children(children(
                     $Button(ButtonProps::up()
                               .set_style($s("header.button"))
                               .set_child($Text(
@@ -226,10 +224,10 @@ public:
                                         .value(locales::en::header_settings)))
                               .click([navigator_ref](lv_event_t *e) {
                                 navigator_ref->navigate("/pin_code");
-                              })),
-                  })
-                  .merge(header_container_right_props)),
-        })
+                              }))
+                  ))
+                  .merge(header_container_right_props))
+        ))
         .merge(header_container_props));
   }
 
@@ -274,17 +272,17 @@ public:
 
     return $View(ViewProps::up()
                    .set_style($s("header.container"))
-                   .set_children(Children{
+                   .set_children(children(
                      $Text(TextProps::up()
                              .set_style($s("header.label"))
                              .value(locales::en::oxygen_level)),
                      $View(ViewProps::up()
                              .set_style($s("header.labels.container"))
-                             .set_children(Children{
+                             .set_children(children(
                                make_circle("oxygen_level", 0),
                                make_circle("oxygen_level", 1),
-                               make_circle("oxygen_level", 2),
-                             })
+                               make_circle("oxygen_level", 2)
+                             ))
                              .w(LV_PCT(100))
                              .h(110)
                              .justify(LV_FLEX_ALIGN_SPACE_AROUND)
@@ -296,18 +294,18 @@ public:
                              .value(locales::en::oxygen_rate)),
                      $View(ViewProps::up()
                              .set_style($s("header.labels.container"))
-                             .set_children(Children{
+                             .set_children(children(
                                make_circle("oxygen_rate", 0),
                                make_circle("oxygen_rate", 1),
-                               make_circle("oxygen_rate", 2),
-                             })
+                               make_circle("oxygen_rate", 2)
+                             ))
                              .w(LV_PCT(100))
                              .h(110)
                              .justify(LV_FLEX_ALIGN_SPACE_AROUND)
                              .items(LV_FLEX_ALIGN_CENTER)
                              .track_cross(LV_FLEX_ALIGN_CENTER)
-                             .direction(LV_FLEX_FLOW_ROW)),
-                   })
+                             .direction(LV_FLEX_FLOW_ROW))
+                   ))
                    .w(LV_PCT(100))
                    .h(LV_PCT(62))
                    .justify(LV_FLEX_ALIGN_START)
@@ -318,6 +316,9 @@ public:
 
   lv_obj_t *render() override
   {
+
+    ESP_LOGI("main screen", "render");
+
     return this->delegate($View(
       ViewProps::up()
             .set_style([](Styling& style) {
@@ -326,12 +327,12 @@ public:
               style.setBorderRadius(0);
               style.setBorder(lv_color_make(255, 255, 255), 0, 0);
             })
-            .set_children(Children{
+            .set_children(children(
           $StatusBar(
             StatusBarProps::up()
               .set_background_color(lv_color_hex(0x2A2A2A))
               .set_height(30)
-              .set_children(Children{
+              .set_children(children(
                 $Text(TextProps::up()
                         .watch<Dataset>(DatasetStore::getInstance(), "moto_hours", [](Text* self, const Dataset& value) {
                           std::string hours = value.operative_data.moto_hours.data();
@@ -349,12 +350,12 @@ public:
                             self->set_state([value](TextProps& props) { props.value(std::format("LVGL Seconds: {}", value)); });
                         })
                         .value("LVGL Seconds: 0")
-                        .set_style($s("status_bar.battery"))),
-              })),
+                        .set_style($s("status_bar.battery")))
+              ))),
           this->render_header(),
           this->render_body(),
-          this->render_footer(),
-        })
+          this->render_footer()
+        ))
         .merge(screen_container_props)));
   }
 

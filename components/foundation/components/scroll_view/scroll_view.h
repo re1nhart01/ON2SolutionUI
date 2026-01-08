@@ -7,7 +7,7 @@ namespace foundation
   class ScrollView final : public Component<ScrollViewProps>
   {
   public:
-    explicit ScrollView(const ScrollViewProps& props)
+    explicit ScrollView(ScrollViewProps&& props)
         : Component(nullptr, nullptr, std::move(props))
     {
       this->apply_reactive<ScrollView>(this, props.reactive_delegates);

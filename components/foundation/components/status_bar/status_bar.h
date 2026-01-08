@@ -10,7 +10,7 @@ namespace foundation
   public:
     using Component::props;
 
-    explicit StatusBar(const StatusBarProps& props) : Component(nullptr, nullptr, std::move(props)) {
+    explicit StatusBar(StatusBarProps&& props) : Component(nullptr, nullptr, std::move(props)) {
       this->apply_reactive<StatusBar>(this, props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
@@ -32,7 +32,7 @@ namespace foundation
     {
       Component::render();
       return this->delegate(
-        std::make_shared<View>(
+        std::make_unique<View>(
           ViewProps::up()
           .set_style([this](Styling& style) {
             style.setBackgroundColor(this->props.background_color.value_or(lv_color_hex(0x303030)));
@@ -42,7 +42,7 @@ namespace foundation
             style.setFont(&lv_font_montserrat_12);
             style.setBorderRadius(0);
           })
-          .set_children(this->props.children)
+          .set_children(std::move(this->props.children))
           .w(LV_PCT(100))
           .h(this->props.height.value_or(24))
           .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)

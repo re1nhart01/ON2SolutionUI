@@ -7,7 +7,7 @@ namespace foundation
   class FlatList final : public Component<FlatListProps>
   {
   public:
-    explicit FlatList(const FlatListProps& props)
+    explicit FlatList(FlatListProps&& props)
         : Component(nullptr, nullptr, std::move(props))
     {
       this->apply_reactive<FlatList>(this, props.reactive_delegates);
