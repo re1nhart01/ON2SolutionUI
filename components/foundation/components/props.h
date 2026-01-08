@@ -23,11 +23,13 @@ namespace foundation
 
 
     template<typename TVal>
-    Derived watch(Reactive<TVal>* reactive, std::string key, Delegate<void(RefT*, const TVal&)> updater)
+    Derived&& watch(Reactive<TVal>* reactive, std::string key, Delegate<void(RefT*, const TVal&)> updater)
     {
-      if (!reactive) return static_cast<Derived&>(*this);
+      ESP_LOGI("Watch", "Registering watcher for key: %s", key.c_str());
+      if (!reactive) return std::move(static_cast<Derived&>(*this));
 
       this->reactive_delegates.push_back([reactive, updater, key](void* internal_component) {
+        ESP_LOGI("Watch", "EXECUTION: Calling attach for key: %s", key.c_str());
         reactive->attach(key, static_cast<RefT*>(internal_component), updater);
       });
 
@@ -37,11 +39,13 @@ namespace foundation
     }
 
     template<typename TVal>
-    Derived watch(ThreadReactive<TVal> * reactive, std::string key, Delegate<void(RefT*, const TVal&)> updater)
+    Derived&& watch(ThreadReactive<TVal> * reactive, std::string key, Delegate<void(RefT*, const TVal&)> updater)
     {
-      if (!reactive) return static_cast<Derived&>(*this);
+      ESP_LOGI("Watch", "Registering watcher for key: %s", key.c_str());
+      if (!reactive) return std::move(static_cast<Derived&>(*this));
 
       this->reactive_delegates.push_back([reactive, updater, key](void* internal_component) {
+        ESP_LOGI("Watch", "EXECUTION: Calling attach for key: %s", key.c_str());
         reactive->attach(key, static_cast<RefT*>(internal_component), updater);
       });
 
@@ -50,25 +54,25 @@ namespace foundation
       return std::move(static_cast<Derived&>(*this));
     }
 
-    Derived set_style(Delegate<void(Styling&)> fn)
+    Derived&& set_style(Delegate<void(Styling&)> fn)
     {
       style_override = std::move(fn);
       return std::move(static_cast<Derived&>(*this));
     }
 
-    Derived set_ref(const std::shared_ptr<Ref<RefT>>& r) {
+    Derived&& set_ref(const std::shared_ptr<Ref<RefT>>& r) {
       ref = r;
       return std::move(static_cast<Derived&>(*this));
     }
 
-    Derived set_visible(const bool value)
+    Derived&& set_visible(const bool value)
     {
       this->is_visible = value;
       return std::move(static_cast<Derived&>(*this));
     }
 
     template <typename Fn>
-    Derived merge(Fn fn) {
+    Derived&& merge(Fn fn) {
       Derived& updated = fn(static_cast<Derived&>(*this));
       return std::move(updated);
     }

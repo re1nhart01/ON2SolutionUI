@@ -9,7 +9,7 @@ namespace foundation
 
   public:
     explicit View(ViewProps&& props) : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<View>(this, props.reactive_delegates);
+      this->apply_reactive<View>(this, this->props.reactive_delegates);
       if(this->props.ref != nullptr) {
           this->props.ref->set(this);
       }

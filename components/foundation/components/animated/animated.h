@@ -12,7 +12,7 @@ namespace foundation
     explicit Animated(AnimatedProps props)
       : Component(std::move(props))
     {
-      this->apply_reactive<Animated>(this, props.reactive_delegates);
+      this->apply_reactive<Animated>(this, this->props.reactive_delegates);
       this->reference = std::make_unique<lv_anim_t>();
 
       lv_anim_init(this->reference.get());

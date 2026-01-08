@@ -17,57 +17,57 @@ namespace foundation
     lv_scrollbar_mode_t scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
     bool disabled = false;
 
-    ScrollViewProps add_child(std::unique_ptr<VNode> c) {
+    ScrollViewProps&& add_child(std::unique_ptr<VNode> c) {
       children.push_back(std::move(c));
       return std::move(*this);
     }
 
-    ScrollViewProps set_children(std::vector<std::unique_ptr<VNode>>&& ch) {
+    ScrollViewProps&& set_children(std::vector<std::unique_ptr<VNode>>&& ch) {
       children = std::move(ch);
       return std::move(*this);
     }
 
-    ScrollViewProps w(short v) {
+    ScrollViewProps&& w(short v) {
       width = v;
       return std::move(*this);
     }
 
-    ScrollViewProps h(short v) {
+    ScrollViewProps&& h(short v) {
       height = v;
       return std::move(*this);
     }
 
-    ScrollViewProps direction(lv_flex_flow_t value) {
+    ScrollViewProps&& direction(lv_flex_flow_t value) {
       flex_direction = value;
       return std::move(*this);
     }
 
-    ScrollViewProps justify(lv_flex_align_t value) {
+    ScrollViewProps&& justify(lv_flex_align_t value) {
       justify_content = value;
       return std::move(*this);
     }
 
-    ScrollViewProps items(lv_flex_align_t value) {
+    ScrollViewProps&& items(lv_flex_align_t value) {
       align_items = value;
       return std::move(*this);
     }
 
-    ScrollViewProps track_cross(lv_flex_align_t value) {
+    ScrollViewProps&& track_cross(lv_flex_align_t value) {
       track_cross_place = value;
       return std::move(*this);
     }
 
-    ScrollViewProps scroll(lv_dir_t dir) {
+    ScrollViewProps&& scroll(lv_dir_t dir) {
       scroll_dir = dir;
       return std::move(*this);
     }
 
-    ScrollViewProps scrollbar(lv_scrollbar_mode_t mode) {
+    ScrollViewProps&& scrollbar(lv_scrollbar_mode_t mode) {
       scrollbar_mode = mode;
       return std::move(*this);
     }
 
-    ScrollViewProps disable(bool v = false) {
+    ScrollViewProps&& disable(bool v = false) {
       disabled = v;
       return std::move(*this);
     }

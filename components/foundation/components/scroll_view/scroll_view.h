@@ -10,7 +10,7 @@ namespace foundation
     explicit ScrollView(ScrollViewProps&& props)
         : Component(nullptr, nullptr, std::move(props))
     {
-      this->apply_reactive<ScrollView>(this, props.reactive_delegates);
+      this->apply_reactive<ScrollView>(this, this->props.reactive_delegates);
         if (this->props.ref != nullptr) {
             this->props.ref->set(this);
         }

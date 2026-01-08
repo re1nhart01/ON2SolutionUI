@@ -14,25 +14,25 @@ namespace foundation
     int arc_length = 60;
     int size = 40;
 
-    ActivityIndicatorProps& time(int t) {
+    ActivityIndicatorProps&& time(int t) {
       this->spin_time = t;
-      return *this;
+      return std::move(*this);
     }
 
-    ActivityIndicatorProps& arc(int a) {
+    ActivityIndicatorProps&& arc(int a) {
       this->arc_length = a;
-      return *this;
+      return std::move(*this);
     }
 
-    ActivityIndicatorProps& sz(int s) {
+    ActivityIndicatorProps&& sz(int s) {
       this->size = s;
-      return *this;
+      return std::move(*this);
     }
 
-    ActivityIndicatorProps& set_color(lv_color_t color)
+    ActivityIndicatorProps&& set_color(lv_color_t color)
     {
       this->color = color;
-      return *this;
+      return std::move(*this);
     }
   };
 }

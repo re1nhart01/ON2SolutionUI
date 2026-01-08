@@ -63,27 +63,32 @@ public:
                 if (auto* ns = dynamic_cast<NavigationScreenBase*>(current->instance.get())) {
                         ns->on_blur();
                 }
+
+                if (save_to_history) {
+                        history.push_back(StackHistoryRoute{.id = history_counter++, .name = current->name});
+                }
         }
 
         lv_obj_t* active_parent = parent ? parent : lv_scr_act();
         lv_obj_clean(active_parent);
 
+        auto screen_instance = it->second();
+
         current.reset();
 
-        auto screen_instance = it->second();
         current = StackCurrentScreen {
             .id = id_counter++,
             .name = name,
             .instance = std::move(screen_instance)
         };
 
-        auto* inst = current->instance.get();
-        inst->set_parent(active_parent);
+        auto screen_ref = current->instance.get();
 
-        auto ui_obj = inst->render();
-        inst->set_component(ui_obj);
+        screen_ref->set_parent(active_parent);
+        auto ui_obj = screen_ref->render();
+        screen_ref->set_component(ui_obj);
 
-        if (auto* ns = dynamic_cast<NavigationScreenBase*>(inst)) {
+        if (auto* ns = dynamic_cast<NavigationScreenBase*>(screen_ref)) {
                 ns->on_focus();
         }
     }

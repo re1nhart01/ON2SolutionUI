@@ -16,7 +16,7 @@ namespace foundation
     explicit Modal(ModalProps&& props)
         : Component(nullptr, nullptr, std::move(props))
     {
-      this->apply_reactive<Modal>(this, props.reactive_delegates);
+      this->apply_reactive<Modal>(this, this->props.reactive_delegates);
         if (this->props.ref != nullptr) {
             this->props.ref->set(this);
         }

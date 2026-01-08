@@ -13,7 +13,7 @@ namespace foundation
   public:
     explicit Fragment(FragmentProps&& props)
       : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<Fragment>(this, props.reactive_delegates);
+      this->apply_reactive<Fragment>(this, this->props.reactive_delegates);
     };
     ~Fragment() override
     {

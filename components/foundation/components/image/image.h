@@ -11,7 +11,7 @@ namespace foundation
   public:
     explicit Image(ImageProps&& props)
       : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<Image>(this, props.reactive_delegates);
+      this->apply_reactive<Image>(this, this->props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }

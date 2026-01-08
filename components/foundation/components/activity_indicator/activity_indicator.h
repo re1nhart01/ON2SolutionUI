@@ -13,7 +13,7 @@ namespace foundation
     public:
 
     explicit ActivityIndicator(ActivityIndicatorProps&& props) : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<ActivityIndicator>(this, props.reactive_delegates);
+      this->apply_reactive<ActivityIndicator>(this, this->props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }

@@ -55,6 +55,7 @@ namespace foundation {
     template<typename T>
     void detach_reactives(T* instance, std::vector<IReactive*>& states)
     {
+      ESP_LOGI("VNode", "apply_reactive called. Count: %d", states.size());
       for (auto* state : states) {
           if (state) state->detach(instance);
       }
@@ -63,6 +64,7 @@ namespace foundation {
 
     template<typename T>
     void apply_reactive(T* instance, const std::vector<Delegate<void(void*)>>& delegates) {
+      ESP_LOGI("VNode", "apply_reactive called. Count: %d", delegates.size());
       for (auto& binder : delegates) {
           if (binder) binder(static_cast<void*>(instance));
       }

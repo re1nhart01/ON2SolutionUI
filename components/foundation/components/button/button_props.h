@@ -25,42 +25,42 @@ namespace foundation
     Delegate<void(lv_event_t *)> on_focused{};
     Delegate<void(lv_event_t *)> on_defocused{};
 
-    ButtonProps set_child(std::unique_ptr<VNode> c) {
+    ButtonProps&& set_child(std::unique_ptr<VNode> c) {
       child = std::move(c);
       return std::move(*this);
     }
 
-    ButtonProps label(const std::string& t) {
+    ButtonProps&& label(const std::string& t) {
       text = t;
       return std::move(*this);
     }
 
-    ButtonProps click(auto fn) {
+    ButtonProps&& click(auto fn) {
       on_click = fn;
       return std::move(*this);
     }
 
-    ButtonProps long_press(auto fn) {
+    ButtonProps&& long_press(auto fn) {
       on_long_press = fn;
       return std::move(*this);
     }
 
-    ButtonProps pressed(auto fn) {
+    ButtonProps&& pressed(auto fn) {
       on_pressed = fn;
       return std::move(*this);
     }
 
-    ButtonProps released(auto fn) {
+    ButtonProps&& released(auto fn) {
       on_released = fn;
       return std::move(*this);
     }
 
-    ButtonProps focused(auto fn) {
+    ButtonProps&& focused(auto fn) {
       on_focused = fn;
       return std::move(*this);
     }
 
-    ButtonProps defocused(auto fn) {
+    ButtonProps&& defocused(auto fn) {
       on_defocused = fn;
       return std::move(*this);
     }

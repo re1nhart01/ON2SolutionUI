@@ -17,7 +17,7 @@ namespace foundation
     using Component::props;
 
    explicit Button(ButtonProps&& props) : Component(nullptr, nullptr, std::move(props)) {
-     this->apply_reactive<Button>(this, props.reactive_delegates);
+     this->apply_reactive<Button>(this, this->props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }

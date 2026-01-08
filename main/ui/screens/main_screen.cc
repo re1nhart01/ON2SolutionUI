@@ -48,7 +48,7 @@ public:
     NavigationScreen::on_focus();
     this->uart_handler = std::make_unique<UartHandler>(
       UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
-    // start_random_updater();
+    start_random_updater();
     ESP_LOGI("main_screen", "on_FOCUS");
     // this->uart_handler->init();
     // this->uart_handler->enable_rx(true);
@@ -179,6 +179,7 @@ public:
                 $Text(
                   TextProps::up()
                     .watch<Dataset>(DatasetStore::getInstance(), "channels", [](Text* self, const Dataset& value) {
+                      ESP_LOGI("Reactive", "3 Attaching component %p to key %s", self, "zxc");
                       int count = value.operative_data.channels_count;
                       self->set_state([count](TextProps &props) {
                           props.value(std::format("Channels: {}", count));
@@ -187,14 +188,16 @@ public:
                     .value("Channels: 0")),
                 $Text(TextProps::up()
                         .watch<Dataset>(DatasetStore::getInstance(), "inputs", [](Text* self, const Dataset& value) {
+                          ESP_LOGI("Reactive", "2 Attaching component %p to key %s", self, "zxc");
                           int inputs = value.operative_data.inputs;
-                          self->set_state([inputs](TextProps &props) {
+                          self->set_state([inputs](TextProps& props) {
                              props.value(std::format("Inputs: {}", inputs));
                           });
                         })
                         .value("Inputs: 0")),
                 $Text(TextProps::up()
                         .watch<Dataset>(DatasetStore::getInstance(), "outputs", [](Text* self, const Dataset& value) {
+                          ESP_LOGI("Reactive", "1 Attaching component %p to key %s", self, "zxc");
                           int outputs = value.operative_data.outputs;
                           self->set_state([outputs](TextProps &props) {
                               props.value(std::format("Outputs: {}", outputs));

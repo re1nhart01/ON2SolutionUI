@@ -10,7 +10,7 @@ namespace foundation
     explicit FlatList(FlatListProps&& props)
         : Component(nullptr, nullptr, std::move(props))
     {
-      this->apply_reactive<FlatList>(this, props.reactive_delegates);
+      this->apply_reactive<FlatList>(this, this->props.reactive_delegates);
         if (this->props.ref != nullptr) this->props.ref->set(this);
     }
 

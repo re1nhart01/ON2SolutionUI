@@ -22,7 +22,7 @@ using $$TabView = std::unique_ptr<foundation::TabView>;
 using $$FlatList = std::unique_ptr<foundation::FlatList>;
 
 
-  inline std::unique_ptr<foundation::View> $View(foundation::ViewProps&& args) {
+  inline std::unique_ptr<foundation::View> $View(foundation::ViewProps args) {
     return std::make_unique<foundation::View>(std::move(args));
   }
 

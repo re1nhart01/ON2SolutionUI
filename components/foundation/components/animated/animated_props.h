@@ -20,42 +20,42 @@ namespace foundation
       X, Y, Opacity, Zoom, Rotation
     } property = Property::X;
 
-    AnimatedProps from(int32_t value) {
+    AnimatedProps&& from(int32_t value) {
       start_value = value;
       return std::move(*this);
     }
 
-    AnimatedProps to(int32_t value) {
+    AnimatedProps&& to(int32_t value) {
       end_value = value;
       return std::move(*this);
     }
 
-    AnimatedProps time(uint32_t ms) {
+    AnimatedProps&& time(uint32_t ms) {
       duration = ms;
       return std::move(*this);
     }
 
-    AnimatedProps playback(uint32_t ms) {
+    AnimatedProps&& playback(uint32_t ms) {
       playback_duration = ms;
       return std::move(*this);
     }
 
-    AnimatedProps wait(uint32_t ms) {
+    AnimatedProps&& wait(uint32_t ms) {
       delay = ms;
       return std::move(*this);
     }
 
-    AnimatedProps repeat(int32_t count) {
+    AnimatedProps&& repeat(int32_t count) {
       repeat_count = count;
       return std::move(*this);
     }
 
-    AnimatedProps easing(lv_anim_path_cb_t cb) {
+    AnimatedProps&& easing(lv_anim_path_cb_t cb) {
       path_cb = cb;
       return std::move(*this);
     }
 
-    AnimatedProps prop(Property p) {
+    AnimatedProps&& prop(Property p) {
       property = p;
       return std::move(*this);
     }
