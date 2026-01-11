@@ -22,64 +22,64 @@ using $$TabView = std::unique_ptr<foundation::TabView>;
 using $$FlatList = std::unique_ptr<foundation::FlatList>;
 
 
-  inline std::unique_ptr<foundation::View> $View(foundation::ViewProps args) {
-    return std::make_unique<foundation::View>(std::move(args));
+  inline std::unique_ptr<foundation::View> $View(foundation::ViewProps&& args) {
+    return std::make_unique<foundation::View>(std::forward<foundation::ViewProps>(args));
   }
 
-  inline std::unique_ptr<foundation::Text> $Text(foundation::TextProps args) {
-    return std::make_unique<foundation::Text>(std::move(args));
+  inline std::unique_ptr<foundation::Text> $Text(foundation::TextProps&& args) {
+    return std::make_unique<foundation::Text>(std::forward<foundation::TextProps>(args));
   }
 
-  inline std::unique_ptr<foundation::Button> $Button(foundation::ButtonProps args) {
-    return std::make_unique<foundation::Button>(std::move(args));
+  inline std::unique_ptr<foundation::Button> $Button(foundation::ButtonProps&& args) {
+    return std::make_unique<foundation::Button>(std::forward<foundation::ButtonProps>(args));
   }
 
-  inline std::unique_ptr<foundation::TextInput> $TextInput(foundation::TextInputProps args) {
-    return std::make_unique<foundation::TextInput>(std::move(args));
+  inline std::unique_ptr<foundation::TextInput> $TextInput(foundation::TextInputProps&& args) {
+    return std::make_unique<foundation::TextInput>(std::forward<foundation::TextInputProps>(args));
   }
 
-  inline std::unique_ptr<foundation::StatusBar> $StatusBar(foundation::StatusBarProps args) {
-    return std::make_unique<foundation::StatusBar>(std::move(args));
+  inline std::unique_ptr<foundation::StatusBar> $StatusBar(foundation::StatusBarProps&& args) {
+    return std::make_unique<foundation::StatusBar>(std::forward<foundation::StatusBarProps>(args));
   }
 
-  inline std::unique_ptr<foundation::Animated> $Animated(foundation::AnimatedProps args) {
-    return std::make_unique<foundation::Animated>(std::move(args));
+  inline std::unique_ptr<foundation::Animated> $Animated(foundation::AnimatedProps&& args) {
+    return std::make_unique<foundation::Animated>(std::forward<foundation::AnimatedProps>(args));
   }
 
-  inline std::unique_ptr<foundation::Image> $Image(foundation::ImageProps args) {
-    return std::make_unique<foundation::Image>(std::move(args));
+  inline std::unique_ptr<foundation::Image> $Image(foundation::ImageProps&& args) {
+    return std::make_unique<foundation::Image>(std::forward<foundation::ImageProps>(args));
   }
 
-  inline std::unique_ptr<foundation::ScrollView> $ScrollView(foundation::ScrollViewProps args) {
-    return std::make_unique<foundation::ScrollView>(std::move(args));
+  inline std::unique_ptr<foundation::ScrollView> $ScrollView(foundation::ScrollViewProps&& args) {
+    return std::make_unique<foundation::ScrollView>(std::forward<foundation::ScrollViewProps>(args));
   }
 
-  inline std::unique_ptr<foundation::CircularProgress> $Circular(foundation::CircularProgressProps args) {
-    return std::make_unique<foundation::CircularProgress>(std::move(args));
+  inline std::unique_ptr<foundation::CircularProgress> $Circular(foundation::CircularProgressProps&& args) {
+    return std::make_unique<foundation::CircularProgress>(std::forward<foundation::CircularProgressProps>(args));
   }
 
-  inline std::unique_ptr<foundation::ActivityIndicator> $Activity(foundation::ActivityIndicatorProps args) {
-    return std::make_unique<foundation::ActivityIndicator>(std::move(args));
+  inline std::unique_ptr<foundation::ActivityIndicator> $Activity(foundation::ActivityIndicatorProps&& args) {
+    return std::make_unique<foundation::ActivityIndicator>(std::forward<foundation::ActivityIndicatorProps>(args));
   }
 
-  inline std::unique_ptr<foundation::Modal> $Modal(foundation::ModalProps args) {
-    return std::make_unique<foundation::Modal>(std::move(args));
+  inline std::unique_ptr<foundation::Modal> $Modal(foundation::ModalProps&& args) {
+    return std::make_unique<foundation::Modal>(std::forward<foundation::ModalProps>(args));
   }
 
-  inline std::unique_ptr<foundation::Stepper> $Stepper(foundation::StepperProps args) {
-    return std::make_unique<foundation::Stepper>(std::move(args));
+  inline std::unique_ptr<foundation::Stepper> $Stepper(foundation::StepperProps&& args) {
+    return std::make_unique<foundation::Stepper>(std::forward<foundation::StepperProps>(args));
   }
 
-  inline std::unique_ptr<foundation::Fragment> $Fragment(foundation::FragmentProps args) {
-    return std::make_unique<foundation::Fragment>(std::move(args));
+  inline std::unique_ptr<foundation::Fragment> $Fragment(foundation::FragmentProps&& args) {
+    return std::make_unique<foundation::Fragment>(std::forward<foundation::FragmentProps>(args));
   }
 
-  inline std::unique_ptr<foundation::TabView> $TabView(foundation::TabViewProps args) {
-    return std::make_unique<foundation::TabView>(std::move(args));
+  inline std::unique_ptr<foundation::TabView> $TabView(foundation::TabViewProps&& args) {
+    return std::make_unique<foundation::TabView>(std::forward<foundation::TabViewProps>(args));
   }
 
-  inline std::unique_ptr<foundation::FlatList> $FlatList(foundation::FlatListProps args) {
-    return std::make_unique<foundation::FlatList>(std::move(args));
+  inline std::unique_ptr<foundation::FlatList> $FlatList(foundation::FlatListProps&& args) {
+    return std::make_unique<foundation::FlatList>(std::forward<foundation::FlatListProps>(args));
   }
 
   using Children = std::vector<std::unique_ptr<foundation::VNode>>;
