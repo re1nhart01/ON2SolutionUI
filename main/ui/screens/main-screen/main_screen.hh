@@ -1,15 +1,14 @@
 #pragma once
 
 #include <core/style_store/style_store.h>
+#include <lg/dataset/store/dataset.store.h>
 #include <protocols/uart/uart_proto.h>
 #include <ui/components/info_modal/info_modal.h>
 #include <ui/styles/common_styles.h>
 #include "../../components/foundation/core/shortcuts.h"
-#include <lg/dataset/store/dataset.store.h>
 #include "../../components/foundation/core/state/state.h"
-#include "lg/dataset/deserializer.hh"
 #include "esp_random.h"
-
+#include "lg/dataset/deserializer.hh"
 
 namespace ON2Solutions {
   class MainScreen;
@@ -22,17 +21,15 @@ namespace ON2Solutions {
     TaskHandle_t xHandle = nullptr;
     Reactive<int> reactive_moto_lvgl;
 
-  public:
+   public:
     explicit MainScreen(StackNavigator* stack, MainScreenProps props)
         : NavigationScreen(stack, std::move(props)),
           styles(std::make_unique<StyleStorage>()),
-          reactive_moto_lvgl(0)
-    {
+          reactive_moto_lvgl(0) {
       style_screen_register(*this->styles);
     }
 
-    ~MainScreen() override
-    {
+    ~MainScreen() override {
       ESP_LOGI("main_screen", "Main screen destroyed");
     };
 
@@ -44,10 +41,10 @@ namespace ON2Solutions {
     void add_uart_data_event();
 
     $$View render_header();
-    $$Button render_footer() const;
+    $$View render_footer() const;
     $$View render_body() const;
     lv_obj_t* render() override;
     const Styling* styling() const override;
     MainScreen* append(lv_obj_t* obj) override;
   };
-}
+}  // namespace ON2Solutions

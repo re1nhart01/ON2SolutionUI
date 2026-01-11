@@ -12,21 +12,23 @@ namespace ON2Solutions {
 
   using namespace foundation;
 
-  struct SettingsScreenProps final : BaseProps<SettingsScreenProps, SettingsScreen> {};
+  struct SettingsScreenProps final
+      : BaseProps<SettingsScreenProps, SettingsScreen> {};
 
   class SettingsScreen final : public NavigationScreen<SettingsScreenProps> {
-  private:
+   private:
     std::unique_ptr<StyleStorage> styles;
 
-  public:
+   public:
     explicit SettingsScreen(StackNavigator* stack, SettingsScreenProps props)
-        : NavigationScreen(stack, std::move(props)), styles(std::make_unique<StyleStorage>())
-    {
+        : NavigationScreen(stack, std::move(props)),
+          styles(std::make_unique<StyleStorage>()) {
       style_screen_register(*this->styles);
     }
 
     void component_did_mount() override;
-    $$Stepper make_param(const char* label, float val, float step = 1.0f, short precis = 0) const;
+    $$Stepper make_param(const char* label, float val, float step = 1.0f,
+                         short precis = 0) const;
     $$View render_sensors_tab() const;
     $$View render_timers_tab() const;
     $$View render_limits_tab() const;
@@ -35,4 +37,4 @@ namespace ON2Solutions {
     const Styling* styling() const override;
     SettingsScreen* append(lv_obj_t* obj) override;
   };
-}
+}  // namespace ON2Solutions

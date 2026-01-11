@@ -4,8 +4,8 @@
 namespace ON2Solutions {
   class InfoModal;
 
-  struct InfoModalProps final : foundation::BaseProps<InfoModalProps, InfoModal>
-  {
+  struct InfoModalProps final
+      : foundation::BaseProps<InfoModalProps, InfoModal> {
     const char* device = nullptr;
 
     const char* loader = nullptr;
@@ -24,63 +24,78 @@ namespace ON2Solutions {
     const char* action_label = nullptr;
 
     InfoModalProps& set_device(const char* v) {
-      device = v; return *this;
+      device = v;
+      return *this;
     }
 
     InfoModalProps& set_loader(const char* v) {
-      loader = v; return *this;
+      loader = v;
+      return *this;
     }
 
     InfoModalProps& set_fw(const char* v) {
-      fw = v; return *this;
+      fw = v;
+      return *this;
     }
 
     InfoModalProps& set_fw_checksum(const char* v) {
-      fw_checksum = v; return *this;
+      fw_checksum = v;
+      return *this;
     }
 
     InfoModalProps& set_module_name(const char* v) {
-      module_name = v; return *this;
+      module_name = v;
+      return *this;
     }
 
     InfoModalProps& set_module_fw(const char* v) {
-      module_fw = v; return *this;
+      module_fw = v;
+      return *this;
     }
 
     InfoModalProps& set_serial_number(const char* v) {
-      serial_number = v; return *this;
+      serial_number = v;
+      return *this;
     }
 
     InfoModalProps& set_ethernet_ip(const char* v) {
-      ethernet_ip = v; return *this;
+      ethernet_ip = v;
+      return *this;
     }
 
     InfoModalProps& set_wifi_ip(const char* v) {
-      wifi_ip = v; return *this;
+      wifi_ip = v;
+      return *this;
     }
 
     InfoModalProps& set_lcd_fw(const char* v) {
-      lcd_fw = v; return *this;
+      lcd_fw = v;
+      return *this;
     }
 
     InfoModalProps& set_lcd_loader(const char* v) {
-      lcd_loader = v; return *this;
+      lcd_loader = v;
+      return *this;
     }
 
     InfoModalProps& set_lcd_partition(const char* v) {
-      lcd_partition = v; return *this;
+      lcd_partition = v;
+      return *this;
     }
 
     InfoModalProps& set_hour_run(const char* v) {
-      hour_run = v; return *this;
+      hour_run = v;
+      return *this;
     }
 
     InfoModalProps& set_restart_seconds(uint32_t v) {
-      restart_seconds = v; return *this;
+      restart_seconds = v;
+      return *this;
     }
 
     InfoModalProps& set_action_label(const char* v) {
-      action_label = v; return *this;
+      action_label = v;
+      return *this;
     }
   };
-}
+}  // namespace ON2Solutions

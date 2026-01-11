@@ -105,7 +105,7 @@ namespace ON2Solutions {
        style.setFont(&lv_font_montserrat_16);
        style.setBackgroundColor(lv_color_hex(0x000000));
        style.setBorderRadius(12);
-       style.setSize(LV_PCT(96), 50);
+       style.setSize(LV_PCT(100), 45);
        style.setBorder(lv_color_hex(0x5B5AFF), 0, 0);
        style.setPadding(8, 8, 16, 16);
     });

@@ -8,10 +8,10 @@
 #include "../../components/foundation/core/state/state.h"
 #include "control_config.hh"
 
-
 namespace ON2Solutions {
   class PinCodeScreen;
-  struct PinCodeScreenProps final : BaseProps<PinCodeScreenProps, PinCodeScreen> {};
+  struct PinCodeScreenProps final
+      : BaseProps<PinCodeScreenProps, PinCodeScreen> {};
 
   class PinCodeScreen : public NavigationScreen<PinCodeScreenProps> {
     std::shared_ptr<KeyboardManager> keyboard;
@@ -20,12 +20,11 @@ namespace ON2Solutions {
     std::unique_ptr<StyleStorage> styles;
     std::unique_ptr<Modal> info_modal = nullptr;
 
-  public:
+   public:
     explicit PinCodeScreen(StackNavigator* stack, PinCodeScreenProps props)
         : NavigationScreen(stack, std::move(props)),
           keyboard(std::make_shared<KeyboardManager>()),
-          styles(std::make_unique<StyleStorage>())
-    {
+          styles(std::make_unique<StyleStorage>()) {
       style_screen_register(*this->styles);
     }
 
@@ -38,4 +37,4 @@ namespace ON2Solutions {
     const Styling* styling() const override;
     PinCodeScreen* append(lv_obj_t* obj) override;
   };
-}
+}  // namespace ON2Solutions
