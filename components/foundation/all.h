@@ -47,6 +47,12 @@
 #include "components/stepper/stepper.h"
 #include "components/stepper/stepper_props.h"
 
+#include "components/bar/bar.h"
+#include "components/bar/bar_props.h"
+
+#include "components/meter/meter.h"
+#include "components/meter/meter_props.h"
+
 #include "core/keyboard_manager/keyboard_manager.h"
 
 #include "core/navigation/stack_navigator/stack_navigator.h"

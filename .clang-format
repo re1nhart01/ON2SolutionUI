@@ -1,41 +1,83 @@
-BasedOnStyle:  GNU
-AlignAfterOpenBracket: Align
-AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: true
-AllowShortCaseLabelsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: All
-# Uncommenting these lines will sometimes result in lines following an
-# if(){} or for(){} block being attached to the end of the block.
-# AllowShortIfStatementsOnASingleLine: true
-# AllowShortLoopsOnASingleLine: true
-AlwaysBreakAfterDefinitionReturnType: None
-AlwaysBreakAfterReturnType: None
+---
+# Использовать Google Style как базу
+BasedOnStyle: Google
+Language: Cpp
+Standard: Latest
+
+# --- Размеры и отступы ---
+ColumnLimit: 110
+IndentWidth: 2
+ContinuationIndentWidth: 4
+AccessModifierOffset: -2
+DerivePointerAlignment: false
+PointerAlignment: Left
+
+# --- Декларативный UI (Method Chaining) ---
+# Заставляет переносить каждую точку в цепочках .set_style().set_children()
+BreakBeforeBinaryOperators: NonAssignment
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: Never
+
+# --- Работа со скобками и аргументами ---
+# Крайне важно для структуры дерева компонентов
+BinPackArguments: false
+BinPackParameters: false
+AlignAfterOpenBracket: AlwaysBreak
+AllowAllArgumentsOnNextLine: false
+NamespaceIndentation: All
+# Настройка переноса строк перед скобками
 BreakBeforeBraces: Custom
 BraceWrapping:
-  AfterClass:      true
-  AfterControlStatement: true
-  AfterEnum:       true
-  AfterFunction:   true
-  AfterNamespace:  true
-  AfterStruct:     true
-  AfterUnion:      true
-  AfterExternBlock: true
-  BeforeCatch:     true
-  BeforeElse:      true
-  IndentBraces:    true
+  AfterClass: false
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterExternBlock: false
+  BeforeCatch: false
+  BeforeElse: false
+  BeforeLambdaBody: false
   SplitEmptyFunction: false
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
-ContinuationIndentWidth: 2
-Cpp11BracedListStyle: true
-KeepEmptyLinesAtTheStartOfBlocks: false
-Language:        Cpp
-MaxEmptyLinesToKeep: 1
-NamespaceIndentation: All
-PenaltyExcessCharacter: 100
-PenaltyReturnTypeOnItsOwnLine: 1
-PointerAlignment: Right
-SortIncludes: true
-SpaceBeforeParens: Never
+
+# --- Лямбда-выражения (для .watch() и .click()) ---
+# Делает их читаемыми в UI колбэках
+AllowShortLambdasOnASingleLine: None
+LambdaBodyIndentation: Signature
+
+# --- Специфика вашего кода ($View, $Text) ---
+# Подсказывает линтеру, что это ключевые блоки
+WhitespaceSensitiveMacros:
+  - '$View'
+  - '$Text'
+  - '$Button'
+  - '$Circular'
+  - '$StatusBar'
+  - '$InfoModal'
+  - '$s'
+  - '$StatusBarProps'
+  - '$$View'
+  - '$$Button'
+
+# --- Инклуды ---
+# Отключаем автоматическую сортировку, чтобы сохранить вашу логику групп
+SortIncludes: false
+
+# --- Штрафы (настройка весов для алгоритма переноса) ---
+# Эти параметры заставляют линтер предпочитать вертикальный стиль горизонтальному
+PenaltyBreakAssignment: 100
+PenaltyBreakBeforeFirstCallParameter: 1
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakString: 1000
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 1000
+
+# Пробелы
+SpaceBeforeParens: ControlStatements
+SpacesInAngles: false
 SpacesInContainerLiterals: false
-Standard:        Latest
+SpaceInEmptyParentheses: false

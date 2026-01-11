@@ -1,13 +1,9 @@
-//
-// Created by evgeniy on 1/2/26.
-//
-
-
 #pragma once
 
 #include "core/state/thread_reactive.h"
+#include <lg/dataset/types.hh>
 
-namespace on2::parser
+namespace ON2Solutions::parser
 {
   class DatasetStore final : public foundation::ThreadReactive<Dataset>
   {

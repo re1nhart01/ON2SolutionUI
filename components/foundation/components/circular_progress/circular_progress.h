@@ -36,12 +36,11 @@ namespace foundation
 
     lv_obj_t* render() override
     {
+      Component::render();
       if (this->get_component() != nullptr) {
           this->do_rebuild();
           return this->get_component();
       }
-
-      Component::render();
 
       lv_obj_t* parent_obj = this->get_parent();
       if (!parent_obj) return nullptr;

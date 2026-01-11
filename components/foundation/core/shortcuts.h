@@ -20,7 +20,8 @@ using $$Stepper = std::unique_ptr<foundation::Stepper>;
 using $$Fragment = std::unique_ptr<foundation::Fragment>;
 using $$TabView = std::unique_ptr<foundation::TabView>;
 using $$FlatList = std::unique_ptr<foundation::FlatList>;
-
+using $$Bar = std::unique_ptr<foundation::Bar>;
+using $$Meter = std::unique_ptr<foundation::Meter>;
 
   inline std::unique_ptr<foundation::View> $View(foundation::ViewProps&& args) {
     return std::make_unique<foundation::View>(std::forward<foundation::ViewProps>(args));
@@ -80,6 +81,14 @@ using $$FlatList = std::unique_ptr<foundation::FlatList>;
 
   inline std::unique_ptr<foundation::FlatList> $FlatList(foundation::FlatListProps&& args) {
     return std::make_unique<foundation::FlatList>(std::forward<foundation::FlatListProps>(args));
+  }
+
+  inline std::unique_ptr<foundation::Bar> $Bar(foundation::BarProps&& args) {
+    return std::make_unique<foundation::Bar>(std::forward<foundation::BarProps>(args));
+  }
+
+  inline std::unique_ptr<foundation::Meter> $Meter(foundation::MeterProps&& args) {
+    return std::make_unique<foundation::Meter>(std::forward<foundation::MeterProps>(args));
   }
 
   using Children = std::vector<std::unique_ptr<foundation::VNode>>;

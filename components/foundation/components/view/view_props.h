@@ -32,11 +32,19 @@ namespace foundation
     lv_flex_align_t align_items = LV_FLEX_ALIGN_CENTER;
     lv_flex_align_t track_cross_place = LV_FLEX_ALIGN_START;
     lv_flex_flow_t flex_direction = LV_FLEX_FLOW_COLUMN;
+    bool overflow_visible = false;
+
 
     // --- size ---
     ViewProps&& w(short value)
     {
       width = value;
+      return std::move(*this);
+    }
+
+    ViewProps&& set_overflow(bool value)
+    {
+      overflow_visible = value;
       return std::move(*this);
     }
 

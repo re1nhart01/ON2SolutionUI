@@ -7,9 +7,7 @@ extern "C" {
   #include "core/waveshare_rgb_lcd_port.h"
 }
 
-using namespace foundation;
-
-std::unique_ptr<WaveApplication> application;
+std::unique_ptr<ON2Solutions::WaveApplication> application;
 
 [[foundation::entrypoint]]
 void start() {
@@ -29,7 +27,7 @@ void start() {
         fclose(f);
     }
 
-    application = std::make_unique<WaveApplication>(screen);
+    application = std::make_unique<ON2Solutions::WaveApplication>(screen);
     application->renderApp();
 
     lvgl_port_unlock();

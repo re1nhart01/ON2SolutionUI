@@ -1,53 +1,28 @@
-#include <string>
 
-#include "helpers.cc"
-#include "esp_log.h"
-#include "esp_random.h"
-#include "lg/dataset/types.cc"
+#include "deserializer.hh";
+#include "esp_log.h";
 
-#include "store/dataset.store.h"
+extern "C" {
+  #include "esp_log.h"
+  #include "freertos/FreeRTOS.h"
+  #include "freertos/task.h"
+  #include "driver/gpio.h"
+  #include "sdkconfig.h"
+}
 
-#include <charconv>
+// operative data example -
+// $</CH=2/ST=F/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/HR=123456789:42>
+// settings  data example -
+// #</OS=+2.2;+3.3;-2.2;+3.3/FS=+2.2;+3.3;-2.2;+3.3/CD=3/RU=480/PS=40/WC=94.0/LL=93.8/LT=30/EC=4/TH=60/TL=50/VH=7.0/VL=5.0/PT=A/TO=50/FE=1.0/CV=2>
+// sysinfo   data example -
+// #</GN=ON2SYS_RevB/GV=1.6.2.4/GL=1.9/MN=EPORT-E20/MV=1.40.5/GF=D29FD7E0/EH=192.168.1.128/WF=10.10.10.10/GD=34EAE706A006>
+//`$</CH=2/ST=F/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/HR=123456789:42>`.replaceAll("$",
+//"").replaceAll("<", "").replaceAll("/", " ").replaceAll(">", "")
 
-using namespace on2::parser::helpers;
-using namespace on2::parser;
+namespace ON2Solutions::parser {
+  using namespace ON2Solutions::parser::helpers;
 
-
-// operative data example - $</CH=2/ST=F/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/HR=123456789:42>
-// settings  data example - #</OS=+2.2;+3.3;-2.2;+3.3/FS=+2.2;+3.3;-2.2;+3.3/CD=3/RU=480/PS=40/WC=94.0/LL=93.8/LT=30/EC=4/TH=60/TL=50/VH=7.0/VL=5.0/PT=A/TO=50/FE=1.0/CV=2>
-// sysinfo   data example - #</GN=ON2SYS_RevB/GV=1.6.2.4/GL=1.9/MN=EPORT-E20/MV=1.40.5/GF=D29FD7E0/EH=192.168.1.128/WF=10.10.10.10/GD=34EAE706A006>
-//`$</CH=2/ST=F/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/HR=123456789:42>`.replaceAll("$", "").replaceAll("<", "").replaceAll("/", " ").replaceAll(">", "")
-
-
-
-const char* CH_PACKETS[15] = {
-  "$</CH=1/ST=F/O2=95.1;79.8;20.1;0.0/FL=10.2;9.8;1.1;5.5/TR=12;18/II=F/IO=FF0F/ER=8FF0FF00/PS=50;1/HR=111111111:41>",
-  "$</CH=2/ST=F/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/HR=123456789:42>",
-  "$</CH=3/ST=T/O2=93.8;81.0;19.5;0.2/FL=9.8;10.3;1.4;5.3/TR=9;14/II=T/IO=0FFF/ER=8FFF0000/PS=52;0/HR=223456789:43>",
-  "$</CH=4/ST=F/O2=96.0;78.9;21.0;0.0/FL=10.5;9.7;1.0;5.8/TR=14;20/II=F/IO=F0FF/ER=8F00FF00/PS=49;1/HR=323456789:44>",
-  "$</CH=5/ST=T/O2=95.7;79.2;20.5;0.0/FL=10.1;9.9;1.2;5.6/TR=11;16/II=T/IO=FFAA/ER=8FFAFA00/PS=50;1/HR=423456789:45>",
-  "#</OS=+2.0;+3.1;-2.0;+3.1/FS=+2.0;+3.1;-2.0;+3.1/CD=3/RU=470/PS=39/WC=93.5/LL=93.2/LT=29/EC=4/TH=58/TL=49/VH=6.8/VL=4.9/PT=A/TO=48/FE=1.1/CV=2>",
-  "#</OS=+2.2;+3.3;-2.2;+3.3/FS=+2.2;+3.3;-2.2;+3.3/CD=3/RU=480/PS=40/WC=94.0/LL=93.8/LT=30/EC=4/TH=60/TL=50/VH=7.0/VL=5.0/PT=A/TO=50/FE=1.0/CV=2>",
-  "#</OS=+2.4;+3.5;-2.4;+3.5/FS=+2.4;+3.5;-2.4;+3.5/CD=3/RU=490/PS=41/WC=94.5/LL=94.2/LT=31/EC=5/TH=61/TL=51/VH=7.2/VL=5.1/PT=A/TO=52/FE=0.9/CV=2>",
-  "#</OS=+1.9;+3.0;-1.9;+3.0/FS=+1.9;+3.0;-1.9;+3.0/CD=4/RU=460/PS=38/WC=92.8/LL=92.5/LT=28/EC=3/TH=56/TL=48/VH=6.5/VL=4.7/PT=B/TO=46/FE=1.2/CV=3>",
-  "#</OS=+2.1;+3.2;-2.1;+3.2/FS=+2.1;+3.2;-2.1;+3.2/CD=3/RU=475/PS=39/WC=93.7/LL=93.4/LT=29/EC=4/TH=59/TL=49/VH=6.9/VL=4.8/PT=A/TO=49/FE=1.0/CV=2>",
-  "#</GN=ON2SYS_RevA/GV=1.6.2.3/GL=1.8/MN=EPORT-E19/MV=1.40.4/GF=C29FD7DF/EH=192.168.1.127/WF=10.10.10.9/GD=34EAE706A005>",
-  "#</GN=ON2SYS_RevB/GV=1.6.2.4/GL=1.9/MN=EPORT-E20/MV=1.40.5/GF=D29FD7E0/EH=192.168.1.128/WF=10.10.10.10/GD=34EAE706A006>",
-  "#</GN=ON2SYS_RevC/GV=1.6.3.0/GL=2.0/MN=EPORT-E21/MV=1.41.0/GF=E29FD7E1/EH=192.168.1.129/WF=10.10.10.11/GD=34EAE706A007>",
-  "#</GN=ON2SYS_RevD/GV=1.6.4.0/GL=2.1/MN=EPORT-E22/MV=1.42.0/GF=F29FD7E2/EH=192.168.1.130/WF=10.10.10.12/GD=34EAE706A008>",
-  "#</GN=ON2SYS_RevE/GV=1.6.5.0/GL=2.2/MN=EPORT-E23/MV=1.43.0/GF=029FD7E3/EH=192.168.1.131/WF=10.10.10.13/GD=34EAE706A009>",
-};
-
-namespace on2::parser
-{
-  enum class PacketType : int8_t {
-    UNKNOWN = -1,
-    OPERATIVE = 0,
-    SETTINGS = 1,
-    SYSTEM_INFO = 2
-  };
-
-  PacketType validate_type(const char* packet_string, size_t len)
+  PacketType validate_type(const char* packet_string, const size_t len)
   {
     if (packet_string == nullptr || len < 40) return PacketType::UNKNOWN;
 
@@ -58,201 +33,211 @@ namespace on2::parser
     return PacketType::UNKNOWN;
   }
 
-void parse_selected_value(Dataset* dataset, const char* key, int key_len, const char* val, int val_len, PacketType type)
-{
-    //Operative Data
-  if (type == PacketType::OPERATIVE) {
-    if (key_len == 2 && key[0] == 'C' && key[1] == 'H') {
-      uint8_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->operative_data.channels_count = out;
+  void parse_selected_value(
+      Dataset* dataset, const char* key, int key_len, const char* val, int val_len, PacketType type)
+  {
+    // Operative Data
+    if (type == PacketType::OPERATIVE) {
+      if (key_len == 2 && key[0] == 'C' && key[1] == 'H') {
+        uint8_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->operative_data.channels_count = out;
+        }
+      } else if (key_len == 2 && key[0] == 'S' && key[1] == 'T') {
+        copy_string(&dataset->operative_data.status, sizeof(dataset->operative_data.status), val, val_len);
+      } else if (key_len == 2 && key[0] == 'O' && key[1] == '2') {
+        std::array<float, 4> o2{0, 0, 0, 0};
+        parse_list(val, val_len, o2);
+        dataset->operative_data.oxygen_levels = o2;
+      } else if (key_len == 2 && key[0] == 'F' && key[1] == 'L') {
+        std::array<float, 4> f2{0, 0, 0, 0};
+        parse_list(val, val_len, f2);
+        dataset->operative_data.oxygen_speed = f2;
+      } else if (key_len == 2 && key[0] == 'T' && key[1] == 'R') {
+        std::array<uint8_t, 2> sp{0, 0};
+        parse_list(val, val_len, sp);
+        dataset->operative_data.secondary_tank_pressure = sp;
+      } else if (key_len == 2 && key[0] == 'I' && key[1] == 'I') {
+        uint8_t out;
+        if (parse_hex(val, val_len, out)) {
+          dataset->operative_data.inputs = out;
+        }
+      } else if (key_len == 2 && key[0] == 'I' && key[1] == 'O') {
+        uint16_t out;
+        if (parse_hex(val, val_len, out)) {
+          dataset->operative_data.outputs = out;
+        }
+      } else if (key_len == 2 && key[0] == 'E' && key[1] == 'R') {
+        uint32_t out;
+        if (parse_hex(val, val_len, out)) {
+          dataset->operative_data.errors = out;
+        }
+      } else if (key_len == 2 && key[0] == 'P' && key[1] == 'S') {
+        std::array<uint8_t, 2> pp{0, 0};
+        parse_list(val, val_len, pp);
+        dataset->operative_data.primary_tank_pressure = pp;
+      } else if (key_len == 2 && key[0] == 'H' && key[1] == 'R') {
+        copy_string(
+            &dataset->operative_data.moto_hours,
+            sizeof(dataset->operative_data.moto_hours),
+            val,
+            val_len);
       }
     }
-    else if (key_len == 2 && key[0] == 'S' && key[1] == 'T') {
-      copy_string(&dataset->operative_data.status, sizeof(dataset->operative_data.status), val, val_len);
-    }
-    else if (key_len == 2 && key[0] == 'O' && key[1] == '2') {
-      std::array<float, 4> o2{0,0,0,0};
-      parse_list(val, val_len, o2);
-      dataset->operative_data.oxygen_levels = o2;
-    }
-    else if (key_len == 2 && key[0] == 'F' && key[1] == 'L') {
-      std::array<float, 4> f2{0,0,0,0};
-      parse_list(val, val_len, f2);
-      dataset->operative_data.oxygen_speed = f2;
-    }
-    else if (key_len == 2 && key[0] == 'T' && key[1] == 'R') {
-      std::array<uint8_t, 2> sp{0,0};
-      parse_list(val, val_len, sp);
-      dataset->operative_data.secondary_tank_pressure = sp;
-    }
-    else if (key_len == 2 && key[0] == 'I' && key[1] == 'I') {
-      uint8_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->operative_data.inputs = out;
+
+    // SETTINGS DATA
+
+    if (type == PacketType::SETTINGS) {
+      if (key_len == 2 && key[0] == 'O' && key[1] == 'S') {
+        std::array<float, 4> oso{0, 0, 0, 0};
+        parse_list(val, val_len, oso);
+        dataset->settings.oxygen_sensor_offset = oso;
+      } else if (key_len == 2 && key[0] == 'F' && key[1] == 'S') {
+        std::array<float, 4> fso{0, 0, 0, 0};
+        parse_list(val, val_len, fso);
+        dataset->settings.flow_sensor_offset = fso;
+      } else if (key_len == 2 && key[0] == 'C' && key[1] == 'D') {
+        uint16_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.compressor_delay_sec = out;
+        }
+      } else if (key_len == 2 && key[0] == 'R' && key[1] == 'U') {
+        uint16_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.run_up_delay_sec = out;
+        }
+      } else if (key_len == 2 && key[0] == 'P' && key[1] == 'S') {
+        uint16_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.prestart_time_sec = out;
+        }
+      } else if (key_len == 2 && key[0] == 'W' && key[1] == 'C') {
+        float out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.work_oxygen_concentration = out;
+        }
+      } else if (key_len == 2 && key[0] == 'L' && key[1] == 'L') {
+        float out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.low_limit_oxygen_concentration = out;
+        }
+      } else if (key_len == 2 && key[0] == 'L' && key[1] == 'T') {
+        uint8_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.low_limit_time_to_error_sec = out;
+        }
+      } else if (key_len == 2 && key[0] == 'E' && key[1] == 'C') {
+        uint8_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.error_to_alarm_count = out;
+        }
+      } else if (key_len == 2 && key[0] == 'T' && key[1] == 'H') {
+        uint8_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.tank_high_pressure = out;
+        }
+      } else if (key_len == 2 && key[0] == 'T' && key[1] == 'L') {
+        uint8_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.tank_low_pressure = out;
+        }
+      } else if (key_len == 2 && key[0] == 'V' && key[1] == 'H') {
+        float out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.spv_on_time_sec = out;
+        }
+      } else if (key_len == 2 && key[0] == 'V' && key[1] == 'L') {
+        float out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.spv_off_time_sec = out;
+        }
+      } else if (key_len == 2 && key[0] == 'P' && key[1] == 'T') {
+        copy_string(
+            &dataset->settings.tank_pressure_sensor_type,
+            sizeof(dataset->settings.tank_pressure_sensor_type),
+            val,
+            val_len);
+      } else if (key_len == 2 && key[0] == 'T' && key[1] == 'O') {
+        uint8_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.temperature_overheat_alarm = out;
+        }
+      } else if (key_len == 2 && key[0] == 'F' && key[1] == 'E') {
+        float out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.flow_low_limit_to_error = out;
+        }
+      } else if (key_len == 2 && key[0] == 'C' && key[1] == 'V') {
+        uint8_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->settings.calibrate_valve_1_9_cycle = out;
+        }
       }
     }
-    else if (key_len == 2 && key[0] == 'I' && key[1] == 'O') {
-      uint16_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->operative_data.outputs = out;
+
+    // System Info
+    if (type == PacketType::SYSTEM_INFO) {
+      if (key_len == 2 && key[0] == 'G' && key[1] == 'N') {
+        copy_string(
+            &dataset->system_info.device_name,
+            sizeof(dataset->system_info.device_name),
+            val,
+            val_len);
+      } else if (key_len == 2 && key[0] == 'G' && key[1] == 'V') {
+        copy_string(
+            &dataset->system_info.firmware_version,
+            sizeof(dataset->system_info.firmware_version),
+            val,
+            val_len);
+      } else if (key_len == 2 && key[0] == 'G' && key[1] == 'L') {
+        copy_string(
+            &dataset->system_info.loader_version,
+            sizeof(dataset->system_info.loader_version),
+            val,
+            val_len);
+      } else if (key_len == 2 && key[0] == 'M' && key[1] == 'N') {
+        copy_string(
+            &dataset->system_info.module_name,
+            sizeof(dataset->system_info.module_name),
+            val,
+            val_len);
+      } else if (key_len == 2 && key[0] == 'M' && key[1] == 'V') {
+        copy_string(
+            &dataset->system_info.module_version,
+            sizeof(dataset->system_info.module_version),
+            val,
+            val_len);
+      } else if (key_len == 2 && key[0] == 'G' && key[1] == 'F') {
+        copy_string(
+            &dataset->system_info.firmware_checksum,
+            sizeof(dataset->system_info.firmware_checksum),
+            val,
+            val_len);
+      } else if (key_len == 2 && key[0] == 'E' && key[1] == 'H') {
+        copy_string(
+            &dataset->system_info.lan_ip_address,
+            sizeof(dataset->system_info.lan_ip_address),
+            val,
+            val_len);
+      } else if (key_len == 2 && key[0] == 'W' && key[1] == 'F') {
+        copy_string(
+            &dataset->system_info.wifi_ip_address,
+            sizeof(dataset->system_info.wifi_ip_address),
+            val,
+            val_len);
+      } else if (key_len == 2 && key[0] == 'G' && key[1] == 'D') {
+        copy_string(
+            &dataset->system_info.serial_number,
+            sizeof(dataset->system_info.serial_number),
+            val,
+            val_len);
       }
-    }
-    else if (key_len == 2 && key[0] == 'E' && key[1] == 'R') {
-      uint32_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->operative_data.errors = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'P' && key[1] == 'S') {
-      std::array<uint8_t, 2> pp{0,0};
-      parse_list(val, val_len, pp);
-      dataset->operative_data.primary_tank_pressure = pp;
-    }
-    else if (key_len == 2 && key[0] == 'H' && key[1] == 'R') {
-      copy_string(&dataset->operative_data.moto_hours, sizeof(dataset->operative_data.moto_hours), val, val_len);
     }
   }
 
-  //SETTINGS DATA
-
-  if (type == PacketType::SETTINGS) {
-    if (key_len == 2 && key[0] == 'O' && key[1] == 'S') {
-      std::array<float, 4> oso{0,0,0,0};
-      parse_list(val, val_len, oso);
-      dataset->settings.oxygen_sensor_offset = oso;
-    }
-    else if (key_len == 2 && key[0] == 'F' && key[1] == 'S') {
-      std::array<float, 4> fso{0,0,0,0};
-      parse_list(val, val_len, fso);
-      dataset->settings.flow_sensor_offset = fso;
-    }
-    else if (key_len == 2 && key[0] == 'C' && key[1] == 'D') {
-      uint16_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.compressor_delay_sec = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'R' && key[1] == 'U') {
-      uint16_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.run_up_delay_sec = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'P' && key[1] == 'S') {
-      uint16_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.prestart_time_sec = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'W' && key[1] == 'C') {
-      float out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.work_oxygen_concentration = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'L' && key[1] == 'L') {
-      float out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.low_limit_oxygen_concentration = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'L' && key[1] == 'T') {
-      uint8_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.low_limit_time_to_error_sec = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'E' && key[1] == 'C') {
-      uint8_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.error_to_alarm_count = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'T' && key[1] == 'H') {
-      uint8_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.tank_high_pressure = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'T' && key[1] == 'L') {
-      uint8_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.tank_low_pressure = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'V' && key[1] == 'H') {
-      float out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.spv_on_time_sec = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'V' && key[1] == 'L') {
-      float out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.spv_off_time_sec = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'P' && key[1] == 'T') {
-      copy_string(&dataset->settings.tank_pressure_sensor_type, sizeof(dataset->settings.tank_pressure_sensor_type), val, val_len);
-    }
-    else if (key_len == 2 && key[0] == 'T' && key[1] == 'O') {
-      uint8_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.temperature_overheat_alarm = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'F' && key[1] == 'E') {
-      float out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.flow_low_limit_to_error = out;
-      }
-    }
-    else if (key_len == 2 && key[0] == 'C' && key[1] == 'V') {
-      uint8_t out;
-      if (parse_value(val, val_len, out)) {
-        dataset->settings.calibrate_valve_1_9_cycle = out;
-      }
-    }
-  }
-
-  //System Info
-  if (type == PacketType::SYSTEM_INFO) {
-    if (key_len == 2 && key[0] == 'G' && key[1] == 'N') {
-      copy_string(&dataset->system_info.device_name, sizeof(dataset->system_info.device_name), val, val_len);
-    }
-    else if (key_len == 2 && key[0] == 'G' && key[1] == 'V') {
-      copy_string(&dataset->system_info.firmware_version, sizeof(dataset->system_info.firmware_version), val, val_len);
-    }
-    else if (key_len == 2 && key[0] == 'G' && key[1] == 'L') {
-      copy_string(&dataset->system_info.loader_version, sizeof(dataset->system_info.loader_version), val, val_len);
-    }
-    else if (key_len == 2 && key[0] == 'M' && key[1] == 'N') {
-      copy_string(&dataset->system_info.module_name, sizeof(dataset->system_info.module_name), val, val_len);
-    }
-    else if (key_len == 2 && key[0] == 'M' && key[1] == 'V') {
-      copy_string(&dataset->system_info.module_version, sizeof(dataset->system_info.module_version), val, val_len);
-    }
-    else if (key_len == 2 && key[0] == 'G' && key[1] == 'F') {
-      copy_string(&dataset->system_info.firmware_checksum, sizeof(dataset->system_info.firmware_checksum), val, val_len);
-    }
-    else if (key_len == 2 && key[0] == 'E' && key[1] == 'H') {
-      copy_string(&dataset->system_info.lan_ip_address, sizeof(dataset->system_info.lan_ip_address), val, val_len);
-    }
-    else if (key_len == 2 && key[0] == 'W' && key[1] == 'F') {
-      copy_string(&dataset->system_info.wifi_ip_address, sizeof(dataset->system_info.wifi_ip_address), val, val_len);
-    }
-    else if (key_len == 2 && key[0] == 'G' && key[1] == 'D') {
-      copy_string(&dataset->system_info.serial_number, sizeof(dataset->system_info.serial_number), val, val_len);
-    }
-  }
-
-
-}
-
-//$</CH=2/ST=F/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/HR=123456789:42>
-void parse_data(char packet_start, Dataset* dataset, const char* packet_string, PacketType type)
-{
+  //$</CH=2/ST=F/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/HR=123456789:42>
+  void parse_data(char packet_start, Dataset* dataset, const char* packet_string, PacketType type)
+  {
     const char* ptr = packet_string;
     ptr = strchr(ptr, '<');
     if (!ptr) return;
@@ -263,35 +248,28 @@ void parse_data(char packet_start, Dataset* dataset, const char* packet_string, 
     const char* value_start = nullptr;
     const char* key_end = nullptr;
 
-    while (*ptr)
-    {
+    while (*ptr) {
       if (*ptr == packet_start || *ptr == '<') {
         ptr++;
         continue;
       }
 
-      if (*ptr == '/' && !is_start_value)
-      {
+      if (*ptr == '/' && !is_start_value) {
         is_start_key = true;
         is_start_value = false;
         key_start = ptr + 1;
-      }
-      else if (*ptr == '=' && is_start_key)
-      {
+      } else if (*ptr == '=' && is_start_key) {
         is_start_value = true;
         is_start_key = false;
 
         key_end = ptr;
         value_start = ptr + 1;
-      }
-      else if ((*ptr == '/' || *ptr == '>') && is_start_value)
-      {
+      } else if ((*ptr == '/' || *ptr == '>') && is_start_value) {
         is_start_value = false;
 
-        if (key_end && key_start && value_start)
-        {
-          auto key_len = static_cast<int>(key_end - key_start);
-          auto val_len = static_cast<int>(ptr - value_start);
+        if (key_end && key_start && value_start) {
+          auto key_len = key_end - key_start;
+          auto val_len = ptr - value_start;
 
           parse_selected_value(dataset, key_start, key_len, value_start, val_len, type);
         }
@@ -307,26 +285,25 @@ void parse_data(char packet_start, Dataset* dataset, const char* packet_string, 
       }
       ptr++;
     }
+  }
 
-}
-
-void parse(Dataset* dataset, const char* packet_string, size_t len)
-{
+  void parse(Dataset* dataset, const char* packet_string, size_t len)
+  {
     PacketType type = validate_type(packet_string, len);
 
     switch (type) {
-        case PacketType::OPERATIVE:
-            parse_data('$', dataset, packet_string, type);
-            break;
-        case PacketType::SETTINGS:
-            parse_data('#', dataset, packet_string, type);
-            break;
-        case PacketType::SYSTEM_INFO:
-            parse_data('#', dataset, packet_string, type);
-            break;
-        default:
-            break;
+      case PacketType::OPERATIVE:
+        parse_data('$', dataset, packet_string, type);
+        break;
+      case PacketType::SETTINGS:
+        parse_data('#', dataset, packet_string, type);
+        break;
+      case PacketType::SYSTEM_INFO:
+        parse_data('#', dataset, packet_string, type);
+        break;
+      default:
+        break;
     }
-}
+  }
 
-}
+}  // namespace ON2Solutions::parser

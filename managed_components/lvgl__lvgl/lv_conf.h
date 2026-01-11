@@ -199,7 +199,7 @@
 #define LV_USE_LED        1
 #define LV_USE_LIST       1
 #define LV_USE_MENU       0
-#define LV_USE_METER      0
+#define LV_USE_METER      1
 #define LV_USE_MSGBOX     1
 #define LV_USE_SPAN       1
 #if LV_USE_SPAN

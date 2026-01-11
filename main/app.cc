@@ -1,56 +1,58 @@
 #include "core/navigation/stack_navigator/stack_navigator.h"
-#include "ui/screens/main_screen.cc"
-#include "ui/screens/pincode_screen.cc"
-#include "ui/screens/preloder_screen.cc"
-#include "ui/screens/settings_screen.cc"
+#include "ui/screens/main-screen/main_screen.hh"
+#include "ui/screens/pincode-screen/pincode_screen.hh"
+#include "ui/screens/preloader-screen/preloader_screen.hh"
+#include "ui/screens/settings-screen/settings_screen.hh"
+
+#include <core/application.h>
 
 extern "C" {
-  #include "../components/foundation/internals/lvgl_port.h"
+#include "../components/foundation/internals/lvgl_port.h"
 }
 
-using namespace foundation;
+namespace ON2Solutions {
+  class WaveApplication final : public foundation::Application {
+    std::shared_ptr<foundation::StackNavigator> stack_navigator;
 
-const auto screen = lv_scr_act();
+  public:
+    explicit WaveApplication(lv_obj_t* screen) : Application(screen)
+    {
+      this->stack_navigator = std::make_shared<foundation::StackNavigator>(
+          foundation::StackNavigatorConfig{.initial_route = "/preloader"},
+          screen);
+    }
 
-class WaveApplication final : public Application {
-  std::shared_ptr<StackNavigator> stack_navigator;
+    void on_init() override
+    {
+      auto navigator = this->stack_navigator;
 
-public:
-  explicit WaveApplication(lv_obj_t *screen)
-      : Application(screen)
-  {
-    this->stack_navigator = std::make_shared<StackNavigator>(StackNavigatorConfig{.initial_route = "/preloader"}, screen);
-  }
-
-  void on_init() override
-  {
-    auto navigator = this->stack_navigator;
-
-    navigator->register_screen("/main", [navigator]() {
+      navigator->register_screen("/main", [navigator]() {
         return std::make_unique<MainScreen>(navigator.get(), MainScreenProps{});
-    });
+      });
 
-    navigator->register_screen("/pin_code", [navigator]() {
+      navigator->register_screen("/pin_code", [navigator]() {
         return std::make_unique<PinCodeScreen>(navigator.get(), PinCodeScreenProps{});
-    });
+      });
 
-    navigator->register_screen("/preloader", [navigator]() {
+      navigator->register_screen("/preloader", [navigator]() {
         return std::make_unique<PreloaderScreen>(navigator.get(), PreloaderScreenProps{});
-    });
+      });
 
-    navigator->register_screen("/settings", [navigator]() {
+      navigator->register_screen("/settings", [navigator]() {
         return std::make_unique<SettingsScreen>(navigator.get(), SettingsScreenProps{});
-    });
+      });
 
-    navigator->start();
+      navigator->start();
+    };
+
+    void before_load_application() override
+    {
+      ESP_LOGI("MyApp", "before_load_application called");
+    }
+
+    void after_load_application() override
+    {
+      ESP_LOGI("MyApp", "after_load_application called");
+    }
   };
-
-  void before_load_application() override {
-    ESP_LOGI("MyApp", "before_load_application called");
-
-  }
-
-  void after_load_application() override {
-    ESP_LOGI("MyApp", "after_load_application called");
-  }
-};
+}
