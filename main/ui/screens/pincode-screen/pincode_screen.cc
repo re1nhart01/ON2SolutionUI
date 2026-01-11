@@ -1,4 +1,4 @@
-#include "pincode_screen.hh"
+#include "pincode_screen.h"
 
 using namespace foundation;
 

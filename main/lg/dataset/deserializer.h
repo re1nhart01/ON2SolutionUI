@@ -1,8 +1,8 @@
 #pragma once
 
 #include "esp_log.h"
-#include "lg/dataset/types.hh"
-#include "lg/dataset/helpers.hh"
+#include "lg/dataset/types.h"
+#include "lg/dataset/helpers.h"
 
 namespace ON2Solutions::parser {
 

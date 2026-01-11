@@ -8,7 +8,7 @@
 #include "../../components/foundation/core/shortcuts.h"
 #include "../../components/foundation/core/state/state.h"
 #include "esp_random.h"
-#include "lg/dataset/deserializer.hh"
+#include "lg/dataset/deserializer.h"
 
 namespace ON2Solutions {
   class MainScreen;

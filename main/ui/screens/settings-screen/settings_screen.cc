@@ -1,4 +1,4 @@
-#include "settings_screen.hh";
+#include "settings_screen.h";
 
 namespace ON2Solutions {
   void SettingsScreen::component_did_mount() {

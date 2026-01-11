@@ -1,4 +1,4 @@
-#include "preloader_screen.hh";
+#include "preloader_screen.h";
 
 namespace ON2Solutions {
   void PreloaderScreen::component_did_mount()

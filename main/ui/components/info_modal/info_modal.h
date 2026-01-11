@@ -4,7 +4,7 @@
 #include "core/shortcuts.h"
 #include "core/styling/styling.h"
 #include "ui/components/info_modal/info_modal_props.h"
-#include "ui/localization.hh"
+#include "ui/localization.h"
 
 using namespace foundation;
 namespace ON2Solutions {

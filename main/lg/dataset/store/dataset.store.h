@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/state/thread_reactive.h"
-#include <lg/dataset/types.hh>
+#include <lg/dataset/types.h>
 
 namespace ON2Solutions::parser
 {

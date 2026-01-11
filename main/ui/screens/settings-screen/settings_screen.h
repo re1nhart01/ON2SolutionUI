@@ -4,7 +4,7 @@
 #include "../../components/foundation/core/shortcuts.h"
 
 #include "esp_log.h"
-#include "ui/localization.hh"
+#include "ui/localization.h"
 #include "ui/styles/common_styles.h"
 
 namespace ON2Solutions {

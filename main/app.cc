@@ -1,8 +1,8 @@
 #include "core/navigation/stack_navigator/stack_navigator.h"
-#include "ui/screens/main-screen/main_screen.hh"
-#include "ui/screens/pincode-screen/pincode_screen.hh"
-#include "ui/screens/preloader-screen/preloader_screen.hh"
-#include "ui/screens/settings-screen/settings_screen.hh"
+#include "ui/screens/main-screen/main_screen.h"
+#include "ui/screens/pincode-screen/pincode_screen.h"
+#include "ui/screens/preloader-screen/preloader_screen.h"
+#include "ui/screens/settings-screen/settings_screen.h"
 
 #include <core/application.h>
 

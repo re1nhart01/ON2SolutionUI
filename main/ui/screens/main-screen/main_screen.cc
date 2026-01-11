@@ -1,4 +1,4 @@
-#include "main_screen.hh"
+#include "main_screen.h"
 
 using namespace foundation;
 using namespace ON2Solutions::parser;
