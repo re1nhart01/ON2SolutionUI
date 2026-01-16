@@ -92,8 +92,8 @@ namespace ON2Solutions::parser::helpers {
     int count = 0;
     int start = 0;
 
-    for (int i = 0; i <= len && count < N; i++) {
-      if (i == len || p[i] == ';') {
+    for (int i = 0; i < len && count < N; i++) {
+      if (p[i] == ';') {
         if (!parse_value(p + start, i - start, out[count])) {
           return count;
         }
@@ -101,6 +101,12 @@ namespace ON2Solutions::parser::helpers {
         start = i + 1;
       }
     }
+
+    if (count < N && start < len) {
+      parse_value(p + start, len - start, out[count]);
+      count++;
+    }
+
     return count;
   }
 

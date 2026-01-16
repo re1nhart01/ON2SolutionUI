@@ -113,6 +113,9 @@ namespace foundation
       lv_obj_set_style_bg_opa(arc_reference, LV_OPA_TRANSP, LV_PART_MAIN);
       lv_obj_remove_style(arc_reference, nullptr, LV_PART_KNOB);
 
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(container);
+      }
 
       if (props.style_override) {
           props.style_override(style);
@@ -136,8 +139,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

@@ -12,7 +12,7 @@ namespace ON2Solutions::parser
     void operator=(const DatasetStore &) = delete;
 
   public:
-    DatasetStore() : ThreadReactive<Dataset>() {}
+    DatasetStore() : ThreadReactive<Dataset>(Dataset{}) {}
 
     static DatasetStore* getInstance()
     {

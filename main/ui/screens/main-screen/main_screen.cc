@@ -1,7 +1,11 @@
 #include "main_screen.h"
 
+#include <ui/styles/theme.h>
+
 using namespace foundation;
 using namespace ON2Solutions::parser;
+
+static const char* current_packet = CH_PACKETS[0];
 
 namespace ON2Solutions {
   void MainScreen::on_focus() {
@@ -23,6 +27,10 @@ namespace ON2Solutions {
       xHandle = nullptr;
     }
   };
+  template <typename C>
+  void MainScreen::update_styles(Component<C>* component, const Delegate<void(Styling&)>& style) {
+    component->set_state([style](C& props) { props.set_style(style); });
+  }
 
   void MainScreen::show_info_modal() {
     DatasetSystemInfo system_info =
@@ -48,24 +56,11 @@ namespace ON2Solutions {
   }
 
   void MainScreen::show_errors_modal() {
-    DatasetSystemInfo system_info =
-        DatasetStore::getInstance()->get().system_info;
+    DatasetOperative operative_data =
+        DatasetStore::getInstance()->get().operative_data;
 
-    info_modal = $InfoModal(
-        std::move(InfoModalProps::up()
-                      .set_device(system_info.device_name.data())
-                      .set_loader(system_info.loader_version.data())
-                      .set_fw(system_info.firmware_version.data())
-                      .set_fw_checksum(system_info.firmware_checksum.data())
-                      .set_module_name(system_info.module_name.data())
-                      .set_module_fw(system_info.firmware_version.data())
-                      .set_serial_number(system_info.serial_number.data())
-                      .set_ethernet_ip(system_info.lan_ip_address.data())
-                      .set_wifi_ip(system_info.wifi_ip_address.data())
-                      .set_lcd_fw("x.x.x")
-                      .set_lcd_loader("x.x.x")
-                      .set_lcd_partition("x.x.x")
-                      .set_restart_seconds(99)));
+    error_modal = $ErrorModal(
+        std::move(ErrorModalProps::up().set_error_hex(operative_data.errors)));
 
     info_modal->show();
   }
@@ -73,29 +68,19 @@ namespace ON2Solutions {
   void MainScreen::start_random_updater() {
     xTaskCreate(
         [](void* pvParameters) {
-          auto* self = static_cast<MainScreen*>(pvParameters);
+          auto* const self = static_cast<MainScreen*>(pvParameters);
 
           while (true) {
             if (self) {
-              auto* packet_str = new std::string(CH_PACKETS[esp_random() % 15]);
+              current_packet = CH_PACKETS[esp_random() % 15];
 
-              ESP_LOGI("main_screen", packet_str->c_str());
+              const char* p = current_packet;
 
-              lv_async_call(
-                  [](void* arg) {
-                    auto* p = static_cast<std::string*>(arg);
-                    Dataset dataset = DatasetStore::getInstance()->get();
-                    parse(&dataset, p->c_str(), p->length());
-                    DatasetStore::getInstance()->set(dataset);
-
-                    delete p;
-                  },
-                  packet_str);
+              Dataset dataset = DatasetStore::getInstance()->get();
+              parse(&dataset, p, strlen(p));
+              DatasetStore::getInstance()->set(dataset);
             }
-
-            ESP_LOGI("main_screen", "start_random_updater, 2");
-
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            vTaskDelay(pdMS_TO_TICKS(1500));
           }
         },
         "rand_task", 16384, this, 5, &xHandle);
@@ -174,20 +159,21 @@ namespace ON2Solutions {
                                                 });
                                           })
                                       .value("Inputs: 0")),
-                            $Text(TextProps::up()
-                                      .watch<Dataset>(
-                                          DatasetStore::getInstance(),
-                                          "outputs",
-                                          [](Text* self, const Dataset& value) {
-                                            int outputs =
-                                                value.operative_data.outputs;
-                                            self->set_state(
-                                                [outputs](TextProps& props) {
-                                                  props.value(std::format(
-                                                      "Outputs: {}", outputs));
-                                                });
-                                          })
-                                      .value("Outputs: 0"))))
+                            $Text(
+                                TextProps::up()
+                                    .watch<Dataset>(
+                                        DatasetStore::getInstance(), "outputs",
+                                        [](Text* self, const Dataset& value) {
+                                          int outputs =
+                                              value.operative_data.outputs;
+                                          self->set_state(
+                                              [outputs](TextProps& props) {
+                                                const auto output = std::format(
+                                                    "Outputs: {}", outputs);
+                                                props.value(output);
+                                              });
+                                        })
+                                    .value("Outputs: 0"))))
                         .merge(header_labels_container_props)),
                 $View(
                     ViewProps::up()
@@ -196,6 +182,20 @@ namespace ON2Solutions {
                             $Button(
                                 ButtonProps::up()
                                     .set_style($s("header.button"))
+                                    .watch<Dataset>(
+                                        DatasetStore::getInstance(), "errors",
+                                        [this](Button* self,
+                                               const Dataset& value) {
+                                          const bool hasError =
+                                              value.operative_data.errors != 0;
+
+                                          update_styles<ButtonProps>(
+                                              self, [hasError](Styling& style) {
+                                                style.setBackgroundColor(
+                                                    hasError ? ERROR_COLOR
+                                                             : NO_ERROR_COLOR);
+                                              });
+                                        })
                                     .set_child($Text(
                                         TextProps::up()
                                             .set_style($s("header.label"))

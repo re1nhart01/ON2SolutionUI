@@ -65,18 +65,24 @@ namespace foundation
 
       lv_meter_set_indicator_value(obj, indic, static_cast<int>(props.current_v));
 
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(obj);
+      }
+
       if (label_obj) {
         update_label_text();
       }
     };
 
-    void update_label_text() {
+    void update_label_text() const {
       if (!label_obj) return;
-      lv_label_set_text(label_obj, std::format("{}{}", props.current_v, props.label_symbol.c_str()).c_str());
+      char buf[32];
+
+      snprintf(buf, sizeof(buf), "%.1f%s", props.current_v, props.label_symbol.c_str());
+      lv_label_set_text(label_obj, buf);
     }
 
     const Styling* styling() const override {
-      style.reset();
       apply_base_style(style);
       if (props.style_override) props.style_override(style);
       return &style;

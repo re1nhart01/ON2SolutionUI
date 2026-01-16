@@ -25,11 +25,9 @@ namespace foundation
     template<typename TVal>
     Derived&& watch(Reactive<TVal>* reactive, std::string key, Delegate<void(RefT*, const TVal&)> updater)
     {
-      ESP_LOGI("Watch", "Registering watcher for key: %s", key.c_str());
       if (!reactive) return std::move(static_cast<Derived&>(*this));
 
       this->reactive_delegates.push_back([reactive, updater, key](void* internal_component) {
-        ESP_LOGI("Watch", "EXECUTION: Calling attach for key: %s", key.c_str());
         reactive->attach(key, static_cast<RefT*>(internal_component), updater);
       });
 
@@ -41,11 +39,9 @@ namespace foundation
     template<typename TVal>
     Derived&& watch(ThreadReactive<TVal> * reactive, std::string key, Delegate<void(RefT*, const TVal&)> updater)
     {
-      ESP_LOGI("Watch", "Registering watcher for key: %s", key.c_str());
       if (!reactive) return std::move(static_cast<Derived&>(*this));
 
       this->reactive_delegates.push_back([reactive, updater, key](void* internal_component) {
-        ESP_LOGI("Watch", "EXECUTION: Calling attach for key: %s", key.c_str());
         reactive->attach(key, static_cast<RefT*>(internal_component), updater);
       });
 

@@ -15,7 +15,7 @@ namespace foundation {
 
     template<typename Fn>
     void set_state(Fn&& fn) {
-      if (!this->component) return;
+        if (!this->component || !lv_obj_is_valid(this->component)) return;
 
       auto* ctx = new Delegate<void()>(
           [this, fn = std::forward<Fn>(fn)]() mutable {

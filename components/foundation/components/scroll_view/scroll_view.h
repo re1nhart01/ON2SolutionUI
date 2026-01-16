@@ -111,8 +111,8 @@ namespace foundation
           lv_obj_set_scrollbar_mode(comp,  props.scrollbar_mode);
         }
 
-        if (auto style = styling()) {
-            style->applyTo(comp);
+        if (auto style = styling(); style->get_is_dirty()) {
+            lv_obj_invalidate(comp);
         }
 
         for (const auto& child : props.children) {
@@ -141,8 +141,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

@@ -62,12 +62,12 @@ void waveshare_esp32_s3_touch_reset()
     i2c_master_write_to_device(I2C_MASTER_NUM, 0x24, &write_buf, 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
 
     // Reset the touch screen. It is recommended to reset the touch screen before using it.
-    write_buf = 0x2C;
+    write_buf = 0x0C;
     i2c_master_write_to_device(I2C_MASTER_NUM, 0x38, &write_buf, 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
     esp_rom_delay_us(100 * 1000);
     gpio_set_level(GPIO_INPUT_IO_4, 0);
     esp_rom_delay_us(100 * 1000);
-    write_buf = 0x2E;
+    write_buf = 0x0E;
     i2c_master_write_to_device(I2C_MASTER_NUM, 0x38, &write_buf, 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
     esp_rom_delay_us(200 * 1000);
 }
@@ -165,11 +165,8 @@ esp_err_t waveshare_esp32_s3_rgb_lcd_init()
 
     // Register callbacks for RGB panel events
     esp_lcd_rgb_panel_event_callbacks_t cbs = {
-#if EXAMPLE_RGB_BOUNCE_BUFFER_SIZE > 0
-        .on_bounce_frame_finish = rgb_lcd_on_vsync_event, // Callback for bounce frame finish
-#else
-        .on_vsync = rgb_lcd_on_vsync_event, // Callback for vertical sync
-#endif
+      .on_vsync = rgb_lcd_on_vsync_event,
+      .on_bounce_frame_finish = rgb_lcd_on_vsync_event, // Для надежности при Bounce Buffer
     };
     ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(panel_handle, &cbs, NULL)); // Register event callbacks
 

@@ -3,11 +3,11 @@
 #include "esp_log.h";
 
 extern "C" {
-  #include "esp_log.h"
-  #include "freertos/FreeRTOS.h"
-  #include "freertos/task.h"
-  #include "driver/gpio.h"
-  #include "sdkconfig.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "sdkconfig.h"
 }
 
 // operative data example -
@@ -22,20 +22,22 @@ extern "C" {
 namespace ON2Solutions::parser {
   using namespace ON2Solutions::parser::helpers;
 
-  PacketType validate_type(const char* packet_string, const size_t len)
-  {
-    if (packet_string == nullptr || len < 40) return PacketType::UNKNOWN;
+  PacketType validate_type(const char* packet_string, const size_t len) {
+    if (packet_string == nullptr || len < 40)
+      return PacketType::UNKNOWN;
 
-    if (packet_string[0] == '$') return PacketType::OPERATIVE;
-    if (packet_string[0] == '#' && packet_string[3] == 'O') return PacketType::SETTINGS;
-    if (packet_string[0] == '#' && packet_string[3] == 'G') return PacketType::SYSTEM_INFO;
+    if (packet_string[0] == '$')
+      return PacketType::OPERATIVE;
+    if (packet_string[0] == '#' && packet_string[3] == 'O')
+      return PacketType::SETTINGS;
+    if (packet_string[0] == '#' && packet_string[3] == 'G')
+      return PacketType::SYSTEM_INFO;
 
     return PacketType::UNKNOWN;
   }
 
-  void parse_selected_value(
-      Dataset* dataset, const char* key, int key_len, const char* val, int val_len, PacketType type)
-  {
+  void parse_selected_value(Dataset* dataset, const char* key, int key_len,
+                            const char* val, int val_len, PacketType type) {
     // Operative Data
     if (type == PacketType::OPERATIVE) {
       if (key_len == 2 && key[0] == 'C' && key[1] == 'H') {
@@ -44,7 +46,8 @@ namespace ON2Solutions::parser {
           dataset->operative_data.channels_count = out;
         }
       } else if (key_len == 2 && key[0] == 'S' && key[1] == 'T') {
-        copy_string(&dataset->operative_data.status, sizeof(dataset->operative_data.status), val, val_len);
+        copy_string(&dataset->operative_data.status,
+                    sizeof(dataset->operative_data.status), val, val_len);
       } else if (key_len == 2 && key[0] == 'O' && key[1] == '2') {
         std::array<float, 4> o2{0, 0, 0, 0};
         parse_list(val, val_len, o2);
@@ -77,11 +80,8 @@ namespace ON2Solutions::parser {
         parse_list(val, val_len, pp);
         dataset->operative_data.primary_tank_pressure = pp;
       } else if (key_len == 2 && key[0] == 'H' && key[1] == 'R') {
-        copy_string(
-            &dataset->operative_data.moto_hours,
-            sizeof(dataset->operative_data.moto_hours),
-            val,
-            val_len);
+        copy_string(&dataset->operative_data.moto_hours,
+                    sizeof(dataset->operative_data.moto_hours), val, val_len);
       }
     }
 
@@ -152,11 +152,9 @@ namespace ON2Solutions::parser {
           dataset->settings.spv_off_time_sec = out;
         }
       } else if (key_len == 2 && key[0] == 'P' && key[1] == 'T') {
-        copy_string(
-            &dataset->settings.tank_pressure_sensor_type,
-            sizeof(dataset->settings.tank_pressure_sensor_type),
-            val,
-            val_len);
+        copy_string(&dataset->settings.tank_pressure_sensor_type,
+                    sizeof(dataset->settings.tank_pressure_sensor_type), val,
+                    val_len);
       } else if (key_len == 2 && key[0] == 'T' && key[1] == 'O') {
         uint8_t out;
         if (parse_value(val, val_len, out)) {
@@ -178,69 +176,45 @@ namespace ON2Solutions::parser {
     // System Info
     if (type == PacketType::SYSTEM_INFO) {
       if (key_len == 2 && key[0] == 'G' && key[1] == 'N') {
-        copy_string(
-            &dataset->system_info.device_name,
-            sizeof(dataset->system_info.device_name),
-            val,
-            val_len);
+        copy_string(&dataset->system_info.device_name,
+                    sizeof(dataset->system_info.device_name), val, val_len);
       } else if (key_len == 2 && key[0] == 'G' && key[1] == 'V') {
-        copy_string(
-            &dataset->system_info.firmware_version,
-            sizeof(dataset->system_info.firmware_version),
-            val,
-            val_len);
+        copy_string(&dataset->system_info.firmware_version,
+                    sizeof(dataset->system_info.firmware_version), val,
+                    val_len);
       } else if (key_len == 2 && key[0] == 'G' && key[1] == 'L') {
-        copy_string(
-            &dataset->system_info.loader_version,
-            sizeof(dataset->system_info.loader_version),
-            val,
-            val_len);
+        copy_string(&dataset->system_info.loader_version,
+                    sizeof(dataset->system_info.loader_version), val, val_len);
       } else if (key_len == 2 && key[0] == 'M' && key[1] == 'N') {
-        copy_string(
-            &dataset->system_info.module_name,
-            sizeof(dataset->system_info.module_name),
-            val,
-            val_len);
+        copy_string(&dataset->system_info.module_name,
+                    sizeof(dataset->system_info.module_name), val, val_len);
       } else if (key_len == 2 && key[0] == 'M' && key[1] == 'V') {
-        copy_string(
-            &dataset->system_info.module_version,
-            sizeof(dataset->system_info.module_version),
-            val,
-            val_len);
+        copy_string(&dataset->system_info.module_version,
+                    sizeof(dataset->system_info.module_version), val, val_len);
       } else if (key_len == 2 && key[0] == 'G' && key[1] == 'F') {
-        copy_string(
-            &dataset->system_info.firmware_checksum,
-            sizeof(dataset->system_info.firmware_checksum),
-            val,
-            val_len);
+        copy_string(&dataset->system_info.firmware_checksum,
+                    sizeof(dataset->system_info.firmware_checksum), val,
+                    val_len);
       } else if (key_len == 2 && key[0] == 'E' && key[1] == 'H') {
-        copy_string(
-            &dataset->system_info.lan_ip_address,
-            sizeof(dataset->system_info.lan_ip_address),
-            val,
-            val_len);
+        copy_string(&dataset->system_info.lan_ip_address,
+                    sizeof(dataset->system_info.lan_ip_address), val, val_len);
       } else if (key_len == 2 && key[0] == 'W' && key[1] == 'F') {
-        copy_string(
-            &dataset->system_info.wifi_ip_address,
-            sizeof(dataset->system_info.wifi_ip_address),
-            val,
-            val_len);
+        copy_string(&dataset->system_info.wifi_ip_address,
+                    sizeof(dataset->system_info.wifi_ip_address), val, val_len);
       } else if (key_len == 2 && key[0] == 'G' && key[1] == 'D') {
-        copy_string(
-            &dataset->system_info.serial_number,
-            sizeof(dataset->system_info.serial_number),
-            val,
-            val_len);
+        copy_string(&dataset->system_info.serial_number,
+                    sizeof(dataset->system_info.serial_number), val, val_len);
       }
     }
   }
 
   //$</CH=2/ST=F/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/HR=123456789:42>
-  void parse_data(char packet_start, Dataset* dataset, const char* packet_string, PacketType type)
-  {
+  void parse_data(char packet_start, Dataset* dataset,
+                  const char* packet_string, PacketType type) {
     const char* ptr = packet_string;
     ptr = strchr(ptr, '<');
-    if (!ptr) return;
+    if (!ptr)
+      return;
 
     bool is_start_key = false;
     bool is_start_value = false;
@@ -271,7 +245,8 @@ namespace ON2Solutions::parser {
           auto key_len = key_end - key_start;
           auto val_len = ptr - value_start;
 
-          parse_selected_value(dataset, key_start, key_len, value_start, val_len, type);
+          parse_selected_value(dataset, key_start, key_len, value_start,
+                               val_len, type);
         }
 
         if (*ptr == '/') {
@@ -287,9 +262,10 @@ namespace ON2Solutions::parser {
     }
   }
 
-  void parse(Dataset* dataset, const char* packet_string, size_t len)
-  {
+  void parse(Dataset* dataset, const char* packet_string, size_t len) {
     PacketType type = validate_type(packet_string, len);
+
+    if (!packet_string || len == 0) return;
 
     switch (type) {
       case PacketType::OPERATIVE:

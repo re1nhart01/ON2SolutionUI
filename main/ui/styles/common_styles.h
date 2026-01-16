@@ -2,12 +2,18 @@
 
 #pragma once
 
-#include "core/style_store/style_store.h"
 #include "components/view/view_props.h"
+#include "core/style_store/style_store.h"
+#include "theme.h"
 
 //----------------------------------- Shorthands
 //------------------------------------------------
+
+
 namespace ON2Solutions {
+  static Styling okStyle = []{ Styling s; s.setBackgroundColor(NO_ERROR_COLOR); return s; }();
+  static Styling errStyle = []{ Styling s; s.setBackgroundColor(ERROR_COLOR); return s; }();
+
   inline foundation::ViewProps& screen_container_props(foundation::ViewProps & p) {
     p.w(LV_PCT(100));
     p.h(LV_PCT(100));

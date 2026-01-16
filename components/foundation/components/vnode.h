@@ -75,6 +75,7 @@ namespace foundation {
       fn(style);
       if (component)
       {
+        lv_obj_remove_style(component, style.getStyle(), LV_PART_MAIN);
         lv_obj_add_style(component, style.getStyle(), 0);
       }
     }

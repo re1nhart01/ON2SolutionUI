@@ -1,12 +1,6 @@
-//
-// Created by evgeniy on 12/8/25.
-//
+#pragma once
 
-#ifndef GLOBAL_STORE_H
-#define GLOBAL_STORE_H
-
-#endif //GLOBAL_STORE_H
-
+#include <core/state/state.h>
 
 class GlobalStore
 {

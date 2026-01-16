@@ -8,4 +8,6 @@
 namespace ON2Solutions {
   const lv_color_t PRIMARY_COLOR = lv_color_hex(0x8BC53D);
   const lv_color_t PRIMARY_COLOR_2 = lv_color_hex(0x0D928D);
+  const lv_color_t ERROR_COLOR = lv_color_hex(0xE53935);
+  const lv_color_t NO_ERROR_COLOR = lv_color_hex(0x388E3C);
 }

@@ -6,94 +6,79 @@ namespace ON2Solutions {
 
   struct InfoModalProps final
       : foundation::BaseProps<InfoModalProps, InfoModal> {
-    const char* device = nullptr;
-
-    const char* loader = nullptr;
-    const char* fw = nullptr;
-    const char* fw_checksum = nullptr;
-    const char* module_name = nullptr;
-    const char* module_fw = nullptr;
-    const char* serial_number = nullptr;
-    const char* ethernet_ip = nullptr;
-    const char* wifi_ip = nullptr;
-    const char* lcd_fw = nullptr;
-    const char* lcd_loader = nullptr;
-    const char* lcd_partition = nullptr;
-    const char* hour_run = nullptr;
+    std::string_view device{};
+    std::string_view loader{};
+    std::string_view fw{};
+    std::string_view fw_checksum{};
+    std::string_view module_name{};
+    std::string_view module_fw{};
+    std::string_view serial_number{};
+    std::string_view ethernet_ip{};
+    std::string_view wifi_ip{};
+    std::string_view lcd_fw{};
+    std::string_view lcd_loader{};
+    std::string_view lcd_partition{};
+    std::string_view hour_run{};
     uint32_t restart_seconds = 0;
-    const char* action_label = nullptr;
+    std::string_view action_label{};
 
-    InfoModalProps& set_device(const char* v) {
+    InfoModalProps& set_device(std::string_view v) {
       device = v;
       return *this;
     }
-
-    InfoModalProps& set_loader(const char* v) {
+    InfoModalProps& set_loader(std::string_view v) {
       loader = v;
       return *this;
     }
-
-    InfoModalProps& set_fw(const char* v) {
+    InfoModalProps& set_fw(std::string_view v) {
       fw = v;
       return *this;
     }
-
-    InfoModalProps& set_fw_checksum(const char* v) {
+    InfoModalProps& set_fw_checksum(std::string_view v) {
       fw_checksum = v;
       return *this;
     }
-
-    InfoModalProps& set_module_name(const char* v) {
+    InfoModalProps& set_module_name(std::string_view v) {
       module_name = v;
       return *this;
     }
-
-    InfoModalProps& set_module_fw(const char* v) {
+    InfoModalProps& set_module_fw(std::string_view v) {
       module_fw = v;
       return *this;
     }
-
-    InfoModalProps& set_serial_number(const char* v) {
+    InfoModalProps& set_serial_number(std::string_view v) {
       serial_number = v;
       return *this;
     }
-
-    InfoModalProps& set_ethernet_ip(const char* v) {
+    InfoModalProps& set_ethernet_ip(std::string_view v) {
       ethernet_ip = v;
       return *this;
     }
-
-    InfoModalProps& set_wifi_ip(const char* v) {
+    InfoModalProps& set_wifi_ip(std::string_view v) {
       wifi_ip = v;
       return *this;
     }
-
-    InfoModalProps& set_lcd_fw(const char* v) {
+    InfoModalProps& set_lcd_fw(std::string_view v) {
       lcd_fw = v;
       return *this;
     }
-
-    InfoModalProps& set_lcd_loader(const char* v) {
+    InfoModalProps& set_lcd_loader(std::string_view v) {
       lcd_loader = v;
       return *this;
     }
-
-    InfoModalProps& set_lcd_partition(const char* v) {
+    InfoModalProps& set_lcd_partition(std::string_view v) {
       lcd_partition = v;
       return *this;
     }
-
-    InfoModalProps& set_hour_run(const char* v) {
+    InfoModalProps& set_hour_run(std::string_view v) {
       hour_run = v;
       return *this;
     }
-
     InfoModalProps& set_restart_seconds(uint32_t v) {
       restart_seconds = v;
       return *this;
     }
-
-    InfoModalProps& set_action_label(const char* v) {
+    InfoModalProps& set_action_label(std::string_view v) {
       action_label = v;
       return *this;
     }

@@ -36,6 +36,13 @@ namespace foundation {
         Delegate(Callable c) {
             using T = std::decay_t<Callable>;
 
+
+            if constexpr (requires(Callable cb) { (bool)cb; }) {
+                if (!c) {
+                    return;
+                }
+            }
+
             if constexpr (sizeof(T) <= Capacity && std::is_nothrow_move_constructible_v<T>) {
                 new (storage) T(std::move(c));
                 is_dynamic = false;
@@ -108,6 +115,10 @@ namespace foundation {
         }
 
         R operator()(Args... args) const {
+            if (!invoke_ptr) {
+                if constexpr (!std::is_void_v<R>) return R{};
+                else return;
+            }
             return invoke_ptr((void*)storage, std::forward<Args>(args)...);
         }
 

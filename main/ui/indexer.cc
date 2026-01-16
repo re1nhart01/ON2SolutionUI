@@ -8,3 +8,4 @@
 
 #include "lg/dataset/helpers.h"
 #include "lg/helpers/utils.h"
+#include "lg/store/global_store.h"

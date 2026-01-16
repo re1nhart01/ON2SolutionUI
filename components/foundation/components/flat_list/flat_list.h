@@ -68,8 +68,8 @@ namespace foundation
 
         lv_obj_set_size(list, props.width, props.height);
 
-        if (auto style = styling()) {
-            style->applyTo(list);
+        if (auto style = styling(); style->get_is_dirty()) {
+            lv_obj_invalidate(list);
         }
 
         for (const auto& child : props.children) {
@@ -79,10 +79,8 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
       apply_base_style(style);
 
-      // Оптимізація: вимикаємо всі прозорості для списку
       style.setBackgroundOpa(LV_OPA_COVER);
 
       if (props.style_override) {
@@ -93,7 +91,6 @@ namespace foundation
 
     FlatList* append(lv_obj_t* obj) override
     {
-        // lv_list автоматично обробляє додані об'єкти як елементи списку
         lv_obj_set_parent(obj, get_component());
         return this;
     }

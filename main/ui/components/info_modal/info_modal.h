@@ -12,8 +12,8 @@ namespace ON2Solutions {
 
   using $$InfoModal = std::unique_ptr<InfoModal>;
 
-  inline $$InfoModal $InfoModal(InfoModalProps args) {
-    return std::make_unique<InfoModal>(std::move(args));
+  inline $$InfoModal $InfoModal(InfoModalProps&& args) {
+    return std::make_unique<InfoModal>(std::forward<InfoModalProps>(args));
   }
 
   class InfoModal final : public Component<InfoModalProps> {
@@ -53,7 +53,6 @@ namespace ON2Solutions {
               .track_cross(LV_FLEX_ALIGN_CENTER)
               .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
               .set_children(children($Text(TextProps::up().value(key)),
-
                                      $Text(TextProps::up().value(value)))));
     }
 

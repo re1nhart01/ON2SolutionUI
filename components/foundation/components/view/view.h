@@ -78,8 +78,8 @@ namespace foundation
       lv_obj_set_scroll_dir(obj, LV_DIR_NONE);
       lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_OFF);
 
-      if (const Styling* style = this->styling(); style != nullptr) {
-          style->applyTo(this->get_component());
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(obj);
       }
 
       for (const auto &child : this->props.children) {
@@ -108,8 +108,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

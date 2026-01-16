@@ -58,6 +58,10 @@ namespace foundation
           lv_textarea_set_text(obj, props.text);
       }
 
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(obj);
+      }
+
       lv_obj_remove_event_cb(obj, nullptr);
 
       if (this->props.kbManager != nullptr)
@@ -93,8 +97,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

@@ -47,9 +47,8 @@ namespace foundation
       lv_obj_set_height(comp, this->props.real_height);
       lv_obj_align(comp, LV_ALIGN_CENTER, 0, 0);
 
-      auto style = this->styling();
-      if (style != nullptr) {
-          lv_obj_add_style(comp, style->getStyle(), LV_PART_MAIN);
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(comp);
       }
 
       return comp;
@@ -57,8 +56,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

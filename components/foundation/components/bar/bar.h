@@ -1,6 +1,3 @@
-//
-// Created by evgeniy on 11/13/25.
-//
 #pragma once
 
 #include "core/styling/styling.h"
@@ -61,6 +58,10 @@ namespace foundation
       lv_obj_set_size(obj, this->props.width, this->props.height);
       lv_bar_set_value(obj, this->props.value, LV_ANIM_ON);
 
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(obj);
+      }
+
       if (this->props.reversed) {
         lv_obj_set_style_base_dir(obj, LV_BASE_DIR_RTL, 0);
       } else {
@@ -71,8 +72,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {
