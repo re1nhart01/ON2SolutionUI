@@ -19,14 +19,6 @@ void start() {
     lv_obj_t *screen = lv_scr_act();
     lvgl_littlefs_driver_init();
 
-    FILE *f = fopen("/littlefs/logo.bin", "rb");
-    if (f == NULL) {
-        ESP_LOGE("LFS_TEST", "Failed to open file /littlefs/logo.bin!");
-    } else {
-        ESP_LOGI("LFS_TEST", "Successfully opened /littlefs/logo.bin.");
-        fclose(f);
-    }
-
     application = std::make_unique<ON2Solutions::WaveApplication>(screen);
     application->renderApp();
 

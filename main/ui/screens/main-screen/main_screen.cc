@@ -327,6 +327,7 @@ namespace ON2Solutions {
   }
 
   lv_obj_t* MainScreen::render() {
+    VNode::render();
     ESP_LOGI("main screen", "render");
 
     return this->delegate($View(

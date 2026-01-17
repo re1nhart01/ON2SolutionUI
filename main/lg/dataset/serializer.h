@@ -3,3 +3,7 @@
 //
 
 #pragma once
+
+namespace ON2Solutions::parser {
+
+}
