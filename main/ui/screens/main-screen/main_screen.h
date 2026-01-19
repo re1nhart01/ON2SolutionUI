@@ -17,7 +17,6 @@ namespace ON2Solutions {
   struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen> {};
 
   class MainScreen final : public NavigationScreen<MainScreenProps> {
-    std::unique_ptr<foundation::StyleStorage> styles;
     std::unique_ptr<UartHandler> uart_handler = nullptr;
     $$InfoModal info_modal = nullptr;
     $$ErrorModal error_modal = nullptr;
@@ -27,9 +26,7 @@ namespace ON2Solutions {
    public:
     explicit MainScreen(StackNavigator* stack, MainScreenProps props)
         : NavigationScreen(stack, std::move(props)),
-          styles(std::make_unique<StyleStorage>()),
           reactive_moto_lvgl(0) {
-      style_screen_register(*this->styles);
     }
 
     ~MainScreen() override {

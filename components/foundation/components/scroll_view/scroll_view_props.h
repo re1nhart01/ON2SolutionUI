@@ -17,6 +17,19 @@ namespace foundation
     lv_scrollbar_mode_t scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
     bool disabled = false;
 
+    lv_scroll_snap_t snap_x = LV_SCROLL_SNAP_NONE;
+    lv_scroll_snap_t snap_y = LV_SCROLL_SNAP_NONE;
+
+    // physics
+    bool momentum = true;     // LV_OBJ_FLAG_SCROLL_MOMENTUM
+    bool elastic = true;      // LV_OBJ_FLAG_SCROLL_ELASTIC
+
+    // optional: scroll chaining behavior
+    bool gesture_bubble = false; // LV_OBJ_FLAG_GESTURE_BUBBLE
+
+    // optional: keep scroll position on rebuild
+    bool keep_scroll_pos = true;
+
     ScrollViewProps&& add_child(std::unique_ptr<VNode> c) {
       children.push_back(std::move(c));
       return std::move(*this);
@@ -69,6 +82,33 @@ namespace foundation
 
     ScrollViewProps&& disable(bool v = false) {
       disabled = v;
+      return std::move(*this);
+    }
+
+    // --- paging helpers ---
+    ScrollViewProps&& snap(lv_scroll_snap_t x, lv_scroll_snap_t y = LV_SCROLL_SNAP_NONE) {
+      snap_x = x;
+      snap_y = y;
+      return std::move(*this);
+    }
+
+    ScrollViewProps&& set_momentum(bool v) {
+      momentum = v;
+      return std::move(*this);
+    }
+
+    ScrollViewProps&& set_elastic(bool v) {
+      elastic = v;
+      return std::move(*this);
+    }
+
+    ScrollViewProps&& bubble(bool v = true) {
+      gesture_bubble = v;
+      return std::move(*this);
+    }
+
+    ScrollViewProps&& preserve_scroll(bool v = true) {
+      keep_scroll_pos = v;
       return std::move(*this);
     }
 

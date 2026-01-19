@@ -3,6 +3,8 @@
 #include "esp_log.h"
 #include "lg/dataset/types.h"
 #include "lg/dataset/helpers.h"
+#include "lg/dataset/serializer.h"
+#include "lg/dataset/paramspec.h"
 
 namespace ON2Solutions::parser {
 

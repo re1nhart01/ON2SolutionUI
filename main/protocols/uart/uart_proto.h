@@ -79,6 +79,7 @@ class UartHandler {
   TaskHandle_t task_handle = nullptr;
   std::string rx_buffer;
   bool is_recording = false;
+  bool is_on = false;
 
   bool push_array(const UartTypes::UartHandlerEvent& value) {
     if (size < list.size()) {
@@ -109,6 +110,7 @@ class UartHandler {
     uart_enable_rx_intr(current_uart_num);
     xTaskCreate(uart_interrupt_handler_trampoline, "uart_event_task",
                 stack_dept, this, 12, &this->task_handle);
+    is_on = true;
     return true;
   }
 
@@ -126,6 +128,7 @@ class UartHandler {
   }
 
   int send(const char* text) const {
+    if (!is_on) return 0;
     xSemaphoreTake(uart_mutex, portMAX_DELAY);
 
     const uint8_t length = strlen(text);
@@ -136,6 +139,7 @@ class UartHandler {
   };
 
   int send(const std::string& text) const {
+    if (!is_on) return 0;
     xSemaphoreTake(uart_mutex, portMAX_DELAY);
 
     const uint8_t length = strlen(text.c_str());
@@ -194,20 +198,23 @@ class UartHandler {
     xSemaphoreGive(uart_mutex);
   }
 
-  void enable_rx(const bool value) const {
+  void enable_rx(const bool value) {
     xSemaphoreTake(uart_mutex, portMAX_DELAY);
     if (value) {
       uart_enable_rx_intr(this->current_uart_num);
       uart_enable_tx_intr(this->current_uart_num, 1, UART_EMPTY_THRESH_DEFAULT);
+      is_on = true;
     } else {
       uart_disable_rx_intr(this->current_uart_num);
       uart_disable_tx_intr(this->current_uart_num);
+      is_on = false;
     }
     xSemaphoreGive(uart_mutex);
   }
 
   void execute_callback_event(const uart_event_type_t event,
-                              const UartTypes::UartCallbackResponse& data) {
+                              const UartTypes::UartCallbackResponse& data) const {
+    if (!is_on) return;
     for (size_t i = 0; i < size; i++) {
       if (list[i].event == event) {
         list[i].delegate(data);

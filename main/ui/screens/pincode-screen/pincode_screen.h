@@ -17,16 +17,12 @@ namespace ON2Solutions {
     std::shared_ptr<KeyboardManager> keyboard;
     State<std::string> password_state = State<std::string>("");
     State<std::string> login_state = State<std::string>("");
-    std::unique_ptr<StyleStorage> styles;
     std::unique_ptr<Modal> info_modal = nullptr;
 
    public:
     explicit PinCodeScreen(StackNavigator* stack, PinCodeScreenProps props)
         : NavigationScreen(stack, std::move(props)),
-          keyboard(std::make_shared<KeyboardManager>()),
-          styles(std::make_unique<StyleStorage>()) {
-      style_screen_register(*this->styles);
-    }
+          keyboard(std::make_shared<KeyboardManager>()) {}
 
     ~PinCodeScreen() override = default;
 

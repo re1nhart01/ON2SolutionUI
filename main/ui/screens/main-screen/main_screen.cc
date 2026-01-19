@@ -28,7 +28,8 @@ namespace ON2Solutions {
     }
   };
   template <typename C>
-  void MainScreen::update_styles(Component<C>* component, const Delegate<void(Styling&)>& style) {
+  void MainScreen::update_styles(Component<C>* component,
+                                 const Delegate<void(Styling&)>& style) {
     component->set_state([style](C& props) { props.set_style(style); });
   }
 
@@ -62,7 +63,7 @@ namespace ON2Solutions {
     error_modal = $ErrorModal(
         std::move(ErrorModalProps::up().set_error_hex(operative_data.errors)));
 
-    info_modal->show();
+    error_modal->show();
   }
 
   void MainScreen::start_random_updater() {
@@ -126,11 +127,11 @@ namespace ON2Solutions {
 
     return $View(
         ViewProps::up()
-            .set_style($s("header.container"))
+            .set_style(HeaderContainerApply)
             .set_children(children(
                 $View(
                     ViewProps::up()
-                        .set_style($s("header.labels.container"))
+                        .set_style(HeaderLabelContainerApply)
                         .set_children(children(
                             $Text(TextProps::up()
                                       .watch<Dataset>(
@@ -177,11 +178,11 @@ namespace ON2Solutions {
                         .merge(header_labels_container_props)),
                 $View(
                     ViewProps::up()
-                        .set_style($s("header.container"))
+                        .set_style(HeaderContainerApply)
                         .set_children(children(
                             $Button(
                                 ButtonProps::up()
-                                    .set_style($s("header.button"))
+                                    .set_style(HeaderButtonApply)
                                     .watch<Dataset>(
                                         DatasetStore::getInstance(), "errors",
                                         [this](Button* self,
@@ -198,16 +199,16 @@ namespace ON2Solutions {
                                         })
                                     .set_child($Text(
                                         TextProps::up()
-                                            .set_style($s("header.label"))
+                                            .set_style(HeaderLabelApply)
                                             .value(locales::en::header_errors)))
                                     .click([this](lv_event_t* e) {
                                       this->show_errors_modal();
                                     })),
                             $Button(ButtonProps::up()
-                                        .set_style($s("header.button"))
+                                        .set_style(HeaderButtonApply)
                                         .set_child($Text(
                                             TextProps::up()
-                                                .set_style($s("header.label"))
+                                                .set_style(HeaderLabelApply)
                                                 .value(locales::en::
                                                            header_information)))
                                         .click([this](lv_event_t* e) {
@@ -216,10 +217,10 @@ namespace ON2Solutions {
 
                             $Button(
                                 ButtonProps::up()
-                                    .set_style($s("header.button"))
+                                    .set_style(HeaderButtonApply)
                                     .set_child($Text(
                                         TextProps::up()
-                                            .set_style($s("header.label"))
+                                            .set_style(HeaderLabelApply)
                                             .value(
                                                 locales::en::header_settings)))
                                     .click([navigator_ref](lv_event_t* e) {
@@ -234,7 +235,7 @@ namespace ON2Solutions {
         ViewProps::up()
             .set_children(children($Button(
                 ButtonProps::up()
-                    .set_style($s("footer.button"))
+                    .set_style(FooterButtonApply)
                     .set_child($Text(
                         TextProps::up()
                             .watch<Dataset>(
@@ -250,7 +251,7 @@ namespace ON2Solutions {
                                         props.value(status_str);
                                       });
                                 })
-                            .set_style($s("header.label"))
+                            .set_style(HeaderLabelApply)
                             .value(locales::en::status))))))
             .set_overflow(true)
             .set_style([](Styling& style) {
@@ -285,14 +286,14 @@ namespace ON2Solutions {
 
     return $View(
         ViewProps::up()
-            .set_style($s("header.container"))
+            .set_style(HeaderContainerApply)
             .set_children(children(
                 $Text(TextProps::up()
-                          .set_style($s("header.label"))
+                          .set_style(HeaderLabelApply)
                           .value(locales::en::oxygen_level)),
                 $View(
                     ViewProps::up()
-                        .set_style($s("common.no_padding"))
+                        .set_style(NoPaddingApply)
                         .set_children(children(make_circle("oxygen_level", 0),
                                                make_circle("oxygen_level", 1),
                                                make_circle("oxygen_level", 2)))
@@ -304,10 +305,10 @@ namespace ON2Solutions {
                         .track_cross(LV_FLEX_ALIGN_CENTER)
                         .direction(LV_FLEX_FLOW_ROW)),
                 $Text(TextProps::up()
-                          .set_style($s("header.label"))
+                          .set_style(HeaderLabelApply)
                           .value(locales::en::oxygen_rate)),
                 $View(ViewProps::up()
-                          .set_style($s("common.no_padding"))
+                          .set_style(NoPaddingApply)
                           .set_children(children(make_circle("oxygen_rate", 0),
                                                  make_circle("oxygen_rate", 1),
                                                  make_circle("oxygen_rate", 2)))
@@ -357,11 +358,8 @@ namespace ON2Solutions {
                                                   props.value(hours);
                                                 });
                                           })
-                                      .value("06:10 AM")
-                                      .set_style($s("status_bar.time"))),
-                            $Text(TextProps::up()
-                                      .value("ON2 Solution")
-                                      .set_style($s("status_bar.logo"))),
+                                      .value("06:10 AM")),
+                            $Text(TextProps::up().value("ON2 Solution")),
                             $Text(TextProps::up()
                                       .watch<int>(
                                           &reactive_moto_lvgl,
@@ -374,8 +372,7 @@ namespace ON2Solutions {
                                                       value));
                                                 });
                                           })
-                                      .value("LVGL Seconds: 0")
-                                      .set_style($s("status_bar.battery")))))),
+                                      .value("LVGL Seconds: 0"))))),
                 this->render_header(), this->render_body(),
                 this->render_footer()))
             .merge(screen_container_props)));

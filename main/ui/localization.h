@@ -78,6 +78,10 @@ namespace ON2Solutions {
     inline constexpr const char* flow_offset = "Flow offset";
     inline constexpr const char* other = "Other";
 
+    inline constexpr const char* oxygen_offset_setting = "Oxygen sensors offset";
+    inline constexpr const char* oxygen_flow_setting = "Flow sensors offset";
+
+
 
     inline constexpr const char* status = "PROCESSING";
 

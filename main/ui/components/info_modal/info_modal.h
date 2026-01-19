@@ -1,10 +1,10 @@
-
-
 #pragma once
 #include "core/shortcuts.h"
 #include "core/styling/styling.h"
 #include "ui/components/info_modal/info_modal_props.h"
 #include "ui/localization.h"
+
+#include <ui/styles/common_styles.h>
 
 using namespace foundation;
 namespace ON2Solutions {
@@ -36,7 +36,7 @@ namespace ON2Solutions {
       }
     };
 
-    inline $$View makeRow(const char* key, const char* value,
+    inline $$View makeRow(const char* key, const std::string_view value,
                           uint16_t height = 28) const {
       return $View(
           ViewProps::up()
@@ -53,7 +53,7 @@ namespace ON2Solutions {
               .track_cross(LV_FLEX_ALIGN_CENTER)
               .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
               .set_children(children($Text(TextProps::up().value(key)),
-                                     $Text(TextProps::up().value(value)))));
+                                     $Text(TextProps::up().value(value.data())))));
     }
 
     lv_obj_t* render() override {
@@ -77,6 +77,7 @@ namespace ON2Solutions {
                               .direction(LV_FLEX_FLOW_COLUMN)
                               .w(LV_PCT(100))
                               .h(LV_SIZE_CONTENT)
+                              .set_style(NoPaddingApply)
                               .set_children(children(
                                   this->makeRow(locales::en::info_device,
                                                 this->props.device),

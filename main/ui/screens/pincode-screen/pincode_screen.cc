@@ -69,7 +69,7 @@ namespace ON2Solutions {
                                     .items(LV_FLEX_ALIGN_CENTER)
                                     .justify(LV_FLEX_ALIGN_START)
                                     .track_cross(LV_FLEX_ALIGN_CENTER)
-                                    .set_style($s("common.no_padding"))
+                                    .set_style(NoPaddingApply)
                                     .set_children(children($Button(
                                         ButtonProps::up()
                                             .set_child(
@@ -82,7 +82,7 @@ namespace ON2Solutions {
                             $View(ViewProps::up()
                                       .w(LV_PCT(78))
                                       .h(60)
-                                      .set_style($s("common.no_padding"))
+                                      .set_style(NoPaddingApply)
                                       .direction(LV_FLEX_FLOW_ROW)
                                       .items(LV_FLEX_ALIGN_CENTER)
                                       .justify(LV_FLEX_ALIGN_CENTER)
@@ -93,7 +93,7 @@ namespace ON2Solutions {
                                                   system_auth_header))))),
                             $View(ViewProps::up()
                                       .w(LV_PCT(20))
-                                      .set_style($s("common.no_padding"))
+                                      .set_style(NoPaddingApply)
                                       .set_children(children(
                                           $Fragment(FragmentProps::up()))))))),
                 $View(ViewProps::up()
@@ -125,7 +125,7 @@ namespace ON2Solutions {
                                           .click([this](lv_event_t* e) {
                                             validate_and_login();
                                           }))))
-                          .set_style($s("header.container"))
+                          .set_style(HeaderContainerApply)
                           .merge(pincode_screen_sign_form_props))))
             .merge(screen_container_props)));
   }

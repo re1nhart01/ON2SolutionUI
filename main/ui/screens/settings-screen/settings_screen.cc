@@ -1,74 +1,150 @@
 #include "settings_screen.h";
 
+#include <lg/dataset/store/dataset.store.h>
+
 namespace ON2Solutions {
-  void SettingsScreen::component_did_mount() {
-    NavigationScreen::component_did_mount();
+
+  void SettingsScreen::on_focus() {
+    // this->uart_handler->init();
+    // this->uart_handler->enable_rx(true);
+  }
+
+  void SettingsScreen::on_blur() {
+    NavigationScreen::on_blur();
+    this->uart_handler->remove_all_event_listeners();
   };
 
-  $$Stepper SettingsScreen::make_param(const char* label, const float val,
-                                       const float step,
-                                       const short precis) const {
+  $$View SettingsScreen::render_section_header(
+      const std::string& heading) const {
+
+    return $View(
+        ViewProps::up()
+            .w(LV_PCT(100))
+            .h(40)
+            .set_style(NoPaddingApply)
+            .set_children(children($Text(TextProps::up().value(heading))))
+            .merge(centered_row));
+  }
+
+  //TODO: make that one param depends from other
+  $$Stepper SettingsScreen::make_param(
+      const ParamSpec& spec, float value, float dependable,
+      const Delegate<void(float), 32>& on_change, short width = 185) const {
+    auto [min, max] = calculate_dynamic_range(spec, dependable);
     return $Stepper(StepperProps::up()
-                        .set_label(label)
-                        .value(val)
-                        .set_step(step)
-                        .set_precision(precis)
-                        .size(155, 55)
-                        .btn_width(35));
+                        .set_label(spec.label)
+                        .value(value)
+                        .set_step(spec.step)
+                        .set_precision(spec.precision)
+                        .range(min, max)
+                        .size(width, 55)
+                        .on_change([on_change](float v) {
+                          if (on_change)
+                            on_change(v);
+                        })
+                        .btn_width(45));
   }
 
   $$View SettingsScreen::render_sensors_tab() const {
-    return $View(ViewProps::up()
-                     .direction(LV_FLEX_FLOW_ROW_WRAP)
-                     .justify(LV_FLEX_ALIGN_CENTER)
-                     .set_children(children(make_param("Oxy-A", 94.4, 0.1, 1),
-                                            make_param("Oxy-B", 94.4, 0.1, 1),
-                                            make_param("Oxy-C", 94.4, 0.1, 1),
-                                            make_param("Oxy-D", 94.4, 0.1, 1),
-                                            make_param("Flow-A", 9.6, 0.1, 1),
-                                            make_param("Flow-B", 9.7, 0.1, 1),
-                                            make_param("Flow-C", 9.8, 0.1, 1),
-                                            make_param("Flow-D", 9.9, 0.1, 1)))
-                     .w(LV_PCT(100))
-                     .h(LV_SIZE_CONTENT));
-  }
-
-  $$View SettingsScreen::render_timers_tab() const {
-    return $View(ViewProps::up()
-                     .direction(LV_FLEX_FLOW_ROW_WRAP)
-                     .justify(LV_FLEX_ALIGN_CENTER)
-                     .set_children(children(make_param("Compressor delay", 3),
-                                            make_param("RunUp time", 480),
-                                            make_param("Prestart time", 40),
-                                            make_param("Low limit time", 30),
-                                            make_param("Error to alarm", 4)))
-                     .w(LV_PCT(100))
-                     .h(LV_SIZE_CONTENT));
-  }
-
-  $$View SettingsScreen::render_limits_tab() const {
-    return $View(
-        ViewProps::up()
-            .direction(LV_FLEX_FLOW_ROW_WRAP)
-            .justify(LV_FLEX_ALIGN_CENTER)
-            .set_children(children(make_param("Low oxy conc.%", 88.6, 0.1, 1),
-                                   make_param("Tank high press", 60),
-                                   make_param("Tank low press", 50),
-                                   make_param("Temp.C overheat", 70),
-                                   make_param("Flow Limit ERR", 1.2, 0.1, 1)))
-            .w(LV_PCT(100))
-            .h(LV_SIZE_CONTENT));
-  }
-
-  $$View SettingsScreen::render_service_tab() const {
+    parser::DatasetSettings dataset =
+        parser::DatasetStore::getInstance()->get().settings;
     return $View(
         ViewProps::up()
             .direction(LV_FLEX_FLOW_ROW_WRAP)
             .justify(LV_FLEX_ALIGN_CENTER)
             .set_children(children(
-                make_param("SPV ON time", 7.0, 0.1, 1),
-                make_param("SPV OFF time", 5.0, 0.1, 1),
-                make_param("Calibrate cycle", 2),
+                render_section_header(locales::en::oxygen_offset_setting),
+                make_param(
+                    OxygenShiftASpec, dataset.oxygen_sensor_offset[0], 0,
+                    []() {}, 165),
+                make_param(
+                    OxygenShiftBSpec, dataset.oxygen_sensor_offset[1], 0,
+                    []() {}, 165),
+                make_param(
+                    OxygenShiftCSpec, dataset.oxygen_sensor_offset[2], 0,
+                    []() {}, 165),
+                make_param(
+                    OxygenShiftDSpec, dataset.oxygen_sensor_offset[3], 0,
+                    []() {}, 165),
+                render_section_header(locales::en::oxygen_flow_setting),
+                make_param(
+                    FlowShiftASpec, dataset.flow_sensor_offset[0], 0, []() {},
+                    165),
+                make_param(
+                    FlowShiftBSpec, dataset.flow_sensor_offset[1], 0, []() {},
+                    165),
+                make_param(
+                    FlowShiftCSpec, dataset.flow_sensor_offset[2], 0, []() {},
+                    165),
+                make_param(
+                    FlowShiftDSpec, dataset.flow_sensor_offset[3], 0, []() {},
+                    165)))
+            .w(LV_PCT(100))
+            .h(LV_SIZE_CONTENT));
+  }
+
+  $$View SettingsScreen::render_timers_tab() const {
+    parser::DatasetSettings dataset =
+        parser::DatasetStore::getInstance()->get().settings;
+
+    return $View(
+        ViewProps::up()
+            .direction(LV_FLEX_FLOW_ROW_WRAP)
+            .justify(LV_FLEX_ALIGN_CENTER)
+            .set_children(children(
+                make_param(CompressorDelaySpec, dataset.compressor_delay_sec, 0,
+                           []() {}),
+                make_param(RunUpTimeSpec, dataset.run_up_delay_sec, 0, []() {}),
+                make_param(PreStartTimeSpec, dataset.prestart_time_sec, 0,
+                           []() {}),
+                make_param(LowLimitTimeSpec,
+                           dataset.low_limit_oxygen_concentration, 0, []() {})))
+            .w(LV_PCT(100))
+            .h(LV_SIZE_CONTENT));
+  }
+
+  $$View SettingsScreen::render_limits_tab() const {
+    parser::DatasetSettings dataset =
+        parser::DatasetStore::getInstance()->get().settings;
+
+    return $View(ViewProps::up()
+                     .direction(LV_FLEX_FLOW_ROW_WRAP)
+                     .justify(LV_FLEX_ALIGN_CENTER)
+                     .set_children(children(
+                         make_param(WorkConcentrationSpec,
+                                    dataset.compressor_delay_sec, 0, []() {}),
+                         make_param(LowLimitConcentrationSpec,
+                                    dataset.compressor_delay_sec, 0, []() {}),
+                         make_param(LowLimitTimeSpec,
+                                    dataset.compressor_delay_sec, 0, []() {}),
+                         make_param(TankHighLimitSpec,
+                                    dataset.compressor_delay_sec, 0, []() {}),
+                         make_param(TankLowLimitSpec,
+                                    dataset.compressor_delay_sec, 0, []() {}),
+                         make_param(TempOverheatSpec,
+                                    dataset.compressor_delay_sec, 0, []() {}),
+                         dataset.compressor_delay_sec, 0, []() {},
+                         make_param(FlowErrorSpec, dataset.compressor_delay_sec,
+                                    0, []() {}),
+                         make_param(ErrorCountSpec,
+                                    dataset.compressor_delay_sec, 0, []() {})))
+                     .w(LV_PCT(100))
+                     .h(LV_SIZE_CONTENT));
+  }
+
+  $$View SettingsScreen::render_service_tab() const {
+    parser::DatasetSettings dataset =
+        parser::DatasetStore::getInstance()->get().settings;
+
+    return $View(
+        ViewProps::up()
+            .direction(LV_FLEX_FLOW_ROW_WRAP)
+            .justify(LV_FLEX_ALIGN_CENTER)
+            .set_children(children(
+                make_param(ValveHighTimeSpec, dataset.spv_on_time_sec, 0,
+                           []() {}),
+                make_param(ValveLowTimeSpec, dataset.spv_off_time_sec, 0,
+                           []() {}),
                 $Button(ButtonProps::up()
                             .set_child(
                                 $Text(TextProps::up().value("Hour Run Reset")))
@@ -102,7 +178,7 @@ namespace ON2Solutions {
                                     .items(LV_FLEX_ALIGN_CENTER)
                                     .justify(LV_FLEX_ALIGN_START)
                                     .track_cross(LV_FLEX_ALIGN_CENTER)
-                                    .set_style($s("common.no_padding"))
+                                    .set_style(NoPaddingApply)
                                     .set_children(children($Button(
                                         ButtonProps::up()
                                             .set_child(
@@ -115,7 +191,7 @@ namespace ON2Solutions {
                             $View(ViewProps::up()
                                       .w(LV_PCT(40))
                                       .h(60)
-                                      .set_style($s("common.no_padding"))
+                                      .set_style(NoPaddingApply)
                                       .direction(LV_FLEX_FLOW_ROW)
                                       .items(LV_FLEX_ALIGN_CENTER)
                                       .justify(LV_FLEX_ALIGN_CENTER)
@@ -126,7 +202,7 @@ namespace ON2Solutions {
                                                   system_settings_header))))),
                             $View(ViewProps::up()
                                       .w(LV_PCT(30))
-                                      .set_style($s("common.no_padding"))
+                                      .set_style(NoPaddingApply)
                                       .set_children(children(
                                           $Fragment(FragmentProps::up()))))))),
                 $TabView(

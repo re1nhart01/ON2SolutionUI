@@ -64,12 +64,10 @@ namespace ON2Solutions {
               .track_cross(LV_FLEX_ALIGN_CENTER)
               .justify(LV_FLEX_ALIGN_START)
               .set_children(children(
-                  // left status rect
-                  $View(ViewProps::up().w(15).h(10).set_style(
+                  $View(ViewProps::up().w(25).h(15).set_style(
                       [is_error](Styling& style) {
-                        style.setBackgroundColor(is_error
-                                                     ? ERROR_COLOR
-                                                     : NO_ERROR_COLOR);
+                        style.setBackgroundColor(is_error ? ERROR_COLOR
+                                                          : NO_ERROR_COLOR);
                         style.setBackgroundOpa(LV_OPA_COVER);
                         style.setBorder(lv_color_make(0, 0, 0), 0,
                                         LV_OPA_TRANSP);
@@ -77,18 +75,16 @@ namespace ON2Solutions {
                         style.setPadding(0, 0, 0, 0);
                       })),
 
-                  // spacer (щоб був відступ між квадратиком і текстом)
-                  $View(ViewProps::up().w(8).h(1).set_style([](Styling& style) {
+                  $View(ViewProps::up().w(2).h(1).set_style([](Styling& style) {
                     style.setBackgroundOpa(LV_OPA_TRANSP);
                     style.setPadding(0, 0, 0, 0);
                     style.setBorder(lv_color_make(0, 0, 0), 0, LV_OPA_TRANSP);
                   })),
 
-                  // right text
                   $Text(TextProps::up().value(text)))));
     }
 
-    inline Children renderRows() {
+    inline Children renderRows() const {
       Children rows;
       rows.reserve(33);
 
@@ -126,13 +122,8 @@ namespace ON2Solutions {
                                     .direction(LV_FLEX_FLOW_COLUMN)
                                     .w(LV_PCT(100))
                                     .h(LV_SIZE_CONTENT)
-                                    .set_children(renderRows())
-                          )
-                      )
-                  )
-              )
-          )
-        )
+                                    .set_style(NoPaddingApply)
+                                    .set_children(renderRows())))))))
               .direction(LV_FLEX_FLOW_COLUMN))));
 
       return this->modal->get_component();
