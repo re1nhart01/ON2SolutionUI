@@ -89,7 +89,7 @@
    OTHERS
  *====================*/
 #define LV_USE_PERF_MONITOR 1          /* Для отладки FPS */
-#define LV_USE_MEM_MONITOR 0
+#define LV_USE_MEM_MONITOR 1
 #define LV_USE_REFR_DEBUG 0
 #define LV_SPRINTF_CUSTOM 0
 #define LV_SPRINTF_USE_FLOAT 0
@@ -173,7 +173,7 @@
 #endif
 
 #define LV_USE_LINE       1
-#define LV_USE_ROLLER     1
+#define LV_USE_ROLLER     0
 #if LV_USE_ROLLER
     #define LV_ROLLER_INF_PAGES 7
 #endif
@@ -193,15 +193,15 @@
 #define LV_USE_ANIMIMG    0
 #define LV_USE_CALENDAR   0
 #define LV_USE_CHART      0
-#define LV_USE_COLORWHEEL 1
-#define LV_USE_IMGBTN     1
+#define LV_USE_COLORWHEEL 0
+#define LV_USE_IMGBTN     0
 #define LV_USE_KEYBOARD   1
-#define LV_USE_LED        1
+#define LV_USE_LED        0
 #define LV_USE_LIST       1
 #define LV_USE_MENU       0
-#define LV_USE_METER      0
-#define LV_USE_MSGBOX     1
-#define LV_USE_SPAN       1
+#define LV_USE_METER      1
+#define LV_USE_MSGBOX     0
+#define LV_USE_SPAN       0
 #if LV_USE_SPAN
     #define LV_SPAN_SNIPPET_STACK_SIZE 64
 #endif
@@ -217,8 +217,8 @@
 #define LV_USE_THEME_DEFAULT 1
 #if LV_USE_THEME_DEFAULT
     #define LV_THEME_DEFAULT_DARK 0
-    #define LV_THEME_DEFAULT_GROW 0           /* ВЫКЛ для производительности */
-    #define LV_THEME_DEFAULT_TRANSITION_TIME 150 /* Мгновенно */
+    #define LV_THEME_DEFAULT_GROW 0
+    #define LV_THEME_DEFAULT_TRANSITION_TIME 150
 #endif
 
 #define LV_USE_THEME_BASIC 1

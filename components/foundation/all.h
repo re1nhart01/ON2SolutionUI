@@ -2,8 +2,7 @@
 // Created by evgeniy on 11/14/25.
 //
 
-#ifndef ALL_H
-#define ALL_H
+#pragma once
 
 #include "components/button/button.h"
 #include "components/button/button_props.h"
@@ -41,11 +40,20 @@
 #include "components/status_bar/status_bar.h"
 #include "components/status_bar/status_bar_props.h"
 
+#include "components/dropdown/dropdown.h"
+#include "components/dropdown/dropdown_props.h"
+
 #include "components/tab_view/tab_view.h"
 #include "components/tab_view/tab_view_props.h"
 
 #include "components/stepper/stepper.h"
 #include "components/stepper/stepper_props.h"
+
+#include "components/bar/bar.h"
+#include "components/bar/bar_props.h"
+
+#include "components/meter/meter.h"
+#include "components/meter/meter_props.h"
 
 #include "core/keyboard_manager/keyboard_manager.h"
 
@@ -62,4 +70,3 @@
 #include "components/props.h"
 #include "core/structures/delegate.h"
 
-#endif //ALL_H

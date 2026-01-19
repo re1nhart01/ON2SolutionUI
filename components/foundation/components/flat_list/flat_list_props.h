@@ -5,21 +5,21 @@ namespace foundation
 {
   class FlatList;
   struct FlatListProps final : BaseProps<FlatListProps, FlatList> {
-    std::vector<std::shared_ptr<VNode>> children;
+    std::vector<std::unique_ptr<VNode>> children;
     short width = LV_PCT(100);
     short height = LV_PCT(100);
 
-    FlatListProps& add_child(const std::shared_ptr<VNode>& c) {
-      children.push_back(c);
-      return *this;
+    FlatListProps&& add_child(std::unique_ptr<VNode> c) {
+      children.push_back(std::move(c));
+      return std::move(*this);
     }
 
-    FlatListProps& set_children(const std::vector<std::shared_ptr<VNode>>& ch) {
-      children = ch;
-      return *this;
+    FlatListProps&& set_children(std::vector<std::unique_ptr<VNode>>&& ch) {
+      children = std::move(ch);
+      return std::move(*this);
     }
 
-    FlatListProps& w(short v) { width = v; return *this; }
-    FlatListProps& h(short v) { height = v; return *this; }
+    FlatListProps&& w(short v) { width = v; return std::move(*this); }
+    FlatListProps&& h(short v) { height = v; return std::move(*this); }
   };
 }

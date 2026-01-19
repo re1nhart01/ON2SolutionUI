@@ -14,49 +14,49 @@ namespace foundation
     short width = 10;
     short height = 10;
 
-    CircularProgressProps& label(const std::string& s) {
+    CircularProgressProps&& label(const std::string& s) {
       label_symbol = s;
-      return *this;
+      return std::move(*this);
     }
 
-    CircularProgressProps& show_label(bool v) {
+    CircularProgressProps&& show_label(bool v) {
       show_label_default = v;
-      return *this;
+      return std::move(*this);
     }
 
-    CircularProgressProps& min(short v) {
+    CircularProgressProps&& min(short v) {
       min_dy = v;
-      return *this;
+      return std::move(*this);
     }
 
-    CircularProgressProps& max(short v) {
+    CircularProgressProps&& max(short v) {
       max_dy = v;
-      return *this;
+      return std::move(*this);
     }
 
-    CircularProgressProps& value(const short v) {
+    CircularProgressProps&& value(const short v) {
       default_dy = v;
-      return *this;
+      return std::move(*this);
     }
 
-    CircularProgressProps& value(const float v) {
+    CircularProgressProps&& value(const float v) {
       default_dy = v;
-      return *this;
+      return std::move(*this);
     }
 
-    CircularProgressProps& value(const int v) {
+    CircularProgressProps&& value(const int v) {
       default_dy = v;
-      return *this;
+      return std::move(*this);
     }
 
-    CircularProgressProps& w(short v) {
+    CircularProgressProps&& w(short v) {
       width = v;
-      return *this;
+      return std::move(*this);
     }
 
-    CircularProgressProps& h(short v) {
+    CircularProgressProps&& h(short v) {
       height = v;
-      return *this;
+      return std::move(*this);
     }
   };
 }

@@ -9,13 +9,13 @@ namespace foundation {
   public:
     Props props;
 
-    explicit Component(const Props& props) : VNode(nullptr, nullptr), props(props) {}
+    explicit Component(Props&& props) : VNode(nullptr, nullptr), props(std::move(props)) {}
 
-    explicit Component(lv_obj_t* obj, lv_obj_t* parent, const Props& props) : VNode(obj, parent), props(props) {}
+    explicit Component(lv_obj_t* obj, lv_obj_t* parent, Props&& props) : VNode(obj, parent), props(std::move(props)) {}
 
     template<typename Fn>
     void set_state(Fn&& fn) {
-      if (!this->component) return;
+        if (!this->component || !lv_obj_is_valid(this->component)) return;
 
       auto* ctx = new Delegate<void()>(
           [this, fn = std::forward<Fn>(fn)]() mutable {

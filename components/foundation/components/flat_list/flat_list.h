@@ -7,10 +7,10 @@ namespace foundation
   class FlatList final : public Component<FlatListProps>
   {
   public:
-    explicit FlatList(const FlatListProps& props)
+    explicit FlatList(FlatListProps&& props)
         : Component(nullptr, nullptr, std::move(props))
     {
-      this->apply_reactive<FlatList>(this, props.reactive_delegates);
+      this->apply_reactive<FlatList>(this, this->props.reactive_delegates);
         if (this->props.ref != nullptr) this->props.ref->set(this);
     }
 
@@ -68,8 +68,8 @@ namespace foundation
 
         lv_obj_set_size(list, props.width, props.height);
 
-        if (auto style = styling()) {
-            style->applyTo(list);
+        if (auto style = styling(); style->get_is_dirty()) {
+            lv_obj_invalidate(list);
         }
 
         for (const auto& child : props.children) {
@@ -79,10 +79,8 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
       apply_base_style(style);
 
-      // Оптимізація: вимикаємо всі прозорості для списку
       style.setBackgroundOpa(LV_OPA_COVER);
 
       if (props.style_override) {
@@ -93,7 +91,6 @@ namespace foundation
 
     FlatList* append(lv_obj_t* obj) override
     {
-        // lv_list автоматично обробляє додані об'єкти як елементи списку
         lv_obj_set_parent(obj, get_component());
         return this;
     }

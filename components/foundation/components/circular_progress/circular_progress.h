@@ -6,14 +6,14 @@ namespace foundation
   class CircularProgress final : public Component<CircularProgressProps> {
   private:
     using Component::props;
-    std::shared_ptr<Text> label = nullptr;
+    std::unique_ptr<Text> label = nullptr;
     lv_obj_t* arc_reference = nullptr;
     bool is_show_label = false;
 
   public:
-    explicit CircularProgress(CircularProgressProps props)
+    explicit CircularProgress(CircularProgressProps&& props)
       : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<CircularProgress>(this, props.reactive_delegates);
+      this->apply_reactive<CircularProgress>(this, this->props.reactive_delegates);
 
 
       this->is_show_label = props.show_label_default;
@@ -36,12 +36,11 @@ namespace foundation
 
     lv_obj_t* render() override
     {
+      Component::render();
       if (this->get_component() != nullptr) {
           this->do_rebuild();
           return this->get_component();
       }
-
-      Component::render();
 
       lv_obj_t* parent_obj = this->get_parent();
       if (!parent_obj) return nullptr;
@@ -70,7 +69,7 @@ namespace foundation
         {
           if (!this->label)
             {
-              this->label = std::make_shared<Text>(
+              this->label = std::make_unique<Text>(
                   TextProps::up().value(std::format("{}{}", props.default_dy, props.label_symbol))
               );
               this->label->set_parent(container);
@@ -114,6 +113,9 @@ namespace foundation
       lv_obj_set_style_bg_opa(arc_reference, LV_OPA_TRANSP, LV_PART_MAIN);
       lv_obj_remove_style(arc_reference, nullptr, LV_PART_KNOB);
 
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(container);
+      }
 
       if (props.style_override) {
           props.style_override(style);
@@ -137,8 +139,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

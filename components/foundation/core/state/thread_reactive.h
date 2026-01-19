@@ -24,9 +24,9 @@ namespace foundation
         Delegate<void(void*, const T&), 40> updater;
       };
 
-      std::unique_ptr<TypedValue<T>> value_store;
+      T value_store;
       std::vector<Binding> bindings;
-      volatile SemaphoreHandle_t _mutex;
+      SemaphoreHandle_t _mutex;
 
       struct Lock {
           SemaphoreHandle_t m;
@@ -39,18 +39,12 @@ namespace foundation
       };
 
     public:
-      ThreadReactive() : value_store(std::make_unique<TypedValue<T>>(T{}))
+      ThreadReactive(const T& default_val) : value_store(default_val)
       {
         _mutex = xSemaphoreCreateMutex();
         if(_mutex == nullptr)
           {
             ESP_LOGE("REACTIVE", "Failed to create mutex!");
-          }
-      }
-      explicit ThreadReactive(const T& default_val) : value_store(std::make_unique<TypedValue<T>>(default_val)) {
-          _mutex = xSemaphoreCreateMutex();
-          if (_mutex == nullptr) {
-              ESP_LOGE("REACTIVE", "Failed to create mutex!");
           }
       }
 
@@ -59,7 +53,6 @@ namespace foundation
               {
                   Lock lock(_mutex);
                   bindings.clear();
-                  value_store.reset();
               }
               vSemaphoreDelete(_mutex);
               _mutex = nullptr;
@@ -99,36 +92,39 @@ namespace foundation
 
       void set(Delegate<T(const T&)> fn) {
         if (!_mutex || !fn) return;
-        T prev = get();
-        T next = fn(prev);
+
+        T current;
+        {
+          Lock lock(_mutex);
+          current = value_store;
+        }
+
+        T next = fn(current);
         set(next);
       }
 
-      void set(const T& newValue)
-      {
+      void set(const T& newValue) {
         if (!_mutex) return;
 
-        std::vector<Binding> temp_bindings;
-        T data_to_send;
+        std::vector<Binding> snapshot;
 
         {
           Lock lock(_mutex);
-          value_store = std::make_unique<TypedValue<T>>(newValue);
-          data_to_send = value_store->data;
-          temp_bindings = bindings;
+          value_store = newValue;
+          snapshot = bindings;
         }
 
-        for (auto &b : temp_bindings) {
-            if (b.component != nullptr && b.updater) {
-                b.updater(b.component, data_to_send);
-            }
+        for (auto& b : snapshot) {
+          if (b.component && b.updater) {
+            b.updater(b.component, newValue);
+          }
         }
       }
 
-      T get() const {
+      T get() {
         if (!_mutex) return T();
         Lock lock(_mutex);
-        return value_store ? value_store->data : T();
+        return value_store;
       }
     };
 }

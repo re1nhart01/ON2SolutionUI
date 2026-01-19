@@ -11,9 +11,9 @@ namespace foundation
   class Fragment final : public Component<FragmentProps> {
   using Component::props;
   public:
-    explicit Fragment(const FragmentProps& props)
+    explicit Fragment(FragmentProps&& props)
       : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<Fragment>(this, props.reactive_delegates);
+      this->apply_reactive<Fragment>(this, this->props.reactive_delegates);
     };
     ~Fragment() override
     {
@@ -51,8 +51,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

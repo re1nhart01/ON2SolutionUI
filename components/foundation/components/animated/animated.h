@@ -6,14 +6,13 @@ namespace foundation
   class Animated final : public Component<AnimatedProps> {
   private:
     std::unique_ptr<lv_anim_t> reference;
-    std::shared_ptr<VNode> component;
+    VNode* component = nullptr;
 
   public:
-    explicit Animated(const std::shared_ptr<VNode> &component, AnimatedProps props)
+    explicit Animated(AnimatedProps props)
       : Component(std::move(props))
     {
-      this->apply_reactive<Animated>(this, props.reactive_delegates);
-      this->component = component;
+      this->apply_reactive<Animated>(this, this->props.reactive_delegates);
       this->reference = std::make_unique<lv_anim_t>();
 
       lv_anim_init(this->reference.get());
@@ -58,8 +57,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

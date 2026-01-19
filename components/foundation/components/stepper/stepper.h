@@ -14,8 +14,8 @@ namespace foundation
     lv_obj_t* spinbox;
     lv_obj_t* spinbox_label;
 
-    explicit Stepper(const StepperProps& props) : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<Stepper>(this, props.reactive_delegates);
+    explicit Stepper(StepperProps&& props) : Component(nullptr, nullptr, std::move(props)) {
+      this->apply_reactive<Stepper>(this, this->props.reactive_delegates);
 
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
@@ -136,8 +136,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

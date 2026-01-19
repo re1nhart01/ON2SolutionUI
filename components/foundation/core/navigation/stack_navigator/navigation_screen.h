@@ -17,7 +17,7 @@ namespace foundation
     ~NavigationScreen() override = default;
 
     explicit NavigationScreen(StackNavigator* navigator, Props props)
-      : Component<Props>(props)
+      : Component<Props>(std::move(props))
     {
       this->navigation_ref = navigator;
     }

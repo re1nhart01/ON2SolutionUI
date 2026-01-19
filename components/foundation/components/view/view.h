@@ -8,8 +8,8 @@ namespace foundation
   private:
 
   public:
-    explicit View(const ViewProps &props) : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<View>(this, props.reactive_delegates);
+    explicit View(ViewProps&& props) : Component(nullptr, nullptr, std::move(props)) {
+      this->apply_reactive<View>(this, this->props.reactive_delegates);
       if(this->props.ref != nullptr) {
           this->props.ref->set(this);
       }
@@ -31,21 +31,27 @@ namespace foundation
       if(get_component() == nullptr || this->parent == nullptr) {
           this->set_component(this->create_initial(this->parent));
       }
-      lv_obj_t *comp = get_component();
-      lv_obj_set_layout(comp, LV_LAYOUT_FLEX);
-      lv_obj_set_size(comp, props.width, props.height);
-      lv_obj_set_flex_flow(comp, props.flex_direction);
-      lv_obj_set_flex_align(comp, props.justify_content, props.align_items,
+      lv_obj_t *obj = get_component();
+      lv_obj_set_layout(obj, LV_LAYOUT_FLEX);
+      lv_obj_set_size(obj, props.width, props.height);
+      lv_obj_set_flex_flow(obj, props.flex_direction);
+      lv_obj_set_flex_align(obj, props.justify_content, props.align_items,
                             props.track_cross_place);
 
-      lv_obj_set_scroll_dir(comp, LV_DIR_NONE);
-      lv_obj_set_scrollbar_mode(comp, LV_SCROLLBAR_MODE_OFF);
+      lv_obj_set_scroll_dir(obj, LV_DIR_NONE);
+      lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_OFF);
       const auto style = this->styling();
+
+      if (this->props.overflow_visible) {
+        lv_obj_add_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
+      } else {
+        lv_obj_clear_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
+      }
 
       for (const auto& child : this->props.children) {
           if (child != nullptr) {
               child->set_active(true);
-              child->set_parent(comp);
+              child->set_parent(obj);
               child->render();
           }
       }
@@ -54,7 +60,7 @@ namespace foundation
           lv_obj_add_style(this->get_component(), style->getStyle(), LV_PART_MAIN);
       }
 
-      return comp;
+      return obj;
     };
 
     void do_rebuild() override
@@ -72,8 +78,8 @@ namespace foundation
       lv_obj_set_scroll_dir(obj, LV_DIR_NONE);
       lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_OFF);
 
-      if (const Styling* style = this->styling(); style != nullptr) {
-          style->applyTo(this->get_component());
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(obj);
       }
 
       for (const auto &child : this->props.children) {
@@ -102,8 +108,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

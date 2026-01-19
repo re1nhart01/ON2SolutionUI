@@ -12,8 +12,8 @@ namespace foundation
     using Component<ActivityIndicatorProps>::Component;
     public:
 
-    explicit ActivityIndicator(const ActivityIndicatorProps &props) : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<ActivityIndicator>(this, props.reactive_delegates);
+    explicit ActivityIndicator(ActivityIndicatorProps&& props) : Component(nullptr, nullptr, std::move(props)) {
+      this->apply_reactive<ActivityIndicator>(this, this->props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }
@@ -53,16 +53,13 @@ namespace foundation
 
       this->set_active(this->props.is_visible);
 
-      if (const Styling* s = styling()) {
-          lv_obj_add_style(get_component(), s->getStyle(), LV_PART_MAIN);
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(obj);
       }
-
     }
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

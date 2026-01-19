@@ -9,8 +9,8 @@ namespace foundation
   public:
     using Component::props;
     bool is_init = true;
-    explicit TextInput(const TextInputProps& props) : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<TextInput>(this, props.reactive_delegates);
+    explicit TextInput(TextInputProps&& props) : Component(nullptr, nullptr, std::move(props)) {
+      this->apply_reactive<TextInput>(this, this->props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }
@@ -58,6 +58,10 @@ namespace foundation
           lv_textarea_set_text(obj, props.text);
       }
 
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(obj);
+      }
+
       lv_obj_remove_event_cb(obj, nullptr);
 
       if (this->props.kbManager != nullptr)
@@ -93,8 +97,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

@@ -5,18 +5,26 @@
 #include <lvgl__lvgl/src/lvgl.h>
 
 #include "components/vnode.h"
-#include "components/props.h";
 #include <memory>
+#include <vector>
 
 namespace foundation
 {
   class View;
 }
+
 namespace foundation
 {
-  struct ViewProps final : BaseProps<ViewProps, View>
+  struct ViewProps final : public BaseProps<ViewProps, View>
   {
-    std::vector<std::shared_ptr<VNode>> children;
+
+    ViewProps() = default;
+    ViewProps(const ViewProps&) = delete;
+    ViewProps& operator=(const ViewProps&) = delete;
+    ViewProps(ViewProps&&) = default;
+    ViewProps& operator=(ViewProps&&) = default;
+
+    std::vector<std::unique_ptr<VNode>> children;
 
     short width = LV_PCT(100);
     short height = LV_SIZE_CONTENT;
@@ -24,43 +32,58 @@ namespace foundation
     lv_flex_align_t align_items = LV_FLEX_ALIGN_CENTER;
     lv_flex_align_t track_cross_place = LV_FLEX_ALIGN_START;
     lv_flex_flow_t flex_direction = LV_FLEX_FLOW_COLUMN;
+    bool overflow_visible = false;
 
-    ViewProps& w(const short value)
+
+    // --- size ---
+    ViewProps&& w(short value)
     {
-      this->width = value;
-      return *this;
+      width = value;
+      return std::move(*this);
     }
 
-    ViewProps& h(const short value)
+    ViewProps&& set_overflow(bool value)
     {
-      this->height = value;
-      return *this;
+      overflow_visible = value;
+      return std::move(*this);
     }
 
-    ViewProps& set_children(const std::vector<std::shared_ptr<VNode>>& value)
+    ViewProps&& h(short value)
     {
-      this->children = std::move(value);
-      return *this;
+      height = value;
+      return std::move(*this);
     }
 
-    ViewProps& direction(lv_flex_flow_t value) {
+    // --- children ---
+    ViewProps&& set_children(std::vector<std::unique_ptr<VNode>> value)
+    {
+      children = std::move(value);
+      return std::move(*this);
+    }
+
+    // --- layout ---
+    ViewProps&& direction(lv_flex_flow_t value)
+    {
       flex_direction = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ViewProps& justify(lv_flex_align_t value) {
+    ViewProps&& justify(lv_flex_align_t value)
+    {
       justify_content = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ViewProps& items(lv_flex_align_t value) {
+    ViewProps&& items(lv_flex_align_t value)
+    {
       align_items = value;
-      return *this;
+      return std::move(*this);
     }
 
-    ViewProps& track_cross(lv_flex_align_t value) {
+    ViewProps&& track_cross(lv_flex_align_t value)
+    {
       track_cross_place = value;
-      return *this;
+      return std::move(*this);
     }
   };
 }

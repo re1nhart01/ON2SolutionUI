@@ -13,32 +13,32 @@ namespace foundation
     short orig_width = 0;
     short orig_height = 0;
 
-    ImageProps& source(const char* src)
+    ImageProps&& source(const char* src)
     {
       this->img_src = src;
-      return *this;
+      return std::move(*this);
     }
 
-    ImageProps& original_size(short w, short h) {
+    ImageProps&& original_size(short w, short h) {
       orig_width = w;
       orig_height = h;
-      return *this;
+      return std::move(*this);
     }
 
-    ImageProps& source(const lv_img_dsc_t& src)
+    ImageProps&& source(const lv_img_dsc_t& src)
     {
       this->img_dsc = src;
-      return *this;
+      return std::move(*this);
     }
 
-    ImageProps& width(short w) {
+    ImageProps&& width(short w) {
       real_width = w;
-      return *this;
+      return std::move(*this);
     }
 
-    ImageProps& height(short h) {
+    ImageProps&& height(short h) {
       real_height = h;
-      return *this;
+      return std::move(*this);
     }
   };
 }

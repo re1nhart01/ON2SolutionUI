@@ -17,40 +17,39 @@ namespace foundation
     lv_event_cb_t on_focused = nullptr;
     lv_event_cb_t on_defocused = nullptr;
 
-    TextProps& value(const std::string& v) {
+    TextProps&& value(const std::string& v) {
       text = v;
-      return *this;
+      return std::move(*this);
     }
 
-    // ---- Event handlers ----
-    TextProps& click(lv_event_cb_t fn) {
+    TextProps&& click(lv_event_cb_t fn) {
       on_click = fn;
-      return *this;
+      return std::move(*this);
     }
 
-    TextProps& long_press(lv_event_cb_t fn) {
+    TextProps&& long_press(lv_event_cb_t fn) {
       on_long_press = fn;
-      return *this;
+      return std::move(*this);
     }
 
-    TextProps& pressed(lv_event_cb_t fn) {
+    TextProps&& pressed(lv_event_cb_t fn) {
       on_pressed = fn;
-      return *this;
+      return std::move(*this);
     }
 
-    TextProps& released(lv_event_cb_t fn) {
+    TextProps&& released(lv_event_cb_t fn) {
       on_released = fn;
-      return *this;
+      return std::move(*this);
     }
 
-    TextProps& focused(lv_event_cb_t fn) {
+    TextProps&& focused(lv_event_cb_t fn) {
       on_focused = fn;
-      return *this;
+      return std::move(*this);
     }
 
-    TextProps& defocused(lv_event_cb_t fn) {
+    TextProps&& defocused(lv_event_cb_t fn) {
       on_defocused = fn;
-      return *this;
+      return std::move(*this);
     }
   };
 }

@@ -28,66 +28,66 @@ namespace foundation
     uint8_t digit_count = 3;
     uint8_t separator_pos = 0;
 
-    StepperProps& range(const float min, const float max) {
+    StepperProps&& range(const float min, const float max) {
       this->min_value = min;
       this->max_value = max;
-      return *this;
+      return std::move(*this);
     }
 
-    StepperProps& value(const float val) {
+    StepperProps&& value(const float val) {
       this->initial_value = val;
-      return *this;
+      return std::move(*this);
     }
 
-    StepperProps& set_step(float val) {
+    StepperProps&& set_step(float val) {
       this->step = val;
-      return *this;
+      return std::move(*this);
     }
 
-    StepperProps& set_label(std::string val) {
+    StepperProps&& set_label(std::string val) {
       this->label = val;
-      return *this;
+      return std::move(*this);
     }
 
-    StepperProps& on_change(Delegate<void(float), 64> cb) {
+    StepperProps&& on_change(Delegate<void(float), 64> cb) {
       this->on_change_cb = std::move(cb);
-      return *this;
+      return std::move(*this);
     }
 
-    StepperProps& size(short w, short h) {
+    StepperProps&& size(short w, short h) {
       this->width = w;
       this->height = h;
-      return *this;
+      return std::move(*this);
     }
 
-    StepperProps& btn_width(short w) {
+    StepperProps&& btn_width(short w) {
       this->button_width = w;
-      return *this;
+      return std::move(*this);
     }
 
-    StepperProps& btn_height(short w) {
+    StepperProps&& btn_height(short w) {
       this->button_height = w;
-      return *this;
+      return std::move(*this);
     }
 
-    StepperProps& set_precision(short w) {
+    StepperProps&& set_precision(short w) {
       this->precision = w;
-      return *this;
+      return std::move(*this);
     }
 
-    StepperProps& format(uint8_t digits, uint8_t separator) {
+    StepperProps&& format(uint8_t digits, uint8_t separator) {
       this->digit_count = digits;
       this->separator_pos = separator;
-      return *this;
+      return std::move(*this);
     }
 
-    StepperProps& set_children(const std::vector<std::shared_ptr<VNode>>& value) {
-      return *this;
+    StepperProps&& set_children(std::vector<std::unique_ptr<VNode>>&& value) {
+      return std::move(*this);
     }
 
-    StepperProps& set_height(lv_coord_t h) {
+    StepperProps&& set_height(lv_coord_t h) {
       this->height = h;
-      return *this;
+      return std::move(*this);
     }
   };
 }

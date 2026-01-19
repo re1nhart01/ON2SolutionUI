@@ -21,65 +21,65 @@ namespace foundation
     short length = 500;
     std::shared_ptr<KeyboardManager> kbManager = nullptr;
 
-    TextInputProps& set_is_one_line(const bool v)
+    TextInputProps&& set_is_one_line(const bool v)
     {
       is_one_line = v;
-      return *this;
+      return std::move(*this);
     }
 
-    TextInputProps& set_secure_timeout(const short v)
+    TextInputProps&& set_secure_timeout(const short v)
     {
       secure_timeout = v;
-      return *this;
+      return std::move(*this);
     }
 
-    TextInputProps& set_keyboard(std::shared_ptr<KeyboardManager> v)
+    TextInputProps&& set_keyboard(std::shared_ptr<KeyboardManager> v)
     {
       kbManager = v;
-      return *this;
+      return std::move(*this);
     }
 
-    TextInputProps& set_is_secure(const bool v)
+    TextInputProps&& set_is_secure(const bool v)
     {
       is_secure = v;
-      return *this;
+      return std::move(*this);
     }
 
 
-    TextInputProps& set_length(const short v)
+    TextInputProps&& set_length(const short v)
     {
       length = v;
-      return *this;
+      return std::move(*this);
     }
 
-    TextInputProps& hint(const char* text) {
+    TextInputProps&& hint(const char* text) {
       placeholder = text;
-      return *this;
+      return std::move(*this);
     }
 
-    TextInputProps& on_click_h(auto fn) {
+    TextInputProps&& on_click_h(auto fn) {
       on_click = fn;
-      return *this;
+      return std::move(*this);
     }
 
-    TextInputProps& on_focused_h(auto fn) {
+    TextInputProps&& on_focused_h(auto fn) {
       on_focused = fn;
-      return *this;
+      return std::move(*this);
     }
 
-    TextInputProps& on_defocused_h(auto fn) {
+    TextInputProps&& on_defocused_h(auto fn) {
       on_defocused = fn;
-      return *this;
+      return std::move(*this);
     }
 
-    TextInputProps& on_changed_h(auto fn) {
+    TextInputProps&& on_changed_h(auto fn) {
       on_value_changed = std::move(fn);
-      return *this;
+      return std::move(*this);
     }
 
-    TextInputProps& submit(auto fn) {
+    TextInputProps&& submit(auto fn) {
       on_submit = std::move(fn);
-      return *this;
+      return std::move(*this);
     }
   };
 }

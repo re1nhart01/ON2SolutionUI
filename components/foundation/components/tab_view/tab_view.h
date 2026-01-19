@@ -11,8 +11,8 @@ namespace foundation
     
     std::vector<lv_obj_t*> tab_pages;
 
-    explicit TabView(const TabViewProps& props) : Component(nullptr, nullptr, std::move(props)) {
-      this->apply_reactive<TabView>(this, props.reactive_delegates);
+    explicit TabView(TabViewProps&& props) : Component(nullptr, nullptr, std::move(props)) {
+      this->apply_reactive<TabView>(this, this->props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }
@@ -47,7 +47,7 @@ namespace foundation
       for (int in = 0; in < props.tabs.size(); in++) {
 
           auto name = props.tabs[in];
-          auto component = props.childrens[in];
+          VNode* component = props.childrens[in].get();
 
           if (component != nullptr)
           {
@@ -91,8 +91,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

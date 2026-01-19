@@ -16,8 +16,8 @@ namespace foundation
   public:
     using Component::props;
 
-   explicit Button(const ButtonProps &props) : Component(nullptr, nullptr, std::move(props)) {
-     this->apply_reactive<Button>(this, props.reactive_delegates);
+   explicit Button(ButtonProps&& props) : Component(nullptr, nullptr, std::move(props)) {
+     this->apply_reactive<Button>(this, this->props.reactive_delegates);
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }
@@ -42,6 +42,10 @@ namespace foundation
 
       set_component(lv_btn_create(parent_obj));
       lv_obj_t* obj = this->get_component();
+
+      if (const Styling* s = styling()) {
+        lv_obj_add_style(obj, s->getStyle(), LV_PART_MAIN);
+      }
 
       if (this->props.child != nullptr) {
           this->props.child->set_parent(obj);
@@ -80,13 +84,13 @@ namespace foundation
                             LV_FLEX_ALIGN_CENTER);
       
       this->set_active(this->props.is_visible);
-      if (label != nullptr)
+      if (label != nullptr && lv_obj_is_valid(label))
         {
           lv_label_set_text(label, props.text.c_str());
         }
 
-      if (const Styling* s = styling()) {
-          lv_obj_add_style(get_component(), s->getStyle(), LV_PART_MAIN);
+      if (auto style = styling(); style->get_is_dirty()) {
+        lv_obj_invalidate(obj);
       }
 
       if (props.child != nullptr) {
@@ -96,8 +100,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {

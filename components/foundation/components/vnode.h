@@ -13,7 +13,7 @@ namespace foundation {
     lv_obj_t* parent = nullptr;
 
     mutable Styling style{};
-    std::shared_ptr<VNode> renderer_view = nullptr;
+    std::unique_ptr<VNode> renderer_view = nullptr;
 
   public:
     virtual ~VNode()
@@ -55,6 +55,7 @@ namespace foundation {
     template<typename T>
     void detach_reactives(T* instance, std::vector<IReactive*>& states)
     {
+      ESP_LOGI("VNode", "apply_reactive called. Count: %d", states.size());
       for (auto* state : states) {
           if (state) state->detach(instance);
       }
@@ -63,6 +64,7 @@ namespace foundation {
 
     template<typename T>
     void apply_reactive(T* instance, const std::vector<Delegate<void(void*)>>& delegates) {
+      ESP_LOGI("VNode", "apply_reactive called. Count: %d", delegates.size());
       for (auto& binder : delegates) {
           if (binder) binder(static_cast<void*>(instance));
       }
@@ -73,6 +75,7 @@ namespace foundation {
       fn(style);
       if (component)
       {
+        lv_obj_remove_style(component, style.getStyle(), LV_PART_MAIN);
         lv_obj_add_style(component, style.getStyle(), 0);
       }
     }
@@ -102,8 +105,11 @@ namespace foundation {
       component_did_rebuild();
     }
 
-    lv_obj_t* delegate(const std::shared_ptr<VNode>& component_view) {
-      this->renderer_view = component_view;
+    lv_obj_t* delegate(std::unique_ptr<VNode> component_view) {
+      if (this->parent == nullptr) {
+          ESP_LOGE("VNode", "ERROR: Parent is NULL during delegate() in %s", typeid(*this).name());
+      }
+      this->renderer_view = std::move(component_view);
       this->renderer_view->set_parent(this->parent);
       this->set_component(this->renderer_view->render());
       return this->renderer_view->get_component();

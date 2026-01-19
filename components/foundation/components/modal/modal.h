@@ -13,10 +13,10 @@ namespace foundation
   public:
     using Component::props;
 
-    explicit Modal(const ModalProps& props)
-        : Component(nullptr, nullptr, props)
+    explicit Modal(ModalProps&& props)
+        : Component(nullptr, nullptr, std::move(props))
     {
-      this->apply_reactive<Modal>(this, props.reactive_delegates);
+      this->apply_reactive<Modal>(this, this->props.reactive_delegates);
         if (this->props.ref != nullptr) {
             this->props.ref->set(this);
         }
@@ -92,8 +92,6 @@ namespace foundation
 
     const Styling* styling() const override
     {
-      style.reset();
-
       apply_base_style(style);
 
       if (props.style_override) {
