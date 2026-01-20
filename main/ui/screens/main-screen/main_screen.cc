@@ -256,37 +256,6 @@ namespace ON2Solutions {
             .merge(header_container_props));
   }
 
-  $$View MainScreen::render_footer() const {
-    return $View(
-        ViewProps::up()
-            .set_children(children($Button(
-                ButtonProps::up()
-                    .set_style(FooterButtonApply)
-                    .set_child($Text(
-                        TextProps::up()
-                            .watch<Dataset>(
-                                DatasetStore::getInstance(), "main_button",
-                                [](Text* self, const Dataset& value) {
-                                  std::string status_str =
-                                      GetTextValueFromStatus(
-                                          GetStatusFromTextValue(
-                                              value.operative_data.status
-                                                  .data()));
-                                  self->set_state(
-                                      [status_str](TextProps& props) {
-                                        props.value(status_str);
-                                      });
-                                })
-                            .set_style(HeaderLabelApply)
-                            .value(locales::en::status))))))
-            .set_overflow(true)
-            .set_style([](Styling& style) {
-              style.setPadding(0, 0, 16, 16);
-              style.setBorderRadius(0);
-              style.setBorder(lv_color_make(255, 255, 255), 0, 0);
-            }));
-  }
-
   $$View MainScreen::render_body() const {
     auto make_circle = [&](const std::string& ref_name, int index) {
       return $Meter(
@@ -415,6 +384,37 @@ namespace ON2Solutions {
             .direction(LV_FLEX_FLOW_ROW));
   }
 
+  $$View MainScreen::render_footer() const {
+    return $View(
+        ViewProps::up()
+            .set_children(children($Button(
+                ButtonProps::up()
+                    .set_style(FooterButtonApply)
+                    .set_child($Text(
+                        TextProps::up()
+                            .watch<Dataset>(
+                                DatasetStore::getInstance(), "main_button",
+                                [](Text* self, const Dataset& value) {
+                                  std::string status_str =
+                                      GetTextValueFromStatus(
+                                          GetStatusFromTextValue(
+                                              value.operative_data.status
+                                                  .data()));
+                                  self->set_state(
+                                      [status_str](TextProps& props) {
+                                        props.value(status_str);
+                                      });
+                                })
+                            .set_style(HeaderLabelApply)
+                            .value(locales::en::status))))))
+            .set_overflow(true)
+            .set_style([](Styling& style) {
+              style.setPadding(0, 0, 16, 16);
+              style.setBorderRadius(0);
+              style.setBorder(lv_color_make(255, 255, 255), 0, 0);
+            }));
+  }
+
   lv_obj_t* MainScreen::render() {
     VNode::render();
     ESP_LOGI("main screen", "render");
@@ -457,8 +457,8 @@ namespace ON2Solutions {
                                                             .channels_count;
                                             self->set_state(
                                                 [count](TextProps& props) {
-                                                  props.value(std::format(
-                                                      "Channels: {}", count));
+                                                  props.value(fmt_str(
+                                                      "Channels: %d", count));
                                                 });
                                           })
                                       .value("Channels: 0"))))),
