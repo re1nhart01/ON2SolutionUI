@@ -47,7 +47,7 @@ namespace ON2Solutions {
       }
     };
 
-    inline $$View makeRow(const char* text, bool is_error,
+    inline $$View makeRow(short index, const char* text, bool is_error,
                           uint16_t height = 28) const {
       return $View(
           ViewProps::up()
@@ -64,16 +64,34 @@ namespace ON2Solutions {
               .track_cross(LV_FLEX_ALIGN_CENTER)
               .justify(LV_FLEX_ALIGN_START)
               .set_children(children(
-                  $View(ViewProps::up().w(25).h(15).set_style(
-                      [is_error](Styling& style) {
-                        style.setBackgroundColor(is_error ? ERROR_COLOR
-                                                          : NO_ERROR_COLOR);
-                        style.setBackgroundOpa(LV_OPA_COVER);
-                        style.setBorder(lv_color_make(0, 0, 0), 0,
-                                        LV_OPA_TRANSP);
-                        style.setBorderRadius(2);
-                        style.setPadding(0, 0, 0, 0);
-                      })),
+                  $View(
+                      ViewProps::up()
+                          .watch<parser::Dataset>(
+                              parser::DatasetStore::getInstance(), "error",
+                              [index](View* self,
+                                      const parser::Dataset& value) {
+                                bool is_enabled = is_up_bit_pos(
+                                    value.operative_data.errors, index);
+
+                                self->set_state([is_enabled](ViewProps& props) {
+                                  props.set_style([is_enabled](Styling& style) {
+                                    style.setBackgroundColor(
+                                        is_enabled ? ERROR_COLOR
+                                                   : NO_ERROR_COLOR);
+                                  });
+                                });
+                              })
+                          .w(25)
+                          .h(15)
+                          .set_style([is_error](Styling& style) {
+                            style.setBackgroundColor(is_error ? ERROR_COLOR
+                                                              : NO_ERROR_COLOR);
+                            style.setBackgroundOpa(LV_OPA_COVER);
+                            style.setBorder(lv_color_make(0, 0, 0), 0,
+                                            LV_OPA_TRANSP);
+                            style.setBorderRadius(2);
+                            style.setPadding(0, 0, 0, 0);
+                          })),
 
                   $View(ViewProps::up().w(2).h(1).set_style([](Styling& style) {
                     style.setBackgroundOpa(LV_OPA_TRANSP);
@@ -88,8 +106,8 @@ namespace ON2Solutions {
       Children rows;
       rows.reserve(33);
 
-      for (int i = 0; i < std::size(locales::en::info_bits_error); i++) {
-        rows.push_back(this->makeRow(locales::en::info_bits_error[i],
+      for (short i = 0; i < std::size(locales::en::info_bits_error); i++) {
+        rows.push_back(this->makeRow(i, locales::en::info_bits_error[i],
                                      is_up_bit_pos(this->props.error_hex, i)));
       }
 

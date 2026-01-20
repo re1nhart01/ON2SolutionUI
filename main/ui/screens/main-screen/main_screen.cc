@@ -27,6 +27,17 @@ namespace ON2Solutions {
       xHandle = nullptr;
     }
   };
+
+  void MainScreen::execute_status_trigger() const {
+    auto command = SerializableCommand<const char*> {
+      .command = SendableCommands::StatusCommand,
+    };
+
+    std::string serialized = serialize(command);
+
+    auto status = this->uart_handler->send(serialized);
+  }
+
   template <typename C>
   void MainScreen::update_styles(Component<C>* component,
                                  const Delegate<void(Styling&)>& style) {
@@ -406,7 +417,11 @@ namespace ON2Solutions {
                                       });
                                 })
                             .set_style(HeaderLabelApply)
-                            .value(locales::en::status))))))
+                            .value(locales::en::status)))
+                            .click([this](lv_event_t* e) {
+                              this->execute_status_trigger();
+                            })
+                            )))
             .set_overflow(true)
             .set_style([](Styling& style) {
               style.setPadding(0, 0, 16, 16);

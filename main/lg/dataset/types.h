@@ -3,6 +3,7 @@
 #include <array>
 #include <cstring>
 #include <string>
+#include <vector>
 
 namespace ON2Solutions::parser {
   // ST – Статус (A-StandBy, B-Booster Delay, C-Startup, D-Running, E-Producing, F-Alarm, G-Tank Full, H-Auto
@@ -43,6 +44,8 @@ namespace ON2Solutions::parser {
 };
 
   static const std::string unknown = "UN";
+
+  static const std::vector<const char*> PRESSURE_TYPE_OPTIONS{ "A", "B", "C" };
 
   enum class DatasetStatuses {
     StandBy,
@@ -149,23 +152,23 @@ namespace ON2Solutions::parser {
   };
 
   struct __attribute__((packed)) DatasetSettings {
-    std::array<float, 4> oxygen_sensor_offset;
-    std::array<float, 4> flow_sensor_offset;
-    uint16_t compressor_delay_sec;
-    uint16_t run_up_delay_sec;
-    uint16_t prestart_time_sec;
-    uint8_t low_limit_time_to_error_sec;
-    float work_oxygen_concentration;
-    float low_limit_oxygen_concentration;
-    uint8_t error_to_alarm_count;
-    uint8_t tank_high_pressure;
-    uint8_t tank_low_pressure;
-    float spv_on_time_sec;
-    float spv_off_time_sec;
-    std::array<char, 2> tank_pressure_sensor_type;
-    uint8_t temperature_overheat_alarm;
-    float flow_low_limit_to_error;
-    uint8_t calibrate_valve_1_9_cycle;  // 0 - disable
+    std::array<float, 4> oxygen_sensor_offset; // OS
+    std::array<float, 4> flow_sensor_offset; // FS
+    uint16_t compressor_delay_sec; // CD
+    uint16_t run_up_delay_sec; // RU
+    uint16_t prestart_time_sec; // PS
+    float work_oxygen_concentration; // WC
+    float low_limit_oxygen_concentration; // LL
+    uint8_t low_limit_time_to_error_sec; // LT
+    uint8_t error_to_alarm_count; // EC
+    uint8_t tank_high_pressure; // TH
+    uint8_t tank_low_pressure; // TL
+    float spv_on_time_sec; // VH
+    float spv_off_time_sec; // VL
+    std::array<char, 2> tank_pressure_sensor_type; // PT
+    uint8_t temperature_overheat_alarm; // TO
+    float flow_low_limit_to_error; // FE
+    uint8_t calibrate_valve_1_9_cycle;  // 0 - disable // CV
   };
 
   struct Dataset {
@@ -199,9 +202,9 @@ namespace ON2Solutions::parser {
         .compressor_delay_sec = 0,
         .run_up_delay_sec = 0,
         .prestart_time_sec = 0,
-        .low_limit_time_to_error_sec = 0,
         .work_oxygen_concentration = 0,
         .low_limit_oxygen_concentration = 0,
+        .low_limit_time_to_error_sec = 0,
         .error_to_alarm_count = 0,
         .tank_high_pressure = 0,
         .tank_low_pressure = 0,

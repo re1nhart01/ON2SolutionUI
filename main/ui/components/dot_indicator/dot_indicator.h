@@ -15,13 +15,13 @@ namespace ON2Solutions {
 
   struct DotIndicatorProps final
       : foundation::BaseProps<DotIndicatorProps, DotIndicator> {
-    uint32_t error_hex = 0;
+    uint32_t active_hex = 0;
     short dot_amount = 4;
     short width = 40;
     short height = 10;
 
     DotIndicatorProps&& set_value_hex(const uint32_t v) {
-      error_hex = v;
+      active_hex = v;
       return std::move(*this);
     }
 
@@ -93,7 +93,7 @@ namespace ON2Solutions {
 
     void do_rebuild() override {
       for (size_t i = 0; i < dots_ref.size(); ++i) {
-        bool is_enabled = is_up_bit_pos(this->props.error_hex, i);
+        bool is_enabled = is_up_bit_pos(this->props.active_hex, i);
 
         dots_ref[i]->set_state([is_enabled](ViewProps& props) {
           props.set_style([is_enabled](Styling& style) {

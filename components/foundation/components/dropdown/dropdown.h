@@ -31,6 +31,7 @@ namespace foundation {
       set_component(lv_dropdown_create(parent_obj));
       auto* obj = get_component();
 
+      lv_dropdown_clear_options(obj);
 
       for (auto option : this->props.options) {
         if (option != nullptr)
@@ -73,7 +74,7 @@ namespace foundation {
           };
           break;
         default:
-          ESP_LOGW("button", "Unknown event code %d", event->code);
+          break;
       }
     }
   };
