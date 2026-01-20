@@ -271,7 +271,7 @@ namespace ON2Solutions::parser::paramspec {
 
 #pragma region HELPERS
 
-  std::pair<float, float> calculate_dynamic_range(const ParamSpec& spec, float dependable) {
+  inline std::pair<float, float> calculate_dynamic_range(const ParamSpec& spec, float dependable) {
     float mn = spec.min;
     float mx = spec.max;
 

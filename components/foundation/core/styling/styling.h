@@ -61,7 +61,7 @@ public:
   Styling *setMaxHeight(const short height);
   Styling *setMaxWidth(const short height);
   Styling *setDirection(const short direction);
-  Styling *setGap(int row, int column);
+  Styling *setGap(short row, short column);
   Styling* setLayoutFlex();
   Styling* setFlexFlow(lv_flex_flow_t flow);
   Styling* setAlign(lv_flex_align_t align);

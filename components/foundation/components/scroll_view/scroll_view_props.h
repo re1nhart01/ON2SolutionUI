@@ -85,7 +85,6 @@ namespace foundation
       return std::move(*this);
     }
 
-    // --- paging helpers ---
     ScrollViewProps&& snap(lv_scroll_snap_t x, lv_scroll_snap_t y = LV_SCROLL_SNAP_NONE) {
       snap_x = x;
       snap_y = y;

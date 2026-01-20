@@ -42,11 +42,6 @@ inline uart_config_t uart_config = {
 }
 
 namespace UartTypes {
-  template <typename T>
-  struct UartAsyncData {
-    std::string packet;
-    T* screen;
-  };
   struct UartData {
     char packet[512];
     size_t len;
@@ -60,10 +55,6 @@ namespace UartTypes {
     char* key_v;
     uart_event_type_t event;
     foundation::Delegate<void(UartCallbackResponse)> delegate;
-  };
-  struct ProtocolConfig {
-    char start_marker;
-    char end_marker;
   };
 }  // namespace UartTypes
 

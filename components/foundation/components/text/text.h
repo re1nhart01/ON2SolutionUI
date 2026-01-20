@@ -8,9 +8,6 @@ namespace foundation
     explicit Text(TextProps&& props) : Component(std::move(props)) {
       this->apply_reactive<Text>(this, this->props.reactive_delegates);
 
-      for (auto& binder : props.reactive_delegates) {
-          if (binder) binder(this);
-      }
       if (this->props.ref != nullptr) {
           this->props.ref->set(this);
       }
