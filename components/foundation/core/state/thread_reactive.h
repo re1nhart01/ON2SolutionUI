@@ -97,10 +97,9 @@ namespace foundation
         {
           Lock lock(_mutex);
           current = value_store;
+          T next = fn(current);
+          set(next);
         }
-
-        T next = fn(current);
-        set(next);
       }
 
       void set(const T& newValue) {
@@ -112,11 +111,10 @@ namespace foundation
           Lock lock(_mutex);
           value_store = newValue;
           snapshot = bindings;
-        }
-
-        for (auto& b : snapshot) {
-          if (b.component && b.updater) {
-            b.updater(b.component, newValue);
+          for (auto& b : snapshot) {
+            if (b.component && b.updater) {
+              b.updater(b.component, newValue);
+            }
           }
         }
       }

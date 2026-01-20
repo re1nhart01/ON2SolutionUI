@@ -132,6 +132,11 @@ namespace ON2Solutions {
     style.setFont(&lv_font_montserrat_12);
   };
 
+  inline static auto LabelPaddedApply = [](Styling& style) {
+    style.setFont(&lv_font_montserrat_12);
+    style.setPadding(16, 16, 0, 0);
+  };
+
   inline static auto HeaderLabelContainerApply = [](Styling& style) {
     style.setFont(&lv_font_montserrat_12);
     style.setPadding(8, 8, 16, 16);

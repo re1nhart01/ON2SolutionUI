@@ -5,6 +5,7 @@
 #include <protocols/uart/uart_proto.h>
 #include <ui/components/info_modal/info_modal.h>
 #include "ui/components/errors_modal/error_modal.h"
+#include <ui/components/dot_indicator/dot_indicator.h>
 #include <ui/styles/common_styles.h>
 #include "../../components/foundation/core/shortcuts.h"
 #include "../../components/foundation/core/state/state.h"
@@ -45,6 +46,7 @@ namespace ON2Solutions {
     $$View render_header();
     $$View render_footer() const;
     $$View render_body() const;
+    $$View render_body_left() const;
     lv_obj_t* render() override;
     const Styling* styling() const override;
     MainScreen* append(lv_obj_t* obj) override;

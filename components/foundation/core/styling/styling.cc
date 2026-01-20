@@ -216,7 +216,7 @@ Styling* Styling::setDirection(const short direction) {
   return this;
 }
 
-Styling* Styling::setGap(const int row, const int column) {
+Styling* Styling::setGap(const short row, const short column) {
   this->dirty = true;
   lv_style_set_pad_row(style.get(), row);
   lv_style_set_pad_column(style.get(), column);

@@ -22,3 +22,10 @@ inline bool is_up_bit_pos(int value, short pos = 0)
  *
  *  pos count from zero
  */
+
+template<typename... Args, size_t Capacity = 64>
+std::string fmt_str(const char* fmt, Args... args) {
+  char buf[Capacity];
+  snprintf(buf, sizeof(buf), fmt, args...);
+  return std::string(buf);
+}

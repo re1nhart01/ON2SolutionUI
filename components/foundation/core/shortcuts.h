@@ -131,6 +131,9 @@ inline std::unique_ptr<foundation::Dropdown> $Dropdown(
 
 using Children = std::vector<std::unique_ptr<foundation::VNode>>;
 
+template <typename T>
+using ChildrenTyped = std::vector<std::unique_ptr<T>>;
+
 template <typename... Nodes>
 std::vector<std::unique_ptr<foundation::VNode>> children(Nodes&&... nodes) {
   std::vector<std::unique_ptr<foundation::VNode>> v;

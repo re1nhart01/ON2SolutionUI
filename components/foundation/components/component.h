@@ -3,6 +3,8 @@
 #include "core/structures/delegate.h"
 #include "vnode.h"
 
+#include <internals/lvgl_port.h>
+
 namespace foundation {
   template<typename Props>
   class Component : public virtual VNode {
@@ -31,14 +33,21 @@ namespace foundation {
           }
       );
 
-      lv_async_call(
-          [](void* user_data) {
-              auto* ctx = static_cast<Delegate<void()>*>(user_data);
-              (*ctx)();
-              delete ctx;
-          },
-          ctx
-      );
+        if (lvgl_port_lock(-1)) {
+            lv_async_call(
+                [](void* user_data) {
+                    auto* ctx = static_cast<Delegate<void()>*>(user_data);
+                    if (ctx) {
+                        (*ctx)();
+                        delete ctx;
+                    }
+                },
+                ctx
+            );
+            lvgl_port_unlock();
+        } else {
+            delete ctx;
+        }
     }
   };
 

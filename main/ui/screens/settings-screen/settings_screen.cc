@@ -56,28 +56,28 @@ namespace ON2Solutions {
                 render_section_header(locales::en::oxygen_offset_setting),
                 make_param(
                     OxygenShiftASpec, dataset.oxygen_sensor_offset[0], 0,
-                    []() {}, 165),
+                    [](float value) {}, 165),
                 make_param(
                     OxygenShiftBSpec, dataset.oxygen_sensor_offset[1], 0,
-                    []() {}, 165),
+                    [](float value) {}, 165),
                 make_param(
                     OxygenShiftCSpec, dataset.oxygen_sensor_offset[2], 0,
-                    []() {}, 165),
+                    [](float value) {}, 165),
                 make_param(
                     OxygenShiftDSpec, dataset.oxygen_sensor_offset[3], 0,
-                    []() {}, 165),
+                    [](float value) {}, 165),
                 render_section_header(locales::en::oxygen_flow_setting),
                 make_param(
-                    FlowShiftASpec, dataset.flow_sensor_offset[0], 0, []() {},
+                    FlowShiftASpec, dataset.flow_sensor_offset[0], 0, [](float value) {},
                     165),
                 make_param(
-                    FlowShiftBSpec, dataset.flow_sensor_offset[1], 0, []() {},
+                    FlowShiftBSpec, dataset.flow_sensor_offset[1], 0, [](float value) {},
                     165),
                 make_param(
-                    FlowShiftCSpec, dataset.flow_sensor_offset[2], 0, []() {},
+                    FlowShiftCSpec, dataset.flow_sensor_offset[2], 0, [](float value) {},
                     165),
                 make_param(
-                    FlowShiftDSpec, dataset.flow_sensor_offset[3], 0, []() {},
+                    FlowShiftDSpec, dataset.flow_sensor_offset[3], 0, [](float value) {},
                     165)))
             .w(LV_PCT(100))
             .h(LV_SIZE_CONTENT));
@@ -93,12 +93,12 @@ namespace ON2Solutions {
             .justify(LV_FLEX_ALIGN_CENTER)
             .set_children(children(
                 make_param(CompressorDelaySpec, dataset.compressor_delay_sec, 0,
-                           []() {}),
-                make_param(RunUpTimeSpec, dataset.run_up_delay_sec, 0, []() {}),
+                           [](float value) {}),
+                make_param(RunUpTimeSpec, dataset.run_up_delay_sec, 0, [](float value) {}),
                 make_param(PreStartTimeSpec, dataset.prestart_time_sec, 0,
-                           []() {}),
+                           [](float value) {}),
                 make_param(LowLimitTimeSpec,
-                           dataset.low_limit_oxygen_concentration, 0, []() {})))
+                           dataset.low_limit_oxygen_concentration, 0, [](float value) {})))
             .w(LV_PCT(100))
             .h(LV_SIZE_CONTENT));
   }
@@ -112,22 +112,21 @@ namespace ON2Solutions {
                      .justify(LV_FLEX_ALIGN_CENTER)
                      .set_children(children(
                          make_param(WorkConcentrationSpec,
-                                    dataset.compressor_delay_sec, 0, []() {}),
+                                    dataset.work_oxygen_concentration, 0, [](float value) {}),
                          make_param(LowLimitConcentrationSpec,
-                                    dataset.compressor_delay_sec, 0, []() {}),
+                                    dataset.low_limit_oxygen_concentration, 0, [](float value) {}),
                          make_param(LowLimitTimeSpec,
-                                    dataset.compressor_delay_sec, 0, []() {}),
+                                    dataset.low_limit_time_to_error_sec, 0, [](float value) {}),
                          make_param(TankHighLimitSpec,
-                                    dataset.compressor_delay_sec, 0, []() {}),
+                                    dataset.tank_high_pressure, 0, [](float value) {}),
                          make_param(TankLowLimitSpec,
-                                    dataset.compressor_delay_sec, 0, []() {}),
+                                    dataset.tank_low_pressure, 0, [](float value) {}),
                          make_param(TempOverheatSpec,
-                                    dataset.compressor_delay_sec, 0, []() {}),
-                         dataset.compressor_delay_sec, 0, []() {},
-                         make_param(FlowErrorSpec, dataset.compressor_delay_sec,
-                                    0, []() {}),
+                                    dataset.temperature_overheat_alarm, 0, [](float value) {}),
+                         make_param(FlowErrorSpec, dataset.flow_low_limit_to_error,
+                                    0, [](float value) {}),
                          make_param(ErrorCountSpec,
-                                    dataset.compressor_delay_sec, 0, []() {})))
+                                    dataset.error_to_alarm_count, 0, [](float value) {})))
                      .w(LV_PCT(100))
                      .h(LV_SIZE_CONTENT));
   }
@@ -142,9 +141,9 @@ namespace ON2Solutions {
             .justify(LV_FLEX_ALIGN_CENTER)
             .set_children(children(
                 make_param(ValveHighTimeSpec, dataset.spv_on_time_sec, 0,
-                           []() {}),
+                           [](float value) {}),
                 make_param(ValveLowTimeSpec, dataset.spv_off_time_sec, 0,
-                           []() {}),
+                           [](float value) {}),
                 $Button(ButtonProps::up()
                             .set_child(
                                 $Text(TextProps::up().value("Hour Run Reset")))
