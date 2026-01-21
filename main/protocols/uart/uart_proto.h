@@ -26,8 +26,6 @@ static auto TAG = "example";
 
 #define BUF_SIZE (1024)
 #define UART_EMPTY_THRESH_DEFAULT (10)
-static SemaphoreHandle_t uart_mutex;
-static QueueHandle_t uart_queue;
 
 extern "C" {
 inline uart_config_t uart_config = {
@@ -60,6 +58,8 @@ namespace UartTypes {
 
 class UartHandler {
  private:
+  SemaphoreHandle_t uart_mutex = nullptr;
+  QueueHandle_t uart_queue = nullptr;
   int tx_pin;
   int rx_pin;
   int baud_rate = 9600;
@@ -70,7 +70,7 @@ class UartHandler {
   TaskHandle_t task_handle = nullptr;
   std::string rx_buffer;
   bool is_recording = false;
-  bool is_on = false;
+  volatile bool is_on = false;
 
   bool push_array(const UartTypes::UartHandlerEvent& value) {
     if (size < list.size()) {
@@ -103,6 +103,43 @@ class UartHandler {
                 stack_dept, this, 12, &this->task_handle);
     is_on = true;
     return true;
+  }
+
+  void stop() {
+    if (!is_on) return;
+
+    is_on = false;
+
+    uart_disable_rx_intr(current_uart_num);
+    uart_disable_tx_intr(current_uart_num);
+
+    if (uart_queue) {
+      uart_event_t ev{};
+      ev.type = UART_BREAK;
+      xQueueSend(uart_queue, &ev, 0);
+    }
+
+    if (task_handle) {
+      vTaskDelete(task_handle);
+      task_handle = nullptr;
+    }
+
+    if (uart_queue) {
+      uart_flush_input(current_uart_num);
+    }
+
+    uart_driver_delete(current_uart_num);
+    uart_queue = nullptr;
+
+    list = {};
+    size = 0;
+
+    if (uart_mutex) {
+      vSemaphoreDelete(uart_mutex);
+      uart_mutex = nullptr;
+    }
+
+    ESP_LOGI(TAG, "UART fully stopped");
   }
 
   static void uart_interrupt_handler_trampoline(void* pvParameters) {
@@ -156,6 +193,7 @@ class UartHandler {
     }
 
     this->list = {};
+    this->size = 0;
     ESP_LOGI(TAG, "Deleting UART driver...");
     if (const esp_err_t err = uart_driver_delete(current_uart_num);
         err != ESP_OK) {

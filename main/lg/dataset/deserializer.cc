@@ -23,7 +23,7 @@ namespace ON2Solutions::parser {
   using namespace ON2Solutions::parser::helpers;
 
   PacketType validate_type(const char* packet_string, const size_t len) {
-    if (packet_string == nullptr || len < 40)
+    if (packet_string == nullptr || len < 3)
       return PacketType::UNKNOWN;
 
     if (packet_string[0] == '$')
@@ -32,6 +32,8 @@ namespace ON2Solutions::parser {
       return PacketType::SETTINGS;
     if (packet_string[0] == '#' && packet_string[3] == 'G')
       return PacketType::SYSTEM_INFO;
+    if (packet_string[0] == '#' && packet_string[3] == 'R')
+      return PacketType::OPTIONAL;
 
     return PacketType::UNKNOWN;
   }
@@ -82,6 +84,16 @@ namespace ON2Solutions::parser {
       } else if (key_len == 2 && key[0] == 'H' && key[1] == 'R') {
         copy_string(&dataset->operative_data.moto_hours,
                     sizeof(dataset->operative_data.moto_hours), val, val_len);
+      }
+    }
+
+    // OPTIONAL (RESET COUNTDOWN)
+    if (type == PacketType::OPTIONAL) {
+      if (key_len == 2 && key[0] == 'R' && key[1] == 'S') {
+        uint8_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->optional.reset_countdown_sec = out;
+        }
       }
     }
 
@@ -271,12 +283,10 @@ namespace ON2Solutions::parser {
       case PacketType::OPERATIVE:
         parse_data('$', dataset, packet_string, type);
         break;
+      case PacketType::OPTIONAL:
+      case PacketType::SYSTEM_INFO:
       case PacketType::SETTINGS:
         parse_data('#', dataset, packet_string, type);
-        break;
-      case PacketType::SYSTEM_INFO:
-        parse_data('#', dataset, packet_string, type);
-        break;
       default:
         break;
     }

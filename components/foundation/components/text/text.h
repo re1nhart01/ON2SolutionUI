@@ -38,6 +38,10 @@ namespace foundation
         lv_label_set_text(obj, props.text.c_str());
       }
 
+      if (const Styling* s = styling()) {
+        lv_obj_add_style(obj, s->getStyle(), LV_PART_MAIN);
+      }
+
       const auto& e = props;
       if (e.on_click)       lv_obj_add_event_cb(obj, e.on_click, LV_EVENT_CLICKED, nullptr);
       if (e.on_long_press)  lv_obj_add_event_cb(obj, e.on_long_press, LV_EVENT_LONG_PRESSED, nullptr);

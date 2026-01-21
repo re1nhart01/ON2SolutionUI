@@ -22,12 +22,10 @@ namespace ON2Solutions {
     $$InfoModal info_modal = nullptr;
     $$ErrorModal error_modal = nullptr;
     TaskHandle_t xHandle = nullptr;
-    Reactive<int> reactive_moto_lvgl;
-
+    std::shared_ptr<AnimatedControl> alarm_control = nullptr;
    public:
     explicit MainScreen(StackNavigator* stack, MainScreenProps props)
-        : NavigationScreen(stack, std::move(props)),
-          reactive_moto_lvgl(0) {
+        : NavigationScreen(stack, std::move(props)), alarm_control(std::make_shared<AnimatedControl>()) {
     }
 
     ~MainScreen() override {
@@ -48,6 +46,7 @@ namespace ON2Solutions {
     $$View render_footer() const;
     $$View render_body() const;
     $$View render_body_left() const;
+    $$Animated render_animated_alarm() const;
     lv_obj_t* render() override;
     const Styling* styling() const override;
     MainScreen* append(lv_obj_t* obj) override;

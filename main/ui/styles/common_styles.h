@@ -4,6 +4,7 @@
 
 #include "components/view/view_props.h"
 #include "core/style_store/style_store.h"
+#include "lg/dataset/types.h"
 #include "theme.h"
 
 //----------------------------------- Shorthands
@@ -21,6 +22,16 @@ namespace ON2Solutions {
     return s;
   }();
 
+  inline static auto AlarmTextStyleApply = [](Styling& s) {
+    s.setTextColor(ERROR_COLOR);
+    s.setTextOpacity(255);
+  };
+
+  inline static auto DefaultTextStyleApply = [](Styling& s) {
+    s.setTextColor(lv_color_white());
+    s.setTextOpacity(255);
+  };
+
   inline foundation::ViewProps& screen_container_props(
       foundation::ViewProps& p) {
     p.w(LV_PCT(100));
@@ -31,6 +42,37 @@ namespace ON2Solutions {
     p.direction(LV_FLEX_FLOW_COLUMN);
 
     return p;
+  }
+
+  inline lv_color_t button_color_by_status(parser::DatasetStatuses status) {
+    switch (status) {
+      case parser::DatasetStatuses::StandBy:
+        return STATUS_STANDBY;
+
+      case parser::DatasetStatuses::BoosterDelay:
+        return STATUS_BOOSTER_DELAY;
+
+      case parser::DatasetStatuses::Startup:
+        return STATUS_STARTUP;
+
+      case parser::DatasetStatuses::Running:
+        return STATUS_RUNNING;
+
+      case parser::DatasetStatuses::Producing:
+        return STATUS_PRODUCING;
+
+      case parser::DatasetStatuses::Alarm:
+        return STATUS_ALARM;
+
+      case parser::DatasetStatuses::TankFull:
+        return STATUS_TANK_FULL;
+
+      case parser::DatasetStatuses::AutoAdjusting:
+        return STATUS_AUTO_ADJUSTING;
+
+      default:
+        return ACTIVE_INDICATOR;
+    }
   }
 
   // ---------------------------- HEADER MAIN ----------------------------
@@ -129,16 +171,16 @@ namespace ON2Solutions {
   };
 
   inline static auto HeaderLabelApply = [](Styling& style) {
-    style.setFont(&lv_font_montserrat_12);
+    style.setFont(&lv_font_montserrat_14);
   };
 
   inline static auto LabelPaddedApply = [](Styling& style) {
-    style.setFont(&lv_font_montserrat_12);
-    style.setPadding(16, 16, 0, 0);
+    style.setFont(&lv_font_montserrat_14);
+    style.setPadding(4, 4, 0, 0);
   };
 
   inline static auto HeaderLabelContainerApply = [](Styling& style) {
-    style.setFont(&lv_font_montserrat_12);
+    style.setFont(&lv_font_montserrat_14);
     style.setPadding(8, 8, 16, 16);
   };
 

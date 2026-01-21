@@ -62,6 +62,7 @@
 
 
 #include "core/styling/styling.h"
+#include "core/animated/animated_control.h"
 
 #include "core/state/reactive.h"
 #include "core/structures/debounce.h"

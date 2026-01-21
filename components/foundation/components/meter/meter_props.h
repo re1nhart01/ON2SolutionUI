@@ -7,6 +7,7 @@ namespace foundation
   struct MeterProps final : BaseProps<MeterProps, Meter> {
     std::string label_symbol = "%";
     bool show_label_default = false;
+    Delegate<void(Styling&)> text_style_override{};
     int min_v = 0;
     int max_v = 100;
     float current_v = 0;
@@ -46,6 +47,12 @@ namespace foundation
 
     MeterProps&& h(short v) {
       height = v;
+      return std::move(*this);
+    }
+
+    MeterProps&& set_text_style(Delegate<void(Styling&)> fn)
+    {
+      text_style_override = std::move(fn);
       return std::move(*this);
     }
   };

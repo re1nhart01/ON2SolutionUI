@@ -3,11 +3,13 @@
 #include "core/styling/styling.h"
 #include "meter_props.h"
 
+#include <core/shortcuts.h>
+
 namespace foundation
 {
   class Meter final : public Component<MeterProps> {
     lv_meter_indicator_t* indic = nullptr;
-    lv_obj_t* label_obj = nullptr;
+    std::unique_ptr<Text> label_obj = nullptr;
 
   public:
     explicit Meter(MeterProps&& props)
@@ -50,8 +52,10 @@ namespace foundation
       lv_meter_set_indicator_value(obj, indic, static_cast<int>(props.current_v));
 
       if (props.show_label_default) {
-        label_obj = lv_label_create(obj);
-        lv_obj_align(label_obj, LV_ALIGN_CENTER, 0, props.height / 3);
+        label_obj = std::make_unique<Text>(TextProps::up().set_style(this->props.text_style_override));
+        label_obj->set_parent(obj);
+        label_obj->render();
+        lv_obj_align(label_obj->get_component(), LV_ALIGN_CENTER, 0, props.height / 3);
         update_label_text();
       }
 
@@ -75,11 +79,11 @@ namespace foundation
     };
 
     void update_label_text() const {
-      if (!label_obj) return;
+      if (!label_obj || !label_obj->get_component()) return;
       char buf[32];
 
       snprintf(buf, sizeof(buf), "%.1f%s", props.current_v, props.label_symbol.c_str());
-      lv_label_set_text(label_obj, buf);
+      lv_label_set_text(label_obj->get_component(), buf);
     }
 
     const Styling* styling() const override {

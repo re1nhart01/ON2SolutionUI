@@ -13,7 +13,7 @@ namespace ON2Solutions::parser {
   inline const char* CH_PACKETS[15] = {
     "$</CH=1/ST=F/O2=95.1;79.8;20.1;0.0/FL=10.2;9.8;1.1;5.5/TR=12;18/II=F/IO=FF0F/ER=8FF0FF00/PS=50;1/"
     "HR=111111111:41>",
-    "$</CH=2/ST=T/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/"
+    "$</CH=2/ST=A/O2=94.5;80.1;19.9;0.0/FL=10.0;9.9;1.2;5.6/TR=10;15/II=F/IO=FFFF/ER=8FFFFF00/PS=51;0/"
     "HR=123456789:42>",
     "$</CH=3/ST=H/O2=93.8;81.0;19.5;0.2/FL=9.8;10.3;1.4;5.3/TR=9;14/II=T/IO=0FFF/ER=8FFF0000/PS=52;0/"
     "HR=223456789:43>",
@@ -171,6 +171,10 @@ namespace ON2Solutions::parser {
     uint8_t calibrate_valve_1_9_cycle;  // 0 - disable // CV
   };
 
+  struct __attribute__((packed)) DatasetOptional {
+    uint8_t reset_countdown_sec;
+  };
+
   struct Dataset {
     bool operator==(const Dataset&) const {};
 
@@ -214,6 +218,9 @@ namespace ON2Solutions::parser {
         .temperature_overheat_alarm = 0,
         .flow_low_limit_to_error = 0,
         .calibrate_valve_1_9_cycle = 0,
+    };
+    DatasetOptional optional{
+      .reset_countdown_sec = 0,
     };
   };
 }  // namespace ON2Solutions::on2::parser

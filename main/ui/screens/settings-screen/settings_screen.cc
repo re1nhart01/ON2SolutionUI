@@ -6,11 +6,17 @@
 namespace ON2Solutions {
 
   void SettingsScreen::on_focus() {
+    NavigationScreen::on_focus();
     this->uart_handler = std::make_unique<UartHandler>(
         UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
-    // this->uart_handler->init();
-    // this->uart_handler->enable_rx(true);
+    this->uart_handler->init();
+    this->uart_handler->enable_rx(true);
   }
+
+  void SettingsScreen::on_blur() {
+    NavigationScreen::on_blur();
+    this->uart_handler->stop();
+  };
 
   template <typename T>
   void SettingsScreen::update_param(const ParamSpec& spec, T value, T min,
@@ -24,6 +30,9 @@ namespace ON2Solutions {
         .with_num_sensor = spec.with_num_sensor,
     };
     std::string serialized = parser::serialize(command);
+
+    ESP_LOGI("SettingsScreen", "Updating settings: %s", serialized.c_str());
+
     auto status = this->uart_handler->send(serialized);
   }
 
@@ -63,11 +72,6 @@ namespace ON2Solutions {
                                                       uint8_t min,
                                                       uint8_t max) const;
 
-  void SettingsScreen::on_blur() {
-    NavigationScreen::on_blur();
-    this->uart_handler->remove_all_event_listeners();
-  };
-
   $$View SettingsScreen::render_section_header(
       const std::string& heading) const {
 
@@ -102,8 +106,10 @@ namespace ON2Solutions {
                 })
             .size(width, 55)
             .on_change([this, spec, min, max](const float v) {
-              this->update_param<T>(
-                  spec, static_cast<T>(std::clamp(v, min, max)), min, max);
+              this->debounce->exec([this, spec, v, min, max]() {
+                this->update_param<T>(
+                    spec, static_cast<T>(std::clamp(v, min, max)), min, max);
+              });
             })
             .btn_width(45));
   }
@@ -190,30 +196,32 @@ namespace ON2Solutions {
                            dataset.spv_on_time_sec),
                 make_param(CalibrateValveSpec,
                            dataset.calibrate_valve_1_9_cycle, 0),
-                $View(ViewProps::up()
-                          .w(165)
-                          .h(85)
-                          .set_style(NoPaddingApply)
-                          .direction(LV_FLEX_FLOW_COLUMN)
-                          .justify(LV_FLEX_ALIGN_START)
-                          .items(LV_FLEX_ALIGN_CENTER)
-                          .track_cross(LV_FLEX_ALIGN_CENTER)
-                          .set_children(children(
-                              $Text(TextProps::up()
-                                        .set_style(LabelPaddedApply)
-                                        .value(
-                                            locales::en::pressure_sensor_type)),
-                              $Dropdown(DropdownProps::up()
-                                            .set_options(
-                                                parser::PRESSURE_TYPE_OPTIONS)
-                                            .change([this](const char* option) {
-                                              this->update_param(
-                                                  PressureTypeSensorSpec,
-                                                  option);
-                                            }))))),
+                $View(
+                    ViewProps::up()
+                        .w(165)
+                        .h(85)
+                        .set_style(NoPaddingApply)
+                        .direction(LV_FLEX_FLOW_COLUMN)
+                        .justify(LV_FLEX_ALIGN_START)
+                        .items(LV_FLEX_ALIGN_CENTER)
+                        .track_cross(LV_FLEX_ALIGN_CENTER)
+                        .set_children(children(
+                            $Text(
+                                TextProps::up()
+                                    .set_style(LabelPaddedApply)
+                                    .value(locales::en::pressure_sensor_type)),
+                            $Dropdown(
+                                DropdownProps::up()
+                                    .set_options(parser::PRESSURE_TYPE_OPTIONS)
+                                    .change([this](const char* option) {
+                                      this->debounce->exec([this, option]() {
+                                        this->update_param(
+                                            PressureTypeSensorSpec, option);
+                                      });
+                                    }))))),
                 $Button(ButtonProps::up()
-                            .set_child(
-                                $Text(TextProps::up().value("Hour Run Reset")))
+                            .set_child($Text(TextProps::up().value(
+                                locales::en::hour_run_reset)))
                             .click([this](lv_event_t* e) {
                               this->hour_run_reset();
                             }))))

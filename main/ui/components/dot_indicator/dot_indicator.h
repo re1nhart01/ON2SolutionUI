@@ -79,7 +79,7 @@ namespace ON2Solutions {
         auto dot =
             $View(ViewProps::up().w(8).h(8).set_style([](Styling& style) {
               style.setBorderRadius(100);
-              style.setBackgroundColor(lv_color_hex(0x000000));
+              style.setBackgroundColor(NOT_ACTIVE_INDICATOR);
               style.setBorder(lv_color_make(0, 0, 0), 0, LV_OPA_TRANSP);
               style.setPadding(0, 0, 0, 0);
             }));

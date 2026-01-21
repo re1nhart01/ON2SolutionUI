@@ -21,10 +21,10 @@ namespace ON2Solutions {
   class SettingsScreen final : public NavigationScreen<SettingsScreenProps> {
    private:
     std::unique_ptr<UartHandler> uart_handler = nullptr;
-
+    std::unique_ptr<Debounce> debounce = nullptr;
    public:
     explicit SettingsScreen(StackNavigator* stack, SettingsScreenProps props)
-        : NavigationScreen(stack, std::move(props)) {}
+        : NavigationScreen(stack, std::move(props)), debounce(std::make_unique<Debounce>(800)) {}
 
     void on_focus() override;
     void on_blur() override;

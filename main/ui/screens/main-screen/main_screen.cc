@@ -12,25 +12,25 @@ namespace ON2Solutions {
     NavigationScreen::on_focus();
     this->uart_handler = std::make_unique<UartHandler>(
         UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
-    start_random_updater();
+    // start_random_updater();
     ESP_LOGI("main_screen", "on_FOCUS");
-    // this->uart_handler->init();
-    // this->uart_handler->enable_rx(true);
-    // this->add_uart_data_event();
+    this->uart_handler->init();
+    this->uart_handler->enable_rx(true);
+    this->add_uart_data_event();
   };
 
   void MainScreen::on_blur() {
     NavigationScreen::on_blur();
-    this->uart_handler->remove_all_event_listeners();
-    if (xHandle != nullptr) {
-      vTaskDelete(xHandle);
-      xHandle = nullptr;
-    }
+    this->uart_handler->stop();
+    // if (xHandle != nullptr) {
+    // vTaskDelete(xHandle);
+    // xHandle = nullptr;
+    // }
   };
 
   void MainScreen::execute_status_trigger() const {
-    auto command = SerializableCommand<const char*> {
-      .command = SendableCommands::StatusCommand,
+    auto command = SerializableCommand<const char*>{
+        .command = SendableCommands::StatusCommand,
     };
 
     std::string serialized = serialize(command);
@@ -102,22 +102,21 @@ namespace ON2Solutions {
   }
 
   void MainScreen::add_uart_data_event() {
-    auto* moto_lvgl = &this->reactive_moto_lvgl;
     this->uart_handler->add_event_listener(UartTypes::UartHandlerEvent{
         .key_v = const_cast<char*>("read_data_dto"),
         .event = UART_DATA,
-        .delegate = [moto_lvgl](
-                        const UartTypes::UartCallbackResponse& uart_data) {
+        .delegate = [](const UartTypes::UartCallbackResponse& uart_data) {
           if (strlen(uart_data.response.packet) <= 0)
             return;
 
           struct AsyncStructure {
             std::string packet;
-            Reactive<int>* reactive_moto_lvgl;
           };
 
-          auto args = new AsyncStructure{.packet = uart_data.response.packet,
-                                         .reactive_moto_lvgl = moto_lvgl};
+          ESP_LOGI("main_screen", "Received data from UART %s",
+                   uart_data.response.packet);
+
+          auto args = new AsyncStructure{.packet = uart_data.response.packet};
 
           lv_async_call(
               [](void* arg) {
@@ -125,10 +124,7 @@ namespace ON2Solutions {
                 Dataset dataset = DatasetStore::getInstance()->get();
                 parse(&dataset, p->packet.c_str(), p->packet.length());
                 DatasetStore::getInstance()->set(dataset);
-                if (p->reactive_moto_lvgl) {
-                  p->reactive_moto_lvgl->set(
-                      [](const int& prev) { return prev + 1; });
-                }
+
                 delete p;
               },
               args);
@@ -333,10 +329,60 @@ namespace ON2Solutions {
             .direction(LV_FLEX_FLOW_COLUMN));
   }
 
+  $$Animated MainScreen::render_animated_alarm() const {
+    return $Animated(
+        AnimatedProps::up()
+            .from(255)
+            .to(120)
+            .stop(255)
+            .time(600)
+            .playback(600)
+            .wait(1500)
+            .easing(lv_anim_path_ease_in_out)
+            .set_control("alarm_anim", alarm_control)
+            .set_auto_start(false)
+            .repeat(LV_ANIM_REPEAT_INFINITE)
+            .prop(AnimatedProps::Property::Opacity)
+            .on($Text(TextProps::up()
+                          .set_style(HeaderLabelApply)
+                          .watch<Dataset>(
+                              DatasetStore::getInstance(), "alarm_text",
+                              [this](Text* self, const Dataset& value) {
+                                bool is_alarm_now =
+                                    value.optional.reset_countdown_sec != 0 &&
+                                    GetStatusFromTextValue(
+                                        value.operative_data.status.data()) ==
+                                        DatasetStatuses::Alarm;
+                                uint8_t count =
+                                    value.optional.reset_countdown_sec;
+                                ESP_LOGI("main screen", "alarm_text %d", count);
+
+                                self->set_state([value, is_alarm_now,
+                                                 count](TextProps& props) {
+                                  props.value(is_alarm_now
+                                                  ? fmt_str("Alarm to "
+                                                            "reset: %d",
+                                                            count)
+                                                  : "ON2 Systems");
+                                  props.set_style(is_alarm_now
+                                                      ? AlarmTextStyleApply
+                                                      : DefaultTextStyleApply);
+                                });
+                                if (is_alarm_now) {
+                                  this->alarm_control->play("alarm_anim");
+                                } else {
+                                  this->alarm_control->stop("alarm_anim");
+                                }
+                              })
+                          .value("ON2 Systems"))));
+  }
+
   $$View MainScreen::render_body_left() const {
     auto make_circle = [&](const std::string& ref_name, int index) {
       return $Meter(
           MeterProps::up()
+              .set_text_style(
+                  [](Styling& style) { style.setFont(&lv_font_montserrat_20); })
               .watch<Dataset>(
                   DatasetStore::getInstance(), "outputs",
                   [index, ref_name](Meter* self, const Dataset& value) {
@@ -401,6 +447,18 @@ namespace ON2Solutions {
             .set_children(children($Button(
                 ButtonProps::up()
                     .set_style(FooterButtonApply)
+                    .watch<Dataset>(
+                        DatasetStore::getInstance(), "main_button_body",
+                        [](Button* self, const Dataset& value) {
+                          auto color =
+                              button_color_by_status(GetStatusFromTextValue(
+                                  value.operative_data.status.data()));
+                          self->set_state([color](ButtonProps& props) {
+                            props.set_style([color](Styling& style) {
+                              style.setBackgroundColor(color);
+                            });
+                          });
+                        })
                     .set_child($Text(
                         TextProps::up()
                             .watch<Dataset>(
@@ -418,10 +476,9 @@ namespace ON2Solutions {
                                 })
                             .set_style(HeaderLabelApply)
                             .value(locales::en::status)))
-                            .click([this](lv_event_t* e) {
-                              this->execute_status_trigger();
-                            })
-                            )))
+                    .click([this](lv_event_t* e) {
+                      this->execute_status_trigger();
+                    }))))
             .set_overflow(true)
             .set_style([](Styling& style) {
               style.setPadding(0, 0, 16, 16);
@@ -462,7 +519,7 @@ namespace ON2Solutions {
                                                 });
                                           })
                                       .value("06:10 AM")),
-                            $Text(TextProps::up().value("ON2 Solution")),
+                            render_animated_alarm(),
                             $Text(TextProps::up()
                                       .watch<Dataset>(
                                           DatasetStore::getInstance(),
