@@ -170,6 +170,10 @@ namespace ON2Solutions {
     style.setBorder(lv_color_make(255, 255, 255), 0, 0);
   };
 
+  inline static auto HeaderBigLabelApply = [](Styling& style) {
+    style.setFont(&lv_font_montserrat_16);
+  };
+
   inline static auto HeaderLabelApply = [](Styling& style) {
     style.setFont(&lv_font_montserrat_14);
   };

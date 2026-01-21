@@ -360,10 +360,9 @@ namespace ON2Solutions {
                                 self->set_state([value, is_alarm_now,
                                                  count](TextProps& props) {
                                   props.value(is_alarm_now
-                                                  ? fmt_str("Alarm to "
-                                                            "reset: %d",
+                                                  ? fmt_str("ALARM TO RESET: %d",
                                                             count)
-                                                  : "ON2 Systems");
+                                                  : "ON2 SYSTEMS");
                                   props.set_style(is_alarm_now
                                                       ? AlarmTextStyleApply
                                                       : DefaultTextStyleApply);
@@ -374,7 +373,7 @@ namespace ON2Solutions {
                                   this->alarm_control->stop("alarm_anim");
                                 }
                               })
-                          .value("ON2 Systems"))));
+                          .value("ON2 SYSTEMS"))));
   }
 
   $$View MainScreen::render_body_left() const {
