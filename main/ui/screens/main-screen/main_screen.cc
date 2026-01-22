@@ -101,7 +101,7 @@ namespace ON2Solutions {
         "rand_task", 16384, this, 5, &xHandle);
   }
 
-  void MainScreen::add_uart_data_event() {
+  void MainScreen::add_uart_data_event() const {
     this->uart_handler->add_event_listener(UartTypes::UartHandlerEvent{
         .key_v = const_cast<char*>("read_data_dto"),
         .event = UART_DATA,
@@ -109,25 +109,16 @@ namespace ON2Solutions {
           if (strlen(uart_data.response.packet) <= 0)
             return;
 
-          struct AsyncStructure {
-            std::string packet;
-          };
-
           ESP_LOGI("main_screen", "Received data from UART %s",
                    uart_data.response.packet);
 
-          auto args = new AsyncStructure{.packet = uart_data.response.packet};
+          if (uart_data.response.packet &&
+              strlen(uart_data.response.packet) > 0) {
 
-          lv_async_call(
-              [](void* arg) {
-                auto* p = static_cast<AsyncStructure*>(arg);
-                Dataset dataset = DatasetStore::getInstance()->get();
-                parse(&dataset, p->packet.c_str(), p->packet.length());
-                DatasetStore::getInstance()->set(dataset);
-
-                delete p;
-              },
-              args);
+              Dataset dataset = DatasetStore::getInstance()->get();
+              parse(&dataset, uart_data.response.packet, uart_data.response.len);
+              DatasetStore::getInstance()->set(dataset);
+          }
         }});
   }
 
@@ -359,10 +350,10 @@ namespace ON2Solutions {
 
                                 self->set_state([value, is_alarm_now,
                                                  count](TextProps& props) {
-                                  props.value(is_alarm_now
-                                                  ? fmt_str("ALARM TO RESET: %d",
-                                                            count)
-                                                  : "ON2 SYSTEMS");
+                                  props.value(
+                                      is_alarm_now
+                                          ? fmt_str("ALARM TO RESET: %d", count)
+                                          : "ON2 SYSTEMS");
                                   props.set_style(is_alarm_now
                                                       ? AlarmTextStyleApply
                                                       : DefaultTextStyleApply);
@@ -517,7 +508,7 @@ namespace ON2Solutions {
                                                   props.value(hours);
                                                 });
                                           })
-                                      .value("06:10 AM")),
+                                      .value("00:00")),
                             render_animated_alarm(),
                             $Text(TextProps::up()
                                       .watch<Dataset>(

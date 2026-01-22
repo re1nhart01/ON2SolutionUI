@@ -85,7 +85,7 @@ namespace ON2Solutions {
 
 
 
-    inline constexpr const char* status = "PROCESSING";
+    inline constexpr const char* status = "STAND BY";
 
 
     inline constexpr const char* info_bit_0_error  = "Oxygen sensor 1 disconnected";

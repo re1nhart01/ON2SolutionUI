@@ -190,7 +190,7 @@ namespace ON2Solutions {
 
   inline static auto FooterButtonApply = [](Styling& style) {
     style.setFont(&lv_font_montserrat_16);
-    style.setBackgroundColor(lv_color_hex(0x000000));
+    style.setBackgroundColor(button_color_by_status(parser::DatasetStatuses::StandBy));
     style.setBorderRadius(12);
     style.setSize(LV_PCT(100), 45);
     style.setBorder(lv_color_hex(0x5B5AFF), 0, 0);

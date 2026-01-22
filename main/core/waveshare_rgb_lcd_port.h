@@ -27,7 +27,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define EXAMPLE_LCD_H_RES               (LVGL_PORT_H_RES)
 #define EXAMPLE_LCD_V_RES               (LVGL_PORT_V_RES)
-#define EXAMPLE_LCD_PIXEL_CLOCK_HZ      (16 * 1000 * 1000)
+#define EXAMPLE_LCD_PIXEL_CLOCK_HZ      (14 * 1000 * 1000)
 #define EXAMPLE_LCD_BIT_PER_PIXEL       (16)
 #define EXAMPLE_RGB_BIT_PER_PIXEL       (16)
 #define EXAMPLE_RGB_DATA_WIDTH          (16)

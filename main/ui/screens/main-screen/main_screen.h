@@ -37,7 +37,7 @@ namespace ON2Solutions {
     void show_info_modal();
     void show_errors_modal();
     void start_random_updater();
-    void add_uart_data_event();
+    void add_uart_data_event() const;
     void execute_status_trigger() const;
     template<typename C>
     void update_styles(Component<C>* component, const Delegate<void(Styling&)>& style);

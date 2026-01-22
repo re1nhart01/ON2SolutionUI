@@ -68,7 +68,8 @@ class UartHandler {
   size_t size = 0;
   std::array<UartTypes::UartHandlerEvent, 32> list{};
   TaskHandle_t task_handle = nullptr;
-  std::string rx_buffer;
+  std::array<char, 512> rx_buffer;
+  size_t rx_idx = 0;
   bool is_recording = false;
   volatile bool is_on = false;
 
@@ -92,6 +93,7 @@ class UartHandler {
   };
 
   bool init() {
+    vTaskDelay(pdMS_TO_TICKS(50));
     uart_mutex = xSemaphoreCreateMutex();
     uart_driver_install(current_uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 20,
                         &uart_queue, 0);
@@ -100,13 +102,14 @@ class UartHandler {
                  UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     uart_enable_rx_intr(current_uart_num);
     xTaskCreate(uart_interrupt_handler_trampoline, "uart_event_task",
-                stack_dept, this, 12, &this->task_handle);
+                stack_dept, this, 6, &this->task_handle);
     is_on = true;
     return true;
   }
 
   void stop() {
-    if (!is_on) return;
+    if (!is_on)
+      return;
 
     is_on = false;
 
@@ -129,6 +132,9 @@ class UartHandler {
     }
 
     uart_driver_delete(current_uart_num);
+
+    vTaskDelay(pdMS_TO_TICKS(50));
+
     uart_queue = nullptr;
 
     list = {};
@@ -156,7 +162,8 @@ class UartHandler {
   }
 
   int send(const char* text) const {
-    if (!is_on) return 0;
+    if (!is_on)
+      return 0;
     xSemaphoreTake(uart_mutex, portMAX_DELAY);
 
     const uint8_t length = strlen(text);
@@ -167,7 +174,8 @@ class UartHandler {
   };
 
   int send(const std::string& text) const {
-    if (!is_on) return 0;
+    if (!is_on)
+      return 0;
     xSemaphoreTake(uart_mutex, portMAX_DELAY);
 
     const uint8_t length = strlen(text.c_str());
@@ -241,9 +249,11 @@ class UartHandler {
     xSemaphoreGive(uart_mutex);
   }
 
-  void execute_callback_event(const uart_event_type_t event,
-                              const UartTypes::UartCallbackResponse& data) const {
-    if (!is_on) return;
+  void execute_callback_event(
+      const uart_event_type_t event,
+      const UartTypes::UartCallbackResponse& data) const {
+    if (!is_on)
+      return;
     for (size_t i = 0; i < size; i++) {
       if (list[i].event == event) {
         list[i].delegate(data);
@@ -260,32 +270,42 @@ class UartHandler {
     }
 
     while (xQueueReceive(uart_queue, &event, portMAX_DELAY)) {
-      if (xSemaphoreTake(uart_mutex, portMAX_DELAY)) {
         switch (event.type) {
           case UART_DATA: {
             int len = uart_read_bytes(current_uart_num, temp_data, BUF_SIZE,
-                                      pdMS_TO_TICKS(100));
+                                      pdMS_TO_TICKS(10));
+            if (len <= 0)
+              continue;
 
             for (int i = 0; i < len; i++) {
               char c = static_cast<char>(temp_data[i]);
 
               if (c == '$' || c == '#' || c == '!') {
-                rx_buffer.clear();
+                rx_idx = 0;
                 is_recording = true;
               }
 
               if (is_recording) {
-                rx_buffer += c;
-
-                if (c == '>') {
-                  dispatch_packet(rx_buffer);
-                  rx_buffer.clear();
+                if (rx_idx < (rx_buffer.size() - 1)) {
+                  rx_buffer[rx_idx++] = c;
+                } else {
                   is_recording = false;
+                  rx_idx = 0;
+                  continue;
                 }
 
-                if (rx_buffer.length() > 512) {
-                  rx_buffer.clear();
+                if (c == '>') {
+                  rx_buffer[rx_idx] = '\0';
+
+                  UartTypes::UartData ready_data;
+                  memcpy(ready_data.packet, rx_buffer.data(), rx_idx + 1);
+                  ready_data.len = rx_idx;
+                  ready_data.flag = true;
+
                   is_recording = false;
+                  rx_idx = 0;
+
+                  execute_callback_event(UART_DATA, {.response = ready_data});
                 }
               }
             }
@@ -322,16 +342,16 @@ class UartHandler {
             }
             break;
         }
-        xSemaphoreGive(uart_mutex);
-      }
     }
   }
 
-  void dispatch_packet(const std::string& packet_str) {
+  void dispatch_packet(const std::array<char, 512>& packet_str,
+                       size_t packet_len) {
     UartTypes::UartData uart_data;
-    size_t copy_len =
-        std::min(packet_str.length(), sizeof(uart_data.packet) - 1);
-    memcpy(uart_data.packet, packet_str.c_str(), copy_len);
+
+    size_t copy_len = std::min(packet_len, sizeof(uart_data.packet) - 1);
+
+    memcpy(uart_data.packet, packet_str.data(), copy_len);
     uart_data.packet[copy_len] = '\0';
     uart_data.len = copy_len;
     uart_data.flag = true;

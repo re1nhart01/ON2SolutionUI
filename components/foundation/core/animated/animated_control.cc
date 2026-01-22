@@ -18,19 +18,30 @@ namespace foundation {
   }
 
   void AnimatedControl::play(const std::string& key) {
-    auto anim = elements.find(key);
-    if (anim == elements.end())
-      return;
+    auto it = elements.find(key);
+    if (it == elements.end()) return;
 
-    anim->second->play();
+    Animated* anim = it->second;
+    if (anim == nullptr || !lv_obj_is_valid(anim->get_component())) return;
+
+    lv_async_call([](void* arg) {
+      auto* a = static_cast<Animated*>(arg);
+      if (a) a->play();
+    }, anim);
   }
 
   void AnimatedControl::stop(const std::string& key) {
-    auto anim = elements.find(key);
-    if (anim == elements.end())
-      return;
+    auto it = elements.find(key);
+    if (it == elements.end()) return;
 
-    anim->second->stop();
+    Animated* anim = it->second;
+
+    if (anim == nullptr || !lv_obj_is_valid(anim->get_component())) return;
+
+    lv_async_call([](void* arg) {
+      auto* a = static_cast<Animated*>(arg);
+      if (a) a->stop();
+    }, anim);
   }
 
   void AnimatedControl::animate_to(const std::string& key, int32_t toValue,
