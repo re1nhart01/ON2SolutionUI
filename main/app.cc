@@ -49,6 +49,13 @@ namespace ON2Solutions {
     void before_load_application() override
     {
       ESP_LOGI("MyApp", "before_load_application called");
+      // Setting pull-up hardware uart to erase gibberish into uart from start of main controller
+      gpio_set_direction(GPIO_NUM_43, GPIO_MODE_OUTPUT);
+      gpio_set_level(GPIO_NUM_43, 1);   // idle state UART
+      gpio_set_pull_mode(GPIO_NUM_43, GPIO_PULLUP_ONLY);
+
+      gpio_set_direction(GPIO_NUM_44, GPIO_MODE_INPUT);
+      gpio_set_pull_mode(GPIO_NUM_44, GPIO_PULLUP_ONLY);
     }
 
     void after_load_application() override

@@ -5,6 +5,7 @@
 #include <ctime>
 #include <functional>
 #include <string>
+#include <memory>
 
 extern "C" {
 #include "internals/lvgl_port.h"
