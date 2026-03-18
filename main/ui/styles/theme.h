@@ -3,13 +3,22 @@
 //
 #pragma once
 
-#include "misc/lv_color.h"
+#include "lvgl.h"
 
 namespace ON2Solutions {
-  const lv_color_t PRIMARY_COLOR = lv_color_hex(0x8BC53D);
-  const lv_color_t PRIMARY_COLOR_2 = lv_color_hex(0x0D928D);
-  const lv_color_t ERROR_COLOR = lv_color_hex(0xE53935);
-  const lv_color_t NO_ERROR_COLOR = lv_color_hex(0x388E3C);
+  const lv_color_t PRIMARY_COLOR = lv_color_hex(0x8CC63E);
+  const lv_color_t PRIMARY_COLOR_2 = lv_color_hex(0x0E928D);
+  const lv_color_t PRIMARY_COLOR_3 = lv_color_hex(0xDDEFEF);
+  const lv_color_t ERROR_COLOR = lv_color_hex(0xE61F23);
+  const lv_color_t ERROR_COLOR_2 = lv_color_hex(0xE61F230A);
+
+  const lv_color_t PRIMARY_BG = lv_color_hex(0xFFFFFF);
+  const lv_color_t SECONDARY_BG = lv_color_hex(0xF8F9FC);
+  const lv_color_t TERTIARY_BG = lv_color_hex(0xF7F7F8);
+
+  const lv_color_t BORDER_PRIMARY = lv_color_hex(0xD0D5DD);
+
+  const lv_color_t NO_ERROR_COLOR = lv_color_hex(0x20B746);
   const lv_color_t NOT_ACTIVE_INDICATOR = lv_color_hex(0xC7CDD6);
   const lv_color_t ACTIVE_INDICATOR = lv_color_hex(0x2F80ED);
 

@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-
 /*
  *
 0 = Oxygen sensor 1 disconnected 00000000000000000000000000000001
