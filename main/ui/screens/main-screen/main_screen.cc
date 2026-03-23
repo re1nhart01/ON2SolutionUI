@@ -1,6 +1,6 @@
 #include "main_screen.h"
 
-#include <ui/styles/theme.h>
+#include "constants/theme.h"
 
 using namespace foundation;
 using namespace ON2Solutions::parser;
@@ -115,143 +115,16 @@ namespace ON2Solutions {
           if (uart_data.response.packet &&
               strlen(uart_data.response.packet) > 0) {
 
-              Dataset dataset = DatasetStore::getInstance()->get();
-              parse(&dataset, uart_data.response.packet, uart_data.response.len);
-              DatasetStore::getInstance()->set(dataset);
+            Dataset dataset = DatasetStore::getInstance()->get();
+            parse(&dataset, uart_data.response.packet, uart_data.response.len);
+            DatasetStore::getInstance()->set(dataset);
           }
         }});
   }
 
 #pragma region UI
-  $$View MainScreen::render_header() {
-    auto navigator_ref = this->navigation_ref;
-
-    return $View(
-        ViewProps::up()
-            .set_style(HeaderContainerApply)
-            .set_children(children(
-                $View(
-                    ViewProps::up()
-                        .set_style(HeaderLabelContainerApply)
-                        .set_children(children(
-                            $View(
-                                ViewProps::up()
-                                    .direction(LV_FLEX_FLOW_ROW)
-                                    .items(LV_FLEX_ALIGN_CENTER)
-                                    .track_cross(LV_FLEX_ALIGN_CENTER)
-                                    .w(LV_PCT(50))
-                                    .h(LV_PCT(100))
-                                    .set_style([](Styling& s) {
-                                      s.setGap(8, 8);
-                                      NoPaddingApply(s);
-                                    })
-                                    .set_children(children(
-                                        $Text(TextProps::up().value("Inputs:")),
-                                        $DotIndicator(
-                                            DotIndicatorProps::up()
-                                                .set_dot_amount(8)
-                                                .w(50)
-                                                .h(20)
-                                                .watch<Dataset>(
-                                                    DatasetStore::getInstance(),
-                                                    "inputs",
-                                                    [](DotIndicator* self,
-                                                       const Dataset& value) {
-                                                      self->set_state(
-                                                          [v = value
-                                                                   .operative_data
-                                                                   .inputs](
-                                                              DotIndicatorProps&
-                                                                  p) {
-                                                            p.set_value_hex(v);
-                                                          });
-                                                    }))))),
-
-                            $View(
-                                ViewProps::up()
-                                    .direction(LV_FLEX_FLOW_ROW)
-                                    .items(LV_FLEX_ALIGN_CENTER)
-                                    .track_cross(LV_FLEX_ALIGN_CENTER)
-                                    .w(LV_PCT(50))
-                                    .h(LV_PCT(100))
-                                    .set_style([](Styling& s) {
-                                      s.setGap(8, 8);
-                                      NoPaddingApply(s);
-                                    })
-                                    .set_children(children(
-                                        $Text(
-                                            TextProps::up().value("Outputs:")),
-                                        $DotIndicator(
-                                            DotIndicatorProps::up()
-                                                .set_dot_amount(16)
-                                                .w(100)
-                                                .h(20)
-                                                .watch<Dataset>(
-                                                    DatasetStore::getInstance(),
-                                                    "outputs",
-                                                    [](DotIndicator* self,
-                                                       const Dataset& value) {
-                                                      self->set_state(
-                                                          [v = value
-                                                                   .operative_data
-                                                                   .outputs](
-                                                              DotIndicatorProps&
-                                                                  p) {
-                                                            p.set_value_hex(v);
-                                                          });
-                                                    })))))))
-                        .merge(header_labels_container_props)),
-
-                $View(
-                    ViewProps::up()
-                        .set_style(HeaderContainerApply)
-                        .set_children(children(
-                            $Button(
-                                ButtonProps::up()
-                                    .set_style(HeaderButtonApply)
-                                    .watch<Dataset>(
-                                        DatasetStore::getInstance(), "errors",
-                                        [this](Button* self,
-                                               const Dataset& value) {
-                                          const bool hasError =
-                                              value.operative_data.errors != 0;
-                                          update_styles<ButtonProps>(
-                                              self, [hasError](Styling& style) {
-                                                style.setBackgroundColor(
-                                                    hasError ? ERROR_COLOR
-                                                             : NO_ERROR_COLOR);
-                                              });
-                                        })
-                                    .set_child($Text(
-                                        TextProps::up()
-                                            .set_style(HeaderLabelApply)
-                                            .value(locales::en::header_errors)))
-                                    .click([this](lv_event_t* e) {
-                                      this->show_errors_modal();
-                                    })),
-                            $Button(ButtonProps::up()
-                                        .set_style(HeaderButtonApply)
-                                        .set_child($Text(
-                                            TextProps::up()
-                                                .set_style(HeaderLabelApply)
-                                                .value(locales::en::
-                                                           header_information)))
-                                        .click([this](lv_event_t* e) {
-                                          this->show_info_modal();
-                                        })),
-                            $Button(
-                                ButtonProps::up()
-                                    .set_style(HeaderButtonApply)
-                                    .set_child($Text(
-                                        TextProps::up()
-                                            .set_style(HeaderLabelApply)
-                                            .value(
-                                                locales::en::header_settings)))
-                                    .click([navigator_ref](lv_event_t* e) {
-                                      navigator_ref->navigate("/pin_code");
-                                    }))))
-                        .merge(header_container_right_props))))
-            .merge(header_container_props));
+  $$CommonHeader MainScreen::render_header() const {
+    return $CommonHeader(CommonHeaderProps::up());
   }
 
   $$View MainScreen::render_body() const {
@@ -481,76 +354,40 @@ namespace ON2Solutions {
     VNode::render();
     ESP_LOGI("main screen", "render");
 
-    return this->delegate($View(
-        ViewProps::up()
-            .set_style([](Styling& style) {
-              style.setTextColor(lv_color_make(255, 255, 255));
-              style.setPadding(0, 0, 0, 0);
-              style.setBorderRadius(0);
-              style.setBorder(lv_color_make(255, 255, 255), 0, 0);
-            })
-            .set_children(children(
-                $StatusBar(
-                    StatusBarProps::up()
-                        .set_background_color(lv_color_hex(0x2A2A2A))
-                        .set_height(30)
-                        .set_children(children(
-                            $Text(TextProps::up()
-                                      .watch<Dataset>(
-                                          DatasetStore::getInstance(),
-                                          "moto_hours",
-                                          [](Text* self, const Dataset& value) {
-                                            std::string hours =
-                                                value.operative_data.moto_hours
-                                                    .data();
-                                            self->set_state(
-                                                [hours](TextProps& props) {
-                                                  props.value(hours);
-                                                });
-                                          })
-                                      .value("00:00")),
-                            render_animated_alarm(),
-                            $Text(TextProps::up()
-                                      .watch<Dataset>(
-                                          DatasetStore::getInstance(),
-                                          "channels",
-                                          [](Text* self, const Dataset& value) {
-                                            int count = value.operative_data
-                                                            .channels_count;
-                                            self->set_state(
-                                                [count](TextProps& props) {
-                                                  props.value(fmt_str(
-                                                      "Channels: %d", count));
-                                                });
-                                          })
-                                      .value("Channels: 0"))))),
-                $ScrollView(
-                    ScrollViewProps::up()
-                        .set_style(NoPaddingApply)
-                        .w(LV_PCT(100))
-                        .h(LV_PCT(75))
-                        .direction(LV_FLEX_FLOW_ROW)
-                        .scroll(LV_DIR_HOR)
-                        .scrollbar(LV_SCROLLBAR_MODE_OFF)
-                        .snap(LV_SCROLL_SNAP_CENTER, LV_SCROLL_SNAP_NONE)
-                        .set_elastic(false)
-                        .set_momentum(true)
-                        .set_children(children(
-                            $View(ViewProps::up()
-                                      .set_style(NoPaddingApply)
-                                      .w(LV_PCT(100))
-                                      .h(LV_PCT(100))
-                                      .set_children(
-                                          children(this->render_header(),
-                                                   this->render_body_left()))),
-                            $View(ViewProps::up()
-                                      .set_style(NoPaddingApply)
-                                      .w(LV_PCT(100))
-                                      .h(LV_PCT(100))
-                                      .set_children(
-                                          children(this->render_body())))))),
-                this->render_footer()))
-            .merge(screen_container_props)));
+    return this->delegate(
+        $View(ViewProps::up()
+                  .set_style([](Styling& style) {
+                    style.setTextColor(lv_color_make(255, 255, 255));
+                    style.setPadding(0, 0, 0, 0);
+                    style.setBorderRadius(0);
+                    style.setBorder(lv_color_make(255, 255, 255), 0, 0);
+                    style.setGap(0, 0);
+                  })
+                  .set_children(children(
+                      this->render_header(),
+                      $View(ViewProps::up()
+                                .w(LV_PCT(100))
+                                .h(LV_PCT(100))
+                                .set_style(NoPaddingApply)
+                                .direction(LV_FLEX_FLOW_ROW)
+                                .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
+                                .items(LV_FLEX_ALIGN_START)
+                                .track_cross(LV_FLEX_ALIGN_SPACE_BETWEEN)
+                                .set_children(children(
+                                    $Sidebar(SidebarProps::up().set_stack(
+                                        this->navigation_ref)),
+                                    $View(ViewProps::up()
+                                              .w(800 - 56)
+                                              .h(LV_PCT(100))
+                                              .set_style([](Styling& style) {
+                                                style.setBackgroundColor(SECONDARY_BG);
+                                                style.setBorderRadius(0);
+                                                style.setPadding(16);
+                                                style.setBorder(SECONDARY_BG, 0, LV_OPA_0);
+                                              })
+
+                                    ))))))
+                  .merge(screen_container_props)));
   }
 
 #pragma endregion UI
@@ -569,3 +406,32 @@ namespace ON2Solutions {
     return this;
   }
 }  // namespace ON2Solutions
+
+/*
+* $ScrollView(
+                    ScrollViewProps::up()
+                        .set_style(NoPaddingApply)
+                        .w(LV_PCT(100))
+                        .h(LV_PCT(75))
+                        .direction(LV_FLEX_FLOW_ROW)
+                        .scroll(LV_DIR_HOR)
+                        .scrollbar(LV_SCROLLBAR_MODE_OFF)
+                        .snap(LV_SCROLL_SNAP_CENTER, LV_SCROLL_SNAP_NONE)
+                        .set_elastic(false)
+                        .set_momentum(true)
+                        .set_children(children(
+                            $View(ViewProps::up()
+                                      .set_style(NoPaddingApply)
+                                      .w(LV_PCT(100))
+                                      .h(LV_PCT(100))
+                                      .set_children(
+                                          children(this->render_body_left()))),
+                            $View(ViewProps::up()
+                                      .set_style(NoPaddingApply)
+                                      .w(LV_PCT(100))
+                                      .h(LV_PCT(100))
+                                      .set_children(
+                                          children(this->render_body()))))))
+ *
+ *
+ */

@@ -1,11 +1,11 @@
 #pragma once
 
+#include "constants/localization.h"
 #include "core/shortcuts.h"
 #include "core/styling/styling.h"
-#include "ui/localization.h"
 
+#include <constants/theme.h>
 #include <lg/helpers/utils.h>
-#include <ui/styles/theme.h>
 
 using namespace foundation;
 namespace ON2Solutions {

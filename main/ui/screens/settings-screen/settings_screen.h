@@ -2,9 +2,9 @@
 
 #include "../../components/foundation/core/shortcuts.h"
 
+#include <constants/localization.h>
 #include <lg/dataset/paramspec.h>
 #include <protocols/uart/uart_proto.h>
-#include <ui/localization.h>
 #include <ui/styles/common_styles.h>
 
 namespace ON2Solutions {

@@ -14,6 +14,13 @@ namespace foundation
   class Button;
   struct ButtonProps final : BaseProps<ButtonProps, Button>
   {
+
+    ButtonProps() = default;
+    ButtonProps(const ButtonProps&) = delete;
+    ButtonProps& operator=(const ButtonProps&) = delete;
+    ButtonProps(ButtonProps&&) = default;
+    ButtonProps& operator=(ButtonProps&&) = default;
+
     std::unique_ptr<VNode> child = nullptr;
     std::string text;
 

@@ -4,6 +4,7 @@
 #include "ui/screens/pincode-screen/pincode_screen.h"
 #include "ui/screens/preloader-screen/preloader_screen.h"
 #include "ui/screens/settings-screen/settings_screen.h"
+#include "ui/screens/charts-screen/charts_screen.h"
 
 #include <core/application.h>
 

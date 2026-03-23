@@ -5,7 +5,7 @@
 #include "components/view/view_props.h"
 #include "core/style_store/style_store.h"
 #include "lg/dataset/types.h"
-#include "theme.h"
+#include "constants/theme.h"
 
 //----------------------------------- Shorthands
 //------------------------------------------------
@@ -155,6 +155,14 @@ namespace ON2Solutions {
     style.setBorder(lv_color_make(0, 0, 0), 0, LV_OPA_TRANSP);
     style.setBorderRadius(0);
     style.setPadding(0, 0, 0, 0);
+  };
+
+  inline static auto CommonHeaderWrapperApply = [](Styling& style) {
+    style.setBackgroundColor(lv_color_hex(0xffffff));
+    style.setBorder(BORDER_SECONDARY, 1, LV_OPA_100);
+    style.setBorderRadius(0);
+    style.setGap(0, 24);
+    style.setPadding(12, 12, 16, 16);
   };
 
   inline static auto HeaderButtonApply = [](Styling& style) {

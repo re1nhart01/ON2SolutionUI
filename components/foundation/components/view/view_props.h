@@ -2,7 +2,7 @@
 
 #include "components/props.h"
 #include "misc/lv_area.h"
-#include <lvgl__lvgl/src/lvgl.h>
+#include <lvgl.h>
 
 #include "components/vnode.h"
 #include <memory>

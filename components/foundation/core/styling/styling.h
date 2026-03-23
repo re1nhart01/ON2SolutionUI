@@ -9,11 +9,12 @@ class Styling
 {
 private:
   std::shared_ptr<lv_style_t> style;
+public:
   short width = -1;
   short height = -1;
   bool dirty = false;
+  bool clear_default = false;
 
-public:
   Styling() : style(std::make_shared<lv_style_t>()) {
     lv_style_init(style.get());
   }
@@ -36,6 +37,7 @@ public:
   Styling *setShadow(lv_color_t color, lv_coord_t width, lv_coord_t spread);
   Styling *setPadding(lv_coord_t top, lv_coord_t bottom, lv_coord_t left,
                       lv_coord_t right);
+  Styling* setPadding(lv_coord_t all);
   Styling *setSize(lv_coord_t width, lv_coord_t height);
   Styling *setMinMaxSize(lv_coord_t min_w, lv_coord_t min_h, lv_coord_t max_w,
                          lv_coord_t max_h);
@@ -63,6 +65,7 @@ public:
   Styling *setDirection(const short direction);
   Styling *setGap(short row, short column);
   Styling* setLayoutFlex();
+  Styling* set_clear_default();
   Styling* setFlexFlow(lv_flex_flow_t flow);
   Styling* setAlign(lv_flex_align_t align);
   Styling* setFlexGrow(uint8_t grow);

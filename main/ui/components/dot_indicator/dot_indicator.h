@@ -2,12 +2,10 @@
 
 #include <core/shortcuts.h>
 
-#include "core/shortcuts.h"
 #include "core/styling/styling.h"
-#include "ui/localization.h"
 
+#include <constants/theme.h>
 #include <lg/helpers/utils.h>
-#include <ui/styles/theme.h>
 
 using namespace foundation;
 namespace ON2Solutions {
@@ -41,13 +39,6 @@ namespace ON2Solutions {
     }
   };
 
-  using $$DotIndicator = std::unique_ptr<DotIndicator>;
-
-  inline $$DotIndicator $DotIndicator(DotIndicatorProps&& args) {
-    return std::make_unique<DotIndicator>(
-        std::forward<DotIndicatorProps>(args));
-  }
-
   class DotIndicator final : public Component<DotIndicatorProps> {
    private:
     std::vector<View*> dots_ref;
@@ -79,7 +70,7 @@ namespace ON2Solutions {
         auto dot =
             $View(ViewProps::up().w(8).h(8).set_style([](Styling& style) {
               style.setBorderRadius(100);
-              style.setBackgroundColor(NOT_ACTIVE_INDICATOR);
+              style.setBackgroundColor(PRIMARY_COLOR_3);
               style.setBorder(lv_color_make(0, 0, 0), 0, LV_OPA_TRANSP);
               style.setPadding(0, 0, 0, 0);
             }));
@@ -93,12 +84,12 @@ namespace ON2Solutions {
 
     void do_rebuild() override {
       for (size_t i = 0; i < dots_ref.size(); ++i) {
-        bool is_enabled = is_up_bit_pos(this->props.active_hex, i);
+        bool is_enabled = is_up_bit_pos(static_cast<int>(this->props.active_hex), i);
 
         dots_ref[i]->set_state([is_enabled](ViewProps& props) {
           props.set_style([is_enabled](Styling& style) {
-            style.setBackgroundColor(is_enabled ? ACTIVE_INDICATOR
-                                                : NOT_ACTIVE_INDICATOR);
+            style.setBackgroundColor(is_enabled ? PRIMARY_COLOR_2
+                                                : PRIMARY_COLOR_3);
           });
         });
       }
@@ -124,7 +115,7 @@ namespace ON2Solutions {
 
     const Styling* styling() const override {
       this->style.setTextColor(lv_color_make(255, 255, 255));
-      this->style.setPadding(0, 0, 16, 16);  // Padding T R B L
+      this->style.setPadding(0, 0, 16, 16);
       this->style.setBorder(lv_color_make(0, 0, 0), 0, 0);
       this->style.setFont(&lv_font_montserrat_12);
       this->style.setBorderRadius(0);
@@ -137,4 +128,11 @@ namespace ON2Solutions {
       return this;
     };
   };
+
+  using $$DotIndicator = std::unique_ptr<DotIndicator>;
+
+  inline $$DotIndicator $DotIndicator(DotIndicatorProps&& args) {
+    return std::make_unique<DotIndicator>(
+        std::forward<DotIndicatorProps>(args));
+  }
 }  // namespace ON2Solutions

@@ -1,5 +1,4 @@
 #pragma once
-#include "core/state/reactive.h"
 #include "core/structures/delegate.h"
 #include "vnode.h"
 

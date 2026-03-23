@@ -17,6 +17,7 @@ namespace ON2Solutions {
   const lv_color_t TERTIARY_BG = lv_color_hex(0xF7F7F8);
 
   const lv_color_t BORDER_PRIMARY = lv_color_hex(0xD0D5DD);
+  const lv_color_t BORDER_SECONDARY = lv_color_hex(0xE7E8E9);
 
   const lv_color_t NO_ERROR_COLOR = lv_color_hex(0x20B746);
   const lv_color_t NOT_ACTIVE_INDICATOR = lv_color_hex(0xC7CDD6);

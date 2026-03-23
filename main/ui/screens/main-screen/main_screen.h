@@ -12,6 +12,8 @@
 #include "esp_random.h"
 #include "lg/dataset/deserializer.h"
 #include "internals/lvgl_port.h"
+#include "ui/components/common_header/common_header.h"
+#include "ui/components/side_bar/side_bar.h"
 
 namespace ON2Solutions {
   class MainScreen;
@@ -42,7 +44,7 @@ namespace ON2Solutions {
     template<typename C>
     void update_styles(Component<C>* component, const Delegate<void(Styling&)>& style);
 
-    $$View render_header();
+    $$CommonHeader render_header() const;
     $$View render_footer() const;
     $$View render_body() const;
     $$View render_body_left() const;

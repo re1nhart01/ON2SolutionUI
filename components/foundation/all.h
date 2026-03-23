@@ -55,6 +55,9 @@
 #include "components/meter/meter.h"
 #include "components/meter/meter_props.h"
 
+#include "components/matrix/matrix.h"
+#include "components/matrix/matrix_props.h"
+
 #include "core/keyboard_manager/keyboard_manager.h"
 
 #include "core/navigation/stack_navigator/stack_navigator.h"

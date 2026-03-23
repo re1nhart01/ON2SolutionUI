@@ -1,7 +1,6 @@
-//
-// Created by evgeniy on 11/13/25.
-//
+
 #pragma once
+
 #include "button_props.h"
 #include "components/component.h"
 
@@ -43,9 +42,14 @@ namespace foundation
       set_component(lv_btn_create(parent_obj));
       lv_obj_t* obj = this->get_component();
 
-      if (const Styling* s = styling()) {
-        lv_obj_add_style(obj, s->getStyle(), LV_PART_MAIN);
+
+      const auto style = this->styling();
+
+      if (style->clear_default) {
+        lv_obj_remove_style_all(obj);
       }
+
+      lv_obj_add_style(obj, style->getStyle(), LV_PART_MAIN);
 
       if (this->props.child != nullptr) {
           this->props.child->set_parent(obj);
@@ -85,9 +89,21 @@ namespace foundation
       
       this->set_active(this->props.is_visible);
       if (label != nullptr && lv_obj_is_valid(label))
-        {
-          lv_label_set_text(label, props.text.c_str());
+      {
+        lv_label_set_text(label, props.text.c_str());
+      }
+
+
+      if (const auto style = this->styling(); style != nullptr) {
+        ESP_LOGI("button", "Style changed %d", style->width);
+        if (style->width > 0) {
+          lv_obj_set_width(obj, style->width);
         }
+        ESP_LOGI("button", "Style changed h %d", style->height);
+        if (style->height > 0) {
+          lv_obj_set_height(obj, style->height);
+        }
+      }
 
       if (auto style = styling(); style->get_is_dirty()) {
         lv_obj_invalidate(obj);
@@ -103,6 +119,7 @@ namespace foundation
       apply_base_style(style);
 
       if (props.style_override) {
+        ESP_LOGI("styling", "styling called");
           props.style_override(style);
       }
 

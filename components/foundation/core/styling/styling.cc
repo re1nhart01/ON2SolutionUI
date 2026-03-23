@@ -66,6 +66,15 @@ Styling* Styling::setPadding(lv_coord_t top, lv_coord_t bottom, lv_coord_t left,
   return this;
 }
 
+Styling* Styling::setPadding(lv_coord_t all) {
+  this->dirty = true;
+  lv_style_set_pad_top(style.get(), all);
+  lv_style_set_pad_bottom(style.get(), all);
+  lv_style_set_pad_left(style.get(), all);
+  lv_style_set_pad_right(style.get(), all);
+  return this;
+}
+
 Styling* Styling::setSize(lv_coord_t width, lv_coord_t height) {
   this->dirty = true;
   lv_style_set_width(style.get(), width);
@@ -182,12 +191,14 @@ Styling* Styling::setTransition(const lv_style_transition_dsc_t* transition) {
 Styling* Styling::setWidth(const short width) {
   this->dirty = true;
   this->width = width;
+  lv_style_set_width(style.get(), width);
   return this;
 }
 
 Styling* Styling::setHeight(const short height) {
   this->dirty = true;
   this->height = height;
+  lv_style_set_height(style.get(), height);
   return this;
 }
 
@@ -195,6 +206,11 @@ Styling* Styling::setSizeW(const short width, const short height) {
   this->dirty = true;
   this->width = width;
   this->height = height;
+  return this;
+}
+
+Styling* Styling::set_clear_default() {
+  this->clear_default = true;
   return this;
 }
 

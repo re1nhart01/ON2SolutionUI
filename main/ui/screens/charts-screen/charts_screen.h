@@ -1,29 +1,28 @@
 
 #pragma once
 
+#include "constants/theme.h"
 #include "../../components/foundation/components/component.h"
 #include "../../components/foundation/core/application.h"
 #include "../../components/foundation/core/shortcuts.h"
-#include <constants/assets.h>
-#include <constants/theme.h>
 
 namespace ON2Solutions {
-  class PreloaderScreen;
+  class ChartsScreen;
   using namespace foundation;
 
-  struct PreloaderScreenProps final
-      : BaseProps<PreloaderScreenProps, PreloaderScreen> {};
+  struct ChartsScreenProps final
+      : BaseProps<ChartsScreenProps, ChartsScreen> {};
 
-  class PreloaderScreen final : public NavigationScreen<PreloaderScreenProps> {
+  class ChartsScreen final : public NavigationScreen<ChartsScreenProps> {
    public:
-    explicit PreloaderScreen(StackNavigator* stack, PreloaderScreenProps props)
+    explicit ChartsScreen(StackNavigator* stack, ChartsScreenProps props)
         : NavigationScreen(stack, std::move(props)) {}
 
-    ~PreloaderScreen() override = default;
+    ~ChartsScreen() override = default;
 
     void component_did_mount() override;
     void navigate_after() const;
     lv_obj_t* render() override;
-    PreloaderScreen* append(lv_obj_t* obj) override;
+    ChartsScreen* append(lv_obj_t* obj) override;
   };
 }  // namespace ON2Solutions

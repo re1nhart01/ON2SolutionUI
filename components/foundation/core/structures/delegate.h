@@ -98,11 +98,32 @@ namespace foundation {
             return *this;
         }
 
-        Delegate(Delegate&& other) noexcept {
-            std::memcpy(this, &other, sizeof(Delegate));
-            other.invoke_ptr = nullptr;
-            other.copy_ptr = nullptr;
-            other.delete_ptr = nullptr;
+        Delegate(Delegate&& other) noexcept
+        : invoke_ptr(other.invoke_ptr),
+          copy_ptr(other.copy_ptr),
+          delete_ptr(other.delete_ptr),
+          is_dynamic(other.is_dynamic)
+            {
+                // Просто копіюємо буфер
+                std::memcpy(storage, other.storage, Capacity);
+
+                // ПОВНІСТЮ деактивуємо старий делегат, щоб його деструктор нічого не чіпав
+                other.invoke_ptr = nullptr;
+                other.copy_ptr = nullptr;
+                other.delete_ptr = nullptr;
+                other.is_dynamic = false;
+            }
+
+        Delegate& operator=(Delegate&& other) noexcept {
+            if (this != &other) {
+                reset();
+                std::memcpy(this, &other, sizeof(Delegate));
+                other.invoke_ptr = nullptr;
+                other.copy_ptr = nullptr;
+                other.delete_ptr = nullptr;
+                other.is_dynamic = false;
+            }
+            return *this;
         }
 
         void reset() {

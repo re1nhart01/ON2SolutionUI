@@ -3,7 +3,8 @@
 //
 
 
-#include "localization.h"
+#include "constants/localization.h"
+#include "../constants/assets.h"
 #include "protocols/uart/uart_proto.h"
 
 #include "lg/dataset/helpers.h"

@@ -3,8 +3,9 @@
 #include "core/ref/ref.h"
 #include "core/styling/styling.h"
 
-#include <memory>
+#include <core/state/reactive.h>
 #include <esp_log.h>
+#include <memory>
 
 namespace foundation {
   class VNode {

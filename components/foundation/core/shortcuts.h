@@ -23,6 +23,7 @@ using $$FlatList = std::unique_ptr<foundation::FlatList>;
 using $$Bar = std::unique_ptr<foundation::Bar>;
 using $$Meter = std::unique_ptr<foundation::Meter>;
 using $$Dropdown = std::unique_ptr<foundation::Dropdown>;
+using $$Matrix = std::unique_ptr<foundation::Matrix>;
 
 inline std::unique_ptr<foundation::View> $View(foundation::ViewProps&& args) {
   return std::make_unique<foundation::View>(
@@ -92,6 +93,12 @@ inline std::unique_ptr<foundation::Stepper> $Stepper(
     foundation::StepperProps&& args) {
   return std::make_unique<foundation::Stepper>(
       std::forward<foundation::StepperProps>(args));
+}
+
+inline std::unique_ptr<foundation::Matrix> $Matrix(
+    foundation::MatrixProps&& args) {
+  return std::make_unique<foundation::Matrix>(
+      std::forward<foundation::MatrixProps>(args));
 }
 
 inline std::unique_ptr<foundation::Fragment> $Fragment(
