@@ -3,16 +3,17 @@
 #include <core/style_store/style_store.h>
 #include <lg/dataset/store/dataset.store.h>
 #include <protocols/uart/uart_proto.h>
-#include <ui/components/info_modal/info_modal.h>
-#include "ui/components/errors_modal/error_modal.h"
 #include <ui/components/dot_indicator/dot_indicator.h>
+#include <ui/components/info_modal/info_modal.h>
 #include <ui/styles/common_styles.h>
 #include "../../components/foundation/core/shortcuts.h"
 #include "../../components/foundation/core/state/state.h"
+#include "../../components/reusable.h"
 #include "esp_random.h"
-#include "lg/dataset/deserializer.h"
 #include "internals/lvgl_port.h"
+#include "lg/dataset/deserializer.h"
 #include "ui/components/common_header/common_header.h"
+#include "ui/components/errors_modal/error_modal.h"
 #include "ui/components/side_bar/side_bar.h"
 
 namespace ON2Solutions {
@@ -45,6 +46,7 @@ namespace ON2Solutions {
     void update_styles(Component<C>* component, const Delegate<void(Styling&)>& style);
 
     $$CommonHeader render_header() const;
+    $$View render_card() const;
     $$View render_footer() const;
     $$View render_body() const;
     $$View render_body_left() const;

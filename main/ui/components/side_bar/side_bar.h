@@ -40,8 +40,8 @@ namespace ON2Solutions {
     };
 
     void on_navigation_press(const std::string& path) const {
-      if (this->props.stack == nullptr)
-        return;
+      if (this->props.stack == nullptr) return;
+      if (this->props.stack->get_current_route() == path) return;
 
       this->props.stack->navigate(path);
     }
@@ -66,7 +66,7 @@ namespace ON2Solutions {
                                                    : TERTIARY_BG);
               })
               .set_child(
-                  $Image(ImageProps::up().source(icon).width(16).height(16)))
+                  $Image(ImageProps::up().source(icon).width(15).height(15)))
 
       );
     }
@@ -93,7 +93,7 @@ namespace ON2Solutions {
                         this->render_nav_button("/main", assets::Pie),
                         this->render_nav_button("/main", assets::Warning),
                         this->render_nav_button("/main", assets::Info),
-                        this->render_nav_button("/main", assets::Settings)))));
+                        this->render_nav_button("/settings", assets::Settings)))));
     };
 
     const Styling* styling() const override {

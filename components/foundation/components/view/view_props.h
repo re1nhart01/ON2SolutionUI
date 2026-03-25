@@ -15,6 +15,16 @@ namespace foundation
 
 namespace foundation
 {
+
+  enum class FlexPreset {
+    ColumnCenter,   // Столбик, всё по центру
+    RowBetween,     // Строка, элементы враспор (justify-between)
+    RowCenter,      // Строка, всё по центру
+    Center,         // И по вертикали, и по горизонтали в центр
+    ColumnStart,   // Список сверху вниз, прижат к левому краю
+    SpaceCenter // column + space between + align items center;
+  };
+
   struct ViewProps final : public BaseProps<ViewProps, View>
   {
 
@@ -85,5 +95,49 @@ namespace foundation
       track_cross_place = value;
       return std::move(*this);
     }
+
+    ViewProps&& flow(FlexPreset preset) {
+      switch (preset) {
+        case FlexPreset::ColumnCenter:
+          flex_direction = LV_FLEX_FLOW_COLUMN;
+          justify_content = LV_FLEX_ALIGN_CENTER;
+          align_items = LV_FLEX_ALIGN_CENTER;
+          track_cross_place = LV_FLEX_ALIGN_CENTER;
+          break;
+
+        case FlexPreset::RowBetween:
+          flex_direction = LV_FLEX_FLOW_ROW;
+          justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN;
+          align_items = LV_FLEX_ALIGN_CENTER;
+          track_cross_place = LV_FLEX_ALIGN_START;
+          break;
+
+        case FlexPreset::RowCenter:
+          flex_direction = LV_FLEX_FLOW_ROW;
+          justify_content = LV_FLEX_ALIGN_CENTER;
+          align_items = LV_FLEX_ALIGN_CENTER;
+          track_cross_place = LV_FLEX_ALIGN_CENTER;
+          break;
+
+        case FlexPreset::Center:
+          justify_content = LV_FLEX_ALIGN_CENTER;
+          align_items = LV_FLEX_ALIGN_CENTER;
+          track_cross_place = LV_FLEX_ALIGN_CENTER;
+          break;
+
+        case FlexPreset::ColumnStart:
+          flex_direction = LV_FLEX_FLOW_COLUMN;
+          justify_content = LV_FLEX_ALIGN_START;
+          align_items = LV_FLEX_ALIGN_START;
+          track_cross_place = LV_FLEX_ALIGN_START;
+          break;
+        case FlexPreset::SpaceCenter:
+          justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN;
+          align_items = LV_FLEX_ALIGN_CENTER;
+          track_cross_place = LV_FLEX_ALIGN_CENTER;
+      }
+      return std::move(*this);
+    }
+
   };
 }

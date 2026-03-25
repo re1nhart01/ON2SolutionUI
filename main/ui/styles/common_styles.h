@@ -196,15 +196,6 @@ namespace ON2Solutions {
     style.setPadding(8, 8, 16, 16);
   };
 
-  inline static auto FooterButtonApply = [](Styling& style) {
-    style.setFont(&lv_font_montserrat_16);
-    style.setBackgroundColor(button_color_by_status(parser::DatasetStatuses::StandBy));
-    style.setBorderRadius(12);
-    style.setSize(LV_PCT(100), 45);
-    style.setBorder(lv_color_hex(0x5B5AFF), 0, 0);
-    style.setPadding(8, 8, 16, 16);
-  };
-
 
   // inline void style_screen_register(foundation::StyleStorage& storage) {
   //   storage.set("header.button", [](Styling& style) {

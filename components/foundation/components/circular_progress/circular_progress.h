@@ -128,13 +128,13 @@ namespace foundation
 
       lv_obj_center(arc_reference);
 
-      if (!props.show_label_default)
-        {
-          if (this->label) {
-              lv_obj_add_flag(this->label->get_component(), LV_OBJ_FLAG_HIDDEN);
-          }
-        }
-      this->update(props.default_dy);
+      if (props.show_label_default) {
+        label = std::make_unique<Text>(TextProps::up().set_style(this->props.text_style_override));
+        label->set_parent(container);
+        label->render();
+        lv_obj_align(label->get_component(), LV_ALIGN_CENTER, 0, props.height / 3);
+      }
+      this->update_label_text();
     }
 
     const Styling* styling() const override
@@ -154,20 +154,12 @@ namespace foundation
       return this;
     };
 
-    void update(const short value) const
-    {
-      const short correct_value = std::clamp(value, props.min_dy, props.max_dy);
-      if (this->arc_reference != nullptr) {
-          lv_arc_set_value(this->arc_reference, correct_value);
-      }
+    void update_label_text() const {
+      if (!label || !label->get_component()) return;
+      char buf[32];
 
-      if (this->is_show_label && this->label) {
-          this->label->update(std::format(
-              "{}{}",
-              correct_value,
-              this->props.label_symbol
-          ));
-      }
+      snprintf(buf, sizeof(buf), "%.1hd%s", props.default_dy, props.label_symbol.c_str());
+      lv_label_set_text(label->get_component(), buf);
     }
   };
 }

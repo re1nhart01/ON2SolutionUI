@@ -54,6 +54,7 @@ namespace ON2Solutions {
     inline constexpr const char* info_hour_run = "Hour Run";
     inline constexpr const char* info_restart = "Restart";
     inline constexpr const char* info_action = "Action";
+    inline constexpr const char* timer = "Timer:";
 
     inline constexpr const char* header_title = "Welcome";
     inline constexpr const char* header_settings = "Settings";

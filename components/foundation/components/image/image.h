@@ -46,6 +46,7 @@ namespace foundation
       lv_obj_set_width(comp, this->props.real_width);
       lv_obj_set_height(comp, this->props.real_height);
       lv_obj_align(comp, LV_ALIGN_CENTER, 0, 0);
+      lv_obj_set_style_bg_img_tiled(comp, false, 0);
 
       if (auto style = styling(); style->get_is_dirty()) {
         lv_obj_invalidate(comp);
