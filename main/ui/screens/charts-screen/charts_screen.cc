@@ -79,7 +79,7 @@ namespace ON2Solutions {
                             style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
                           })
                           .set_children(children(
-                              $HighButton(assets::Right,
+                              $HighButton(assets::Left,
                                           [navigation](lv_event_t* _) {
                                             navigation->navigate("/main");
                                           }),
