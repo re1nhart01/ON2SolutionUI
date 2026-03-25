@@ -1,28 +1,31 @@
 
 #pragma once
 
-#include "constants/theme.h"
-#include "../../components/foundation/components/component.h"
 #include "../../components/foundation/core/application.h"
 #include "../../components/foundation/core/shortcuts.h"
+#include <ui/components/common_header/common_header.h>
+#include <ui/components/side_bar/side_bar.h>
+#include <ui/styles/common_styles.h>
+#include "constants/theme.h"
 
 namespace ON2Solutions {
-  class ChartsScreen;
+  class ErrorsScreen;
   using namespace foundation;
 
-  struct ChartsScreenProps final
-      : BaseProps<ChartsScreenProps, ChartsScreen> {};
+  struct ErrorsScreenProps final
+      : BaseProps<ErrorsScreen, ErrorsScreen> {};
 
-  class ChartsScreen final : public NavigationScreen<ChartsScreenProps> {
+  class ErrorsScreen final : public NavigationScreen<ErrorsScreenProps> {
    public:
-    explicit ChartsScreen(StackNavigator* stack, ChartsScreenProps props)
+    explicit ErrorsScreen(StackNavigator* stack, ErrorsScreenProps props)
         : NavigationScreen(stack, std::move(props)) {}
 
-    ~ChartsScreen() override = default;
+    ~ErrorsScreen() override = default;
 
     void component_did_mount() override;
-    void navigate_after() const;
+    $$CommonHeader render_header() const;
+    $$View render_body();
     lv_obj_t* render() override;
-    ChartsScreen* append(lv_obj_t* obj) override;
+    ErrorsScreen* append(lv_obj_t* obj) override;
   };
 }  // namespace ON2Solutions

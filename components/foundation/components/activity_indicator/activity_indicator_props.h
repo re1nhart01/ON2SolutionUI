@@ -10,21 +10,21 @@ namespace foundation
   struct ActivityIndicatorProps final : BaseProps<ActivityIndicatorProps, ActivityIndicator>
   {
     lv_color_t color = lv_color_hex(0xFF0000);
-    int spin_time = 1000;
-    int arc_length = 60;
-    int size = 40;
+    short spin_time = 1000;
+    short arc_length = 60;
+    short size = 40;
 
-    ActivityIndicatorProps&& time(int t) {
+    ActivityIndicatorProps&& time(short t) {
       this->spin_time = t;
       return std::move(*this);
     }
 
-    ActivityIndicatorProps&& arc(int a) {
+    ActivityIndicatorProps&& arc(short a) {
       this->arc_length = a;
       return std::move(*this);
     }
 
-    ActivityIndicatorProps&& sz(int s) {
+    ActivityIndicatorProps&& sz(short s) {
       this->size = s;
       return std::move(*this);
     }

@@ -6,7 +6,7 @@
 #include "ui/screens/settings-screen/settings_screen.h"
 #include "ui/screens/charts-screen/charts_screen.h"
 #include "ui/screens/errors-screen/errors_screen.h"
-#include "ui/screens/charts-screen/charts_screen.h"
+#include "ui/screens/info-screen/info_screen.h"
 
 
 #include <core/application.h>
@@ -45,6 +45,18 @@ namespace ON2Solutions {
 
       navigator->register_screen("/settings", [navigator]() {
         return std::make_unique<SettingsScreen>(navigator.get(), SettingsScreenProps{});
+      });
+
+      navigator->register_screen("/errors", [navigator]() {
+        return std::make_unique<ErrorsScreen>(navigator.get(), ErrorsScreenProps{});
+      });
+
+      navigator->register_screen("/info", [navigator]() {
+        return std::make_unique<InfoScreen>(navigator.get(), InfoScreenProps{});
+      });
+
+      navigator->register_screen("/charts", [navigator]() {
+        return std::make_unique<ChartsScreen>(navigator.get(), ChartsScreenProps{});
       });
 
       navigator->start();

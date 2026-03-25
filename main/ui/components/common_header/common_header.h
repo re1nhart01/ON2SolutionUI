@@ -5,6 +5,7 @@
 
 #include <memory>
 #include "core/styling/styling.h"
+#include "ui/components/dot_indicator/dot_indicator.h"
 
 #include <constants/assets.h>
 #include "constants/theme.h"

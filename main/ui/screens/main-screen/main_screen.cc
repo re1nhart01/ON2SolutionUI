@@ -154,6 +154,8 @@ namespace ON2Solutions {
   }
 
   $$View MainScreen::render_body() const {
+    auto navigation = navigation_ref;
+
     return $View(ViewProps::up()
                      .w(LV_PCT(100))
                      .h(LV_PCT(100))
@@ -181,7 +183,9 @@ namespace ON2Solutions {
                                    })
                                    .set_children(children(
                                        this->render_card(), this->render_card(),
-                                       $HighButton(assets::Right)))),
+                                       $HighButton(assets::Right, [navigation](lv_event_t* _) {
+                                         navigation->navigate("/charts");
+                                       })))),
                          this->render_footer())));
   }
 

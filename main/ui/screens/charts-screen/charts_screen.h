@@ -6,6 +6,8 @@
 #include "../../components/foundation/core/application.h"
 #include "../../components/foundation/core/shortcuts.h"
 
+#include <ui/components/common_header/common_header.h>
+
 namespace ON2Solutions {
   class ChartsScreen;
   using namespace foundation;
@@ -21,7 +23,12 @@ namespace ON2Solutions {
     ~ChartsScreen() override = default;
 
     void component_did_mount() override;
+    void execute_status_trigger() const;
+    $$CommonHeader render_header() const;
+    $$View render_body() const;
+    $$View render_card() const;
     void navigate_after() const;
+    $$View render_footer() const;
     lv_obj_t* render() override;
     ChartsScreen* append(lv_obj_t* obj) override;
   };

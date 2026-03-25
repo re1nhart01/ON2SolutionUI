@@ -93,8 +93,8 @@ public:
         }
     }
 
-  void navigate(const std::string& name) {
-      _mount_screen(name, true);
+  void navigate(const std::string& name, bool with_save = true) {
+      _mount_screen(name, with_save);
   }
 
 

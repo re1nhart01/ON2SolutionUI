@@ -5,24 +5,33 @@
 #include "../../components/foundation/components/component.h"
 #include "../../components/foundation/core/application.h"
 #include "../../components/foundation/core/shortcuts.h"
+#include <ui/components/common_header/common_header.h>
+#include <ui/components/side_bar/side_bar.h>
+#include <ui/screens/errors-screen/errors_screen.h>
+#include <ui/styles/common_styles.h>
+#include "constants/theme.h"
+
+
+#include <ui/components/common_header/common_header.h>
 
 namespace ON2Solutions {
-  class ChartsScreen;
+  class InfoScreen;
   using namespace foundation;
 
-  struct ChartsScreenProps final
-      : BaseProps<ChartsScreenProps, ChartsScreen> {};
+  struct InfoScreenProps final
+      : BaseProps<InfoScreenProps, InfoScreen> {};
 
-  class ChartsScreen final : public NavigationScreen<ChartsScreenProps> {
+  class InfoScreen final : public NavigationScreen<InfoScreenProps> {
    public:
-    explicit ChartsScreen(StackNavigator* stack, ChartsScreenProps props)
+    explicit InfoScreen(StackNavigator* stack, InfoScreenProps props)
         : NavigationScreen(stack, std::move(props)) {}
 
-    ~ChartsScreen() override = default;
+    ~InfoScreen() override = default;
 
     void component_did_mount() override;
-    void navigate_after() const;
+    $$CommonHeader render_header() const;
+    $$View render_body();
     lv_obj_t* render() override;
-    ChartsScreen* append(lv_obj_t* obj) override;
+    InfoScreen* append(lv_obj_t* obj) override;
   };
 }  // namespace ON2Solutions

@@ -43,7 +43,7 @@ namespace ON2Solutions {
       if (this->props.stack == nullptr) return;
       if (this->props.stack->get_current_route() == path) return;
 
-      this->props.stack->navigate(path);
+      this->props.stack->navigate(path, false);
     }
 
     $$Button render_nav_button(const std::string& path,
@@ -91,8 +91,8 @@ namespace ON2Solutions {
                     })
                     .set_children(children(
                         this->render_nav_button("/main", assets::Pie),
-                        this->render_nav_button("/main", assets::Warning),
-                        this->render_nav_button("/main", assets::Info),
+                        this->render_nav_button("/errors", assets::Warning),
+                        this->render_nav_button("/info", assets::Info),
                         this->render_nav_button("/settings", assets::Settings)))));
     };
 
