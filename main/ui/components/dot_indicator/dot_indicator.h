@@ -107,7 +107,7 @@ namespace ON2Solutions {
                       style.setGap(4, 4);
                       NoPaddingApply(style);
                     })
-                    .set_children(std::move(this->render_rows()))
+                    .set_children(this->render_rows())
                     .direction(LV_FLEX_FLOW_ROW_WRAP)
                     .items(LV_FLEX_ALIGN_START)
                     .justify(LV_FLEX_ALIGN_START)

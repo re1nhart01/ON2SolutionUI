@@ -2,7 +2,6 @@
 // Created by evgeniy on 3/25/26.
 //
 
-#ifndef LVGL_PORTING_PAGINATED_LIST_H
-#define LVGL_PORTING_PAGINATED_LIST_H
 
-#endif  //LVGL_PORTING_PAGINATED_LIST_H
+#pragma once
+

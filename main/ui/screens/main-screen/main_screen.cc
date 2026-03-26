@@ -183,9 +183,11 @@ namespace ON2Solutions {
                                    })
                                    .set_children(children(
                                        this->render_card(), this->render_card(),
-                                       $HighButton(assets::Right, [navigation](lv_event_t* _) {
-                                         navigation->navigate("/charts");
-                                       })))),
+                                       $HighButton(assets::Right,
+                                                   [navigation](lv_event_t* _) {
+                                                     navigation->navigate(
+                                                         "/charts");
+                                                   })))),
                          this->render_footer())));
   }
 
@@ -193,57 +195,56 @@ namespace ON2Solutions {
     return $View(
         ViewProps::up()
             .set_children(children(
-            $TimerView(),
-            $Button(
-                ButtonProps::up()
-                    .set_style([](Styling& style) {
-                      style.setFont(&lv_font_montserrat_16);
-                      style.setBackgroundColor(button_color_by_status(
-                          parser::DatasetStatuses::StandBy));
-                      style.setBorderRadius(12);
-                      style.setSize(300, 44);
-                      style.setBorder(lv_color_hex(0x5B5AFF), 0, 0);
-                      style.setPadding(8, 8, 16, 16);
-                      style.setBorderRadius(14);
-                    })
-                    .watch<Dataset>(
-                        DatasetStore::getInstance(), "main_button_body",
-                        [](Button* self, const Dataset& value) {
-                          auto color =
-                              button_color_by_status(GetStatusFromTextValue(
-                                  value.operative_data.status.data()));
-                          self->set_state([color](ButtonProps& props) {
-                            props.set_style([color](Styling& style) {
-                              style.setBackgroundColor(color);
-                            });
-                          });
+                $TimerView(),
+                $Button(
+                    ButtonProps::up()
+                        .set_style([](Styling& style) {
+                          style.setFont(&lv_font_montserrat_16);
+                          style.setBackgroundColor(button_color_by_status(
+                              parser::DatasetStatuses::StandBy));
+                          style.setBorderRadius(12);
+                          style.setSize(300, 44);
+                          style.setBorder(lv_color_hex(0x5B5AFF), 0, 0);
+                          style.setPadding(8, 8, 16, 16);
+                          style.setBorderRadius(14);
                         })
-                    .set_child($Text(
-                        TextProps::up()
-                            .watch<Dataset>(
-                                DatasetStore::getInstance(), "main_button",
-                                [](Text* self, const Dataset& value) {
-                                  std::string status_str =
-                                      GetTextValueFromStatus(
-                                          GetStatusFromTextValue(
-                                              value.operative_data.status
-                                                  .data()));
-                                  self->set_state(
-                                      [status_str](TextProps& props) {
-                                        props.value(status_str);
-                                      });
-                                })
-                            .set_style(HeaderLabelApply)
-                            .value(locales::en::status)))
-                    .click([this](lv_event_t* e) {
-                      this->execute_status_trigger();
-                    })),
-            $FooterFragment()
-        ))
+                        .watch<Dataset>(
+                            DatasetStore::getInstance(), "main_button_body",
+                            [](Button* self, const Dataset& value) {
+                              auto color =
+                                  button_color_by_status(GetStatusFromTextValue(
+                                      value.operative_data.status.data()));
+                              self->set_state([color](ButtonProps& props) {
+                                props.set_style([color](Styling& style) {
+                                  style.setBackgroundColor(color);
+                                });
+                              });
+                            })
+                        .set_child($Text(
+                            TextProps::up()
+                                .watch<Dataset>(
+                                    DatasetStore::getInstance(), "main_button",
+                                    [](Text* self, const Dataset& value) {
+                                      std::string status_str =
+                                          GetTextValueFromStatus(
+                                              GetStatusFromTextValue(
+                                                  value.operative_data.status
+                                                      .data()));
+                                      self->set_state(
+                                          [status_str](TextProps& props) {
+                                            props.value(status_str);
+                                          });
+                                    })
+                                .set_style(HeaderLabelApply)
+                                .value(locales::en::status)))
+                        .click([this](lv_event_t* e) {
+                          this->execute_status_trigger();
+                        })),
+                $FooterFragment()))
             .flow(FlexPreset::RowCenter)
             .set_style([](Styling& style) {
               style.setPadding(0);
-              style.setGap(8,8);
+              style.setGap(8, 8);
               style.setBorderRadius(0);
               style.setBorder(PRIMARY_BG, 0, 0);
             }));
@@ -307,32 +308,6 @@ namespace ON2Solutions {
 }  // namespace ON2Solutions
 
 /*
-* $ScrollView(
-                    ScrollViewProps::up()
-                        .set_style(NoPaddingApply)
-                        .w(LV_PCT(100))
-                        .h(LV_PCT(75))
-                        .direction(LV_FLEX_FLOW_ROW)
-                        .scroll(LV_DIR_HOR)
-                        .scrollbar(LV_SCROLLBAR_MODE_OFF)
-                        .snap(LV_SCROLL_SNAP_CENTER, LV_SCROLL_SNAP_NONE)
-                        .set_elastic(false)
-                        .set_momentum(true)
-                        .set_children(children(
-                            $View(ViewProps::up()
-                                      .set_style(NoPaddingApply)
-                                      .w(LV_PCT(100))
-                                      .h(LV_PCT(100))
-                                      .set_children(
-                                          children(this->render_body_left()))),
-                            $View(ViewProps::up()
-                                      .set_style(NoPaddingApply)
-                                      .w(LV_PCT(100))
-                                      .h(LV_PCT(100))
-                                      .set_children(
-                                          children(this->render_body()))))))
- *
- *
  *
  *$$Animated MainScreen::render_animated_alarm() const {
     return $Animated(
@@ -381,75 +356,5 @@ namespace ON2Solutions {
                           .value("ON2 SYSTEMS"))));
   }
  *
- *
- */
-
-
-/*
- *
- *
- * $$View MainScreen::render_body_left() const {
-    auto make_circle = [&](const std::string& ref_name, int index) {
-      return $Circular(
-          CircularProgressProps::up()
-              .set_text_style(
-                  [](Styling& style) { style.setFont(&lv_font_montserrat_20); })
-              .watch<Dataset>(
-                  DatasetStore::getInstance(), "outputs",
-                  [index, ref_name](CircularProgress* self, const Dataset& value) {
-                    float val = (ref_name == "oxygen_level")
-                                    ? value.operative_data.oxygen_levels[index]
-                                    : value.operative_data.oxygen_speed[index];
-
-                    self->set_state(
-                        [val](MeterProps& props) { props.value(val); });
-                  })
-              .label("%")
-              .show_label(true)
-              .min(0)
-              .max(100)
-              .value(0)
-              .w(232)
-              .h(232));
-    };
-
-    return $View(
-        ViewProps::up()
-            .set_style(HeaderContainerApply)
-            .set_children(children(
-                $View(ViewProps::up()
-                          .w(LV_PCT(50))
-                          .h(LV_PCT(100))
-                          .set_style(NoPaddingApply)
-                          .direction(LV_FLEX_FLOW_COLUMN)
-                          .justify(LV_FLEX_ALIGN_START)
-                          .items(LV_FLEX_ALIGN_CENTER)
-                          .track_cross(LV_FLEX_ALIGN_CENTER)
-                          .set_children(children(
-                              $Text(TextProps::up()
-                                        .set_style(LabelPaddedApply)
-                                        .value(locales::en::oxygen_rate)),
-                              make_circle("oxygen_level", 0)))),
-
-                $View(ViewProps::up()
-                          .w(LV_PCT(50))
-                          .h(LV_PCT(100))
-                          .set_style(NoPaddingApply)
-                          .direction(LV_FLEX_FLOW_COLUMN)
-                          .justify(LV_FLEX_ALIGN_START)
-                          .items(LV_FLEX_ALIGN_CENTER)
-                          .track_cross(LV_FLEX_ALIGN_CENTER)
-                          .set_children(children(
-                              $Text(TextProps::up()
-                                        .set_style(LabelPaddedApply)
-                                        .value(locales::en::oxygen_rate)),
-                              make_circle("oxygen_rate", 0))))))
-            .w(LV_PCT(100))
-            .h(LV_PCT(100))
-            .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
-            .items(LV_FLEX_ALIGN_CENTER)
-            .track_cross(LV_FLEX_ALIGN_START)
-            .direction(LV_FLEX_FLOW_ROW));
-  }
  *
  */

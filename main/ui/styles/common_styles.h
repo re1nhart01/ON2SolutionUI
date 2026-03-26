@@ -150,6 +150,14 @@ namespace ON2Solutions {
     return p;
   }
 
+  inline static auto HideAllApply = [](Styling& style) {
+    style.setBackgroundColor(PRIMARY_BG);
+    style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+    style.setBackgroundOpa(LV_OPA_0);
+    style.setBorderRadius(0);
+    style.setPadding(0);
+  };
+
   inline static auto NoPaddingApply = [](Styling& style) {
     style.setBackgroundColor(lv_color_hex(0xffffff));
     style.setBorder(lv_color_make(0, 0, 0), 0, LV_OPA_TRANSP);

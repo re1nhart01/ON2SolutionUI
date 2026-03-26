@@ -10,13 +10,13 @@ namespace ON2Solutions {
   }
 
   void ChartsScreen::execute_status_trigger() const {
-  //   auto command = SerializableCommand<const char*>{
-  //     .command = SendableCommands::StatusCommand,
-  // };
-  //
-  //   std::string serialized = serialize(command);
-  //
-  //   auto status = this->uart_handler->send(serialized);
+    //   auto command = SerializableCommand<const char*>{
+    //     .command = SendableCommands::StatusCommand,
+    // };
+    //
+    //   std::string serialized = serialize(command);
+    //
+    //   auto status = this->uart_handler->send(serialized);
   }
 
   $$CommonHeader ChartsScreen::render_header() const {
@@ -26,15 +26,18 @@ namespace ON2Solutions {
   $$View ChartsScreen::render_card() const {
     return $View(
         ViewProps::up()
-            .w(318)
-            .h(328)
+            .w(160)
+            .h(LV_PCT(100))
             .direction(LV_FLEX_FLOW_COLUMN)
             .flow(FlexPreset::SpaceCenter)
             .set_style([](Styling& style) {
-
+              style.setBackgroundColor(PRIMARY_BG);
+              style.setBackgroundOpa(LV_OPA_0);
+              style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+              style.setPadding(0);
             })
             .set_children(children(
-                //Circular
+                $SpecificCircular(CircularSelectorType::O2, 0, true),
                 $View(ViewProps::up()
                           .w(LV_PCT(100))
                           .h(24)
@@ -47,6 +50,22 @@ namespace ON2Solutions {
                           .set_children(children($ConnectionStat(),
                                                  $Text(TextProps::up().value(
                                                      "Oxygen Level"))))))));
+  }
+
+  $$View ChartsScreen::render_circular_wrapper(
+      std::vector<std::unique_ptr<VNode>> childs, bool is_around = false) const {
+
+      return $View(ViewProps::up()
+                       .w(648)
+                       .h(158)
+                       .flow(FlexPreset::RowBetween)
+                       .justify(is_around ? LV_FLEX_ALIGN_SPACE_AROUND : LV_FLEX_ALIGN_SPACE_BETWEEN)
+                       .set_style([](Styling& style) {
+                         style.setBackgroundColor(PRIMARY_BG);
+                         style.setPadding(12);
+                         style.setBorderRadius(16);
+                       })
+                       .set_children(std::move(childs)));
   }
 
   $$View ChartsScreen::render_body() const {
@@ -83,7 +102,24 @@ namespace ON2Solutions {
                                           [navigation](lv_event_t* _) {
                                             navigation->navigate("/main");
                                           }),
-                              this->render_card(), this->render_card()))),
+                              $View(ViewProps::up()
+                                        .w(LV_SIZE_CONTENT)
+                                        .h(LV_SIZE_CONTENT)
+                                        .flow(FlexPreset::ColumnCenter)
+                                        .set_style(HideAllApply)
+                                        .set_children(
+                                            children(
+                                            this->render_circular_wrapper(
+                                                children(this->render_card(),
+                                                         this->render_card(),
+                                                         this->render_card())),
+                                            this->render_circular_wrapper(
+                                                children(this->render_card(),
+                                                         this->render_card()),
+                                                true)
+                                            ))
+
+                                        )))),
                 this->render_footer())));
   }
 

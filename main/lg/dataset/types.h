@@ -176,16 +176,18 @@ namespace ON2Solutions::parser {
   };
 
   struct Dataset {
-    bool operator==(const Dataset&) const {};
+    bool operator==(const Dataset&) const {
+      return true;
+    };
 
     DatasetSystemInfo system_info{
-        .device_name = {"UNKNOWN"},
-        .firmware_version = {"UNKNOWN"},
-        .loader_version = {"UNKNOWN"},
-        .module_name = {"UNKNOWN"},
-        .module_version = {"UNKNOWN"},
-        .firmware_checksum = {"UNKNOWN"},
-        .serial_number = {"UNKNOWN"},
+        .device_name = {""},
+        .firmware_version = {""},
+        .loader_version = {""},
+        .module_name = {""},
+        .module_version = {""},
+        .firmware_checksum = {""},
+        .serial_number = {""},
         .lan_ip_address = {},
         .wifi_ip_address = {}};
     DatasetOperative operative_data{

@@ -27,6 +27,9 @@ namespace ON2Solutions {
     $$CommonHeader render_header() const;
     $$View render_body() const;
     $$View render_card() const;
+    $$View render_circular_wrapper(std::vector<std::unique_ptr<VNode>> childs,
+                                   bool is_around) const;
+    $$View render_circular_column() const;
     void navigate_after() const;
     $$View render_footer() const;
     lv_obj_t* render() override;
