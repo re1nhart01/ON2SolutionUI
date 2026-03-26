@@ -9,6 +9,9 @@ namespace foundation
   struct StepperProps final : BaseProps<StepperProps, Stepper>
   {
     Delegate<void(float), 64> on_change_cb{};
+    Delegate<void(Styling&)> buttons_style_override{};
+    Delegate<void(Styling&)> spinbox_style_override{};
+    Delegate<void(Styling&)> text_style_override{};
 
 
     float step = 1.0f;
@@ -21,8 +24,6 @@ namespace foundation
     short height = 40;
     short button_width = 40;
     short button_height = 40;
-
-    std::string label = "";
 
     bool set_cursor_click_pos = false;
     uint8_t digit_count = 3;
@@ -41,11 +42,6 @@ namespace foundation
 
     StepperProps&& set_step(float val) {
       this->step = val;
-      return std::move(*this);
-    }
-
-    StepperProps&& set_label(std::string val) {
-      this->label = val;
       return std::move(*this);
     }
 
@@ -87,6 +83,24 @@ namespace foundation
 
     StepperProps&& set_height(lv_coord_t h) {
       this->height = h;
+      return std::move(*this);
+    }
+
+    StepperProps&& set_spinbox_style(Delegate<void(Styling&)> fn)
+    {
+      spinbox_style_override = std::move(fn);
+      return std::move(*this);
+    }
+
+    StepperProps&& set_buttons_style(Delegate<void(Styling&)> fn)
+    {
+      buttons_style_override = std::move(fn);
+      return std::move(*this);
+    }
+
+    StepperProps&& set_text_style(Delegate<void(Styling&)> fn)
+    {
+      text_style_override = std::move(fn);
       return std::move(*this);
     }
   };

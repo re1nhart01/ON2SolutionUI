@@ -54,7 +54,28 @@ namespace ON2Solutions {
 
       return $Button(
           ButtonProps::up()
-              .click([this, path](lv_event_t*) { on_navigation_press(path); })
+              .click([this, path](lv_event_t*) {
+
+                struct AsyncArg {
+                  std::string path;
+                };
+
+                auto delegate = new Delegate<void()>(
+                    [path, this]() {
+                  this->on_navigation_press(path);
+                });
+
+                lv_async_call(
+                    [](void* arg) {
+                      auto* callback = static_cast<Delegate<void()>*>(arg);
+
+                      if (callback) {
+                        (*callback)();
+                        delete callback;
+                      }
+                }, delegate);
+
+              })
               .set_style([is_active](Styling& style) {
                 style.set_clear_default();
                 style.setWidth(32);

@@ -11,6 +11,8 @@
 using namespace foundation;
 namespace ON2Solutions {
 
+
+
   inline $$Button $HighButton(const char* source, auto on_press) {
     return $Button(ButtonProps::up()
                        .click(on_press)
@@ -24,28 +26,6 @@ namespace ON2Solutions {
                            ImageProps::up().source(source).height(14).width(9)))
 
     );
-  }
-
-  inline $$Circular $SpecificCircular() {
-    return $Circular(
-        CircularProgressProps::up()
-            .watch<parser::Dataset>(
-                parser::DatasetStore::getInstance(), "outputs",
-                [](CircularProgress* self, const parser::Dataset& value) {
-                  // float val = (ref_name == "oxygen_level")
-                  //                 ? value.operative_data.oxygen_levels[index]
-                  //                 : value.operative_data.oxygen_speed[index];
-                  //
-                  // self->set_state(
-                  //     [val](MeterProps& props) { props.value(val); });
-                })
-            .label("%")
-            .show_label(true)
-            .min(0)
-            .max(100)
-            .value(0)
-            .w(135)
-            .h(135));
   }
 
   inline $$View $ConnectionStat() {

@@ -138,7 +138,7 @@ namespace ON2Solutions {
 
             })
             .set_children(children(
-                //Circular
+                $SpecificCircular(CircularSelectorType::O2, 0, false),
                 $View(ViewProps::up()
                           .w(LV_PCT(100))
                           .h(24)
@@ -384,78 +384,6 @@ namespace ON2Solutions {
  *
  */
 
-/**
- *
- *
- * $$View MainScreen::render_body() const {
-    auto make_circle = [&](const std::string& ref_name, int index) {
-      return $Circular(
-          CircularProgressProps::up()
-              .watch<Dataset>(
-                  DatasetStore::getInstance(), "outputs",
-                  [index, ref_name](CircularProgress* self, const Dataset& value) {
-                    float val = (ref_name == "oxygen_level")
-                                    ? value.operative_data.oxygen_levels[index]
-                                    : value.operative_data.oxygen_speed[index];
-
-                    self->set_state(
-                        [val](MeterProps& props) { props.value(val); });
-                  })
-              .label("%")
-              .show_label(true)
-              .min(0)
-              .max(100)
-              .value(0)
-              .w(135)
-              .h(135));
-    };
-
-    return $View(
-        ViewProps::up()
-            .set_style(HeaderContainerApply)
-            .set_children(children(
-                $Text(TextProps::up()
-                          .set_style(HeaderLabelApply)
-                          .value(locales::en::oxygen_level)),
-                $View(
-                    ViewProps::up()
-                        .set_style(NoPaddingApply)
-                        .set_children(children(make_circle("oxygen_level", 1),
-                                               make_circle("oxygen_level", 2),
-                                               make_circle("oxygen_level", 3)))
-                        .w(LV_PCT(100))
-                        .h(135)
-                        .set_overflow(true)
-                        .justify(LV_FLEX_ALIGN_SPACE_AROUND)
-                        .items(LV_FLEX_ALIGN_CENTER)
-                        .track_cross(LV_FLEX_ALIGN_CENTER)
-                        .direction(LV_FLEX_FLOW_ROW)),
-                $Text(TextProps::up()
-                          .set_style(HeaderLabelApply)
-                          .value(locales::en::oxygen_rate)),
-                $View(ViewProps::up()
-                          .set_style(NoPaddingApply)
-                          .set_children(children(make_circle("oxygen_rate", 1),
-                                                 make_circle("oxygen_rate", 2),
-                                                 make_circle("oxygen_rate", 3)))
-                          .w(LV_PCT(100))
-                          .set_overflow(true)
-                          .h(135)
-                          .justify(LV_FLEX_ALIGN_SPACE_AROUND)
-                          .items(LV_FLEX_ALIGN_CENTER)
-                          .track_cross(LV_FLEX_ALIGN_CENTER)
-                          .direction(LV_FLEX_FLOW_ROW))))
-            .w(LV_PCT(100))
-            .h(LV_PCT(100))
-            .justify(LV_FLEX_ALIGN_START)
-            .items(LV_FLEX_ALIGN_CENTER)
-            .track_cross(LV_FLEX_ALIGN_START)
-            .direction(LV_FLEX_FLOW_COLUMN));
-  }
-
- *
- *
- */
 
 /*
  *

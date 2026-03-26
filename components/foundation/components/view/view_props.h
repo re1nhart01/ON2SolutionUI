@@ -109,7 +109,7 @@ namespace foundation
           flex_direction = LV_FLEX_FLOW_ROW;
           justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN;
           align_items = LV_FLEX_ALIGN_CENTER;
-          track_cross_place = LV_FLEX_ALIGN_START;
+          track_cross_place = LV_FLEX_ALIGN_CENTER;
           break;
 
         case FlexPreset::RowCenter:

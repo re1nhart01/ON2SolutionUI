@@ -70,7 +70,7 @@ namespace foundation
           if (!this->label)
             {
               this->label = std::make_unique<Text>(
-                  TextProps::up().value(std::format("{}{}", props.default_dy, props.label_symbol))
+                  TextProps::up().set_style(this->props.text_style_override).value(std::format("{}{}", props.default_dy, props.label_symbol))
               );
               this->label->set_parent(container);
               this->label->render();
@@ -128,12 +128,6 @@ namespace foundation
 
       lv_obj_center(arc_reference);
 
-      if (props.show_label_default) {
-        label = std::make_unique<Text>(TextProps::up().set_style(this->props.text_style_override));
-        label->set_parent(container);
-        label->render();
-        lv_obj_align(label->get_component(), LV_ALIGN_CENTER, 0, props.height / 3);
-      }
       this->update_label_text();
     }
 
@@ -155,11 +149,13 @@ namespace foundation
     };
 
     void update_label_text() const {
-      if (!label || !label->get_component()) return;
-      char buf[32];
+      if (!label) return;
+      auto* obj = label->get_component();
+      if (!obj) return;
 
-      snprintf(buf, sizeof(buf), "%.1hd%s", props.default_dy, props.label_symbol.c_str());
-      lv_label_set_text(label->get_component(), buf);
+      const std::string text = std::to_string(props.default_dy) + props.label_symbol;
+
+      lv_label_set_text(obj, text.c_str());
     }
   };
 }

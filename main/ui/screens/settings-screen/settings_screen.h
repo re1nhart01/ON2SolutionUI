@@ -5,6 +5,7 @@
 #include <constants/localization.h>
 #include <lg/dataset/paramspec.h>
 #include <protocols/uart/uart_proto.h>
+#include <ui/components/common_header/common_header.h>
 #include <ui/styles/common_styles.h>
 
 namespace ON2Solutions {
@@ -34,12 +35,13 @@ namespace ON2Solutions {
     void hour_run_reset() const;
 
     template <typename T>
-    $$Stepper make_param(const ParamSpec& spec, T value, float dependable = 0,
-                         short width = 165) const;
+    $$View make_param(const ParamSpec& spec, T value, float dependable = 0,
+                         short width = 135) const;
     $$View render_sensors_tab() const;
     $$View render_timers_tab() const;
     $$View render_limits_tab() const;
     $$View render_service_tab() const;
+    $$CommonHeader render_header() const;
     $$View render_section_header(const std::string& heading) const;
     lv_obj_t* render() override;
     const Styling* styling() const override;
