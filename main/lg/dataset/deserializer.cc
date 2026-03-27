@@ -62,6 +62,10 @@ namespace ON2Solutions::parser {
         std::array<uint8_t, 2> sp{0, 0};
         parse_list(val, val_len, sp);
         dataset->operative_data.secondary_tank_pressure = sp;
+      } else if (key_len == 2 && key[0] == 'T' && key[1] == 'N') {
+        std::array<uint8_t, 2> tn{0, 0};
+        parse_list(val, val_len, tn);
+        dataset->operative_data.tank_temperatures = tn;
       } else if (key_len == 2 && key[0] == 'I' && key[1] == 'I') {
         uint8_t out;
         if (parse_hex(val, val_len, out)) {

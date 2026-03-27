@@ -127,7 +127,8 @@ namespace ON2Solutions {
     return $CommonHeader(CommonHeaderProps::up());
   }
 
-  $$View MainScreen::render_card() const {
+  $$View MainScreen::render_card(const CircularSelectorType& type,
+                                 uint8_t index) const {
     return $View(
         ViewProps::up()
             .w(318)
@@ -138,7 +139,7 @@ namespace ON2Solutions {
 
             })
             .set_children(children(
-                $SpecificCircular(CircularSelectorType::O2, 0, false),
+                $SpecificCircular(type, index, false),
                 $View(ViewProps::up()
                           .w(LV_PCT(100))
                           .h(24)
@@ -182,11 +183,12 @@ namespace ON2Solutions {
                                      style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
                                    })
                                    .set_children(children(
-                                       this->render_card(), this->render_card(),
+                                       this->render_card(O2, 0),
+                                       this->render_card(Ps, 0),
                                        $HighButton(assets::Right,
                                                    [navigation](lv_event_t* _) {
                                                      navigation->navigate(
-                                                         "/charts");
+                                                         "/charts", { { "page", 0 } }, false);
                                                    })))),
                          this->render_footer())));
   }

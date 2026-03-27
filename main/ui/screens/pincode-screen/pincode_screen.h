@@ -11,7 +11,9 @@
 namespace ON2Solutions {
   class PinCodeScreen;
   struct PinCodeScreenProps final
-      : BaseProps<PinCodeScreenProps, PinCodeScreen> {};
+      : BaseProps<PinCodeScreenProps, PinCodeScreen> {
+    NavigationParam params;
+  };
 
   class PinCodeScreen : public NavigationScreen<PinCodeScreenProps> {
     std::shared_ptr<KeyboardManager> keyboard;

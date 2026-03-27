@@ -17,7 +17,9 @@ namespace ON2Solutions {
   using namespace foundation;
 
   struct SettingsScreenProps final
-      : BaseProps<SettingsScreenProps, SettingsScreen> {};
+      : BaseProps<SettingsScreenProps, SettingsScreen> {
+    NavigationParam params;
+  };
 
   class SettingsScreen final : public NavigationScreen<SettingsScreenProps> {
    private:

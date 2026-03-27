@@ -19,7 +19,9 @@ namespace ON2Solutions {
   using namespace foundation;
 
   struct InfoScreenProps final
-      : BaseProps<InfoScreenProps, InfoScreen> {};
+      : BaseProps<InfoScreenProps, InfoScreen> {
+    NavigationParam params;
+  };
 
   class InfoScreen final : public NavigationScreen<InfoScreenProps> {
    public:

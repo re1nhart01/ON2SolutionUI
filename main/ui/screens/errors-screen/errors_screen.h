@@ -13,7 +13,9 @@ namespace ON2Solutions {
   using namespace foundation;
 
   struct ErrorsScreenProps final
-      : BaseProps<ErrorsScreen, ErrorsScreen> {};
+      : BaseProps<ErrorsScreen, ErrorsScreen> {
+    NavigationParam params;
+  };
 
   class ErrorsScreen final : public NavigationScreen<ErrorsScreenProps> {
    public:

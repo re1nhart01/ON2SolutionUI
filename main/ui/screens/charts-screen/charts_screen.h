@@ -13,7 +13,9 @@ namespace ON2Solutions {
   using namespace foundation;
 
   struct ChartsScreenProps final
-      : BaseProps<ChartsScreenProps, ChartsScreen> {};
+      : BaseProps<ChartsScreenProps, ChartsScreen> {
+    NavigationParam params;
+  };
 
   class ChartsScreen final : public NavigationScreen<ChartsScreenProps> {
    public:

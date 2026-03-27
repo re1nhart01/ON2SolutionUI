@@ -31,32 +31,32 @@ namespace ON2Solutions {
     {
       auto navigator = this->stack_navigator;
 
-      navigator->register_screen("/main", [navigator]() {
-        return std::make_unique<MainScreen>(navigator.get(), MainScreenProps{});
+      navigator->register_screen("/main", [navigator](const NavigationParam& params) {
+        return std::make_unique<MainScreen>(navigator.get(), MainScreenProps{.params = params});
       });
 
-      navigator->register_screen("/pin_code", [navigator]() {
-        return std::make_unique<PinCodeScreen>(navigator.get(), PinCodeScreenProps{});
+      navigator->register_screen("/pin_code", [navigator](const NavigationParam& params) {
+        return std::make_unique<PinCodeScreen>(navigator.get(), PinCodeScreenProps{.params = params});
       });
 
-      navigator->register_screen("/preloader", [navigator]() {
+      navigator->register_screen("/preloader", [navigator](const NavigationParam& _) {
         return std::make_unique<PreloaderScreen>(navigator.get(), PreloaderScreenProps{});
       });
 
-      navigator->register_screen("/settings", [navigator]() {
-        return std::make_unique<SettingsScreen>(navigator.get(), SettingsScreenProps{});
+      navigator->register_screen("/settings", [navigator](const NavigationParam& params) {
+        return std::make_unique<SettingsScreen>(navigator.get(), SettingsScreenProps{.params = params});
       });
 
-      navigator->register_screen("/errors", [navigator]() {
-        return std::make_unique<ErrorsScreen>(navigator.get(), ErrorsScreenProps{});
+      navigator->register_screen("/errors", [navigator](const NavigationParam& params) {
+        return std::make_unique<ErrorsScreen>(navigator.get(), ErrorsScreenProps{.params = params});
       });
 
-      navigator->register_screen("/info", [navigator]() {
-        return std::make_unique<InfoScreen>(navigator.get(), InfoScreenProps{});
+      navigator->register_screen("/info", [navigator](const NavigationParam& params) {
+        return std::make_unique<InfoScreen>(navigator.get(), InfoScreenProps{.params = params});
       });
 
-      navigator->register_screen("/charts", [navigator]() {
-        return std::make_unique<ChartsScreen>(navigator.get(), ChartsScreenProps{});
+      navigator->register_screen("/charts", [navigator](const NavigationParam& params) {
+        return std::make_unique<ChartsScreen>(navigator.get(), ChartsScreenProps{.params = params});
       });
 
       navigator->start();

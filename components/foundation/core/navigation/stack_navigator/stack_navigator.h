@@ -24,13 +24,28 @@ struct StackNavigatorConfig {
     std::string initial_route;
 };
 
+
+
+using NavigationParam = std::unordered_map<std::string, std::variant<float, int, short, const char*, bool, std::string>>;
+using ScreenFactory = Delegate<std::unique_ptr<VNode>(const NavigationParam& params)>;
+
 struct StackHistoryRoute
 {
-  int id;
-  std::string name;
+    int id;
+    std::string name;
+    NavigationParam params;
 };
 
-using ScreenFactory = Delegate<std::unique_ptr<VNode>()>;
+template <typename T>
+T get_param(const NavigationParam& params, const std::string& key, T default_val = T()) {
+        auto it = params.find(key);
+        if (it != params.end()) {
+            if (auto val = std::get_if<T>(&it->second)) {
+                return *val;
+            }
+        }
+        return default_val;
+}
 
 class StackNavigator {
 public:
@@ -52,10 +67,10 @@ public:
     void start() {
       const auto initial_route = config.initial_route;
       history.clear();
-      _mount_screen(initial_route, false);
+      _mount_screen(initial_route, false, {});
     }
 
-    void _mount_screen(const std::string& name, bool save_to_history) {
+    void _mount_screen(const std::string& name, bool save_to_history, const NavigationParam& param) {
         auto it = factories.find(name);
         if (it == factories.end()) return;
 
@@ -65,14 +80,14 @@ public:
                 }
 
                 if (save_to_history) {
-                        history.push_back(StackHistoryRoute{.id = history_counter++, .name = current->name});
+                        history.push_back(StackHistoryRoute{.id = history_counter++, .name = current->name, .params = param});
                 }
         }
 
         lv_obj_t* active_parent = parent ? parent : lv_scr_act();
         lv_obj_clean(active_parent);
 
-        auto screen_instance = it->second();
+        auto screen_instance = it->second(param);
 
         current.reset();
 
@@ -94,10 +109,12 @@ public:
     }
 
   void navigate(const std::string& name, bool with_save = true) {
-      _mount_screen(name, with_save);
+        _mount_screen(name, with_save, {});
   }
 
-
+  void navigate(const std::string& name, const NavigationParam& params, bool with_save = true) {
+        _mount_screen(name, with_save, params);
+  }
 
   void goBack() {
       if(history.empty())
@@ -107,13 +124,18 @@ public:
       if (history.size() == 0) return;
       history.pop_back();
 
-      _mount_screen(prev.name, false);
+      _mount_screen(prev.name, false, prev.params);
   }
 
   void reset_to(const std::string& name) {
       history.clear();
-      _mount_screen(name, false);
+      _mount_screen(name, false, {});
   }
+
+    void reset_to(const std::string& name, const NavigationParam& param) {
+        history.clear();
+        _mount_screen(name, false, param);
+    }
 
     const std::string& get_current_route() const {
         static const std::string empty = "";

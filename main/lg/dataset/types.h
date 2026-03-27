@@ -145,6 +145,7 @@ namespace ON2Solutions::parser {
     std::array<float, 4> oxygen_speed;
     std::array<uint8_t, 2> secondary_tank_pressure;  // TR
     std::array<uint8_t, 2> primary_tank_pressure;    // PS
+    std::array<uint8_t, 2> tank_temperatures;
     std::array<char, 21> moto_hours;
     uint8_t inputs;
     uint16_t outputs;

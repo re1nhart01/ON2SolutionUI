@@ -19,7 +19,9 @@
 
 namespace ON2Solutions {
   class MainScreen;
-  struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen> {};
+  struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen> {
+    NavigationParam params;
+  };
 
   class MainScreen final : public NavigationScreen<MainScreenProps> {
     std::unique_ptr<UartHandler> uart_handler = nullptr;
@@ -47,7 +49,7 @@ namespace ON2Solutions {
     void update_styles(Component<C>* component, const Delegate<void(Styling&)>& style);
 
     $$CommonHeader render_header() const;
-    $$View render_card() const;
+    $$View render_card(const CircularSelectorType& type, uint8_t index) const;
     $$View render_footer() const;
     $$View render_body() const;
     $$View render_body_left() const;
