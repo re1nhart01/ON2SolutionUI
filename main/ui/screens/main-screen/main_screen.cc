@@ -1,41 +1,32 @@
 #include "main_screen.h"
 
 #include "constants/theme.h"
+#include <hal/uart_ll.h>
 
 using namespace foundation;
 using namespace ON2Solutions::parser;
 
-static const char* current_packet = CH_PACKETS[0];
-
 namespace ON2Solutions {
   void MainScreen::on_focus() {
     NavigationScreen::on_focus();
-    this->uart_handler = std::make_unique<UartHandler>(
-        UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
-    // start_random_updater();
-    ESP_LOGI("main_screen", "on_FOCUS");
-    this->uart_handler->init();
-    this->uart_handler->enable_rx(true);
-    this->add_uart_data_event();
   };
 
   void MainScreen::on_blur() {
     NavigationScreen::on_blur();
-    this->uart_handler->stop();
-    // if (xHandle != nullptr) {
-    // vTaskDelete(xHandle);
-    // xHandle = nullptr;
-    // }
   };
 
   void MainScreen::execute_status_trigger() const {
+    if (!this->props.uart) {
+      return;
+    }
+
     auto command = SerializableCommand<const char*>{
         .command = SendableCommands::StatusCommand,
     };
 
     std::string serialized = serialize(command);
 
-    auto status = this->uart_handler->send(serialized);
+    auto _ = this->props.uart->send(serialized);
   }
 
   template <typename C>
@@ -44,90 +35,13 @@ namespace ON2Solutions {
     component->set_state([style](C& props) { props.set_style(style); });
   }
 
-  void MainScreen::show_info_modal() {
-    DatasetSystemInfo system_info =
-        DatasetStore::getInstance()->get().system_info;
-
-    info_modal = $InfoModal(
-        std::move(InfoModalProps::up()
-                      .set_device(system_info.device_name.data())
-                      .set_loader(system_info.loader_version.data())
-                      .set_fw(system_info.firmware_version.data())
-                      .set_fw_checksum(system_info.firmware_checksum.data())
-                      .set_module_name(system_info.module_name.data())
-                      .set_module_fw(system_info.firmware_version.data())
-                      .set_serial_number(system_info.serial_number.data())
-                      .set_ethernet_ip(system_info.lan_ip_address.data())
-                      .set_wifi_ip(system_info.wifi_ip_address.data())
-                      .set_lcd_fw("x.x.x")
-                      .set_lcd_loader("x.x.x")
-                      .set_lcd_partition("x.x.x")
-                      .set_restart_seconds(99)));
-
-    info_modal->show();
-  }
-
-  void MainScreen::show_errors_modal() {
-    DatasetOperative operative_data =
-        DatasetStore::getInstance()->get().operative_data;
-
-    error_modal = $ErrorModal(
-        std::move(ErrorModalProps::up().set_error_hex(operative_data.errors)));
-
-    error_modal->show();
-  }
-
-  void MainScreen::start_random_updater() {
-    xTaskCreate(
-        [](void* pvParameters) {
-          auto* const self = static_cast<MainScreen*>(pvParameters);
-          while (true) {
-            if (self) {
-              current_packet = CH_PACKETS[esp_random() % 15];
-              const char* p = current_packet;
-
-              if (lvgl_port_lock(-1)) {
-                Dataset dataset = DatasetStore::getInstance()->get();
-                parse(&dataset, p, strlen(p));
-
-                DatasetStore::getInstance()->set(dataset);
-
-                lvgl_port_unlock();
-              }
-            }
-            vTaskDelay(pdMS_TO_TICKS(1500));
-          }
-        },
-        "rand_task", 16384, this, 5, &xHandle);
-  }
-
-  void MainScreen::add_uart_data_event() const {
-    this->uart_handler->add_event_listener(UartTypes::UartHandlerEvent{
-        .key_v = const_cast<char*>("read_data_dto"),
-        .event = UART_DATA,
-        .delegate = [](const UartTypes::UartCallbackResponse& uart_data) {
-          if (strlen(uart_data.response.packet) <= 0)
-            return;
-
-          ESP_LOGI("main_screen", "Received data from UART %s",
-                   uart_data.response.packet);
-
-          if (uart_data.response.packet &&
-              strlen(uart_data.response.packet) > 0) {
-
-            Dataset dataset = DatasetStore::getInstance()->get();
-            parse(&dataset, uart_data.response.packet, uart_data.response.len);
-            DatasetStore::getInstance()->set(dataset);
-          }
-        }});
-  }
 
 #pragma region UI
   $$CommonHeader MainScreen::render_header() const {
     return $CommonHeader(CommonHeaderProps::up());
   }
 
-  $$View MainScreen::render_card(const CircularSelectorType& type,
+  $$View MainScreen::render_card(const CircularSelectorType& type, const char* title,
                                  uint8_t index) const {
     return $View(
         ViewProps::up()
@@ -150,8 +64,7 @@ namespace ON2Solutions {
                           })
                           .flow(FlexPreset::RowCenter)
                           .set_children(children($ConnectionStat(),
-                                                 $Text(TextProps::up().value(
-                                                     "Oxygen Level"))))))));
+                                                 $Text(TextProps::up().value(fmt_str("%s %d", title, index + 1)))))))));
   }
 
   $$View MainScreen::render_body() const {
@@ -183,8 +96,8 @@ namespace ON2Solutions {
                                      style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
                                    })
                                    .set_children(children(
-                                       this->render_card(O2, 0),
-                                       this->render_card(Ps, 0),
+                                       this->render_card(O2, locales::en::oxygen_level, 0),
+                                       this->render_card(Ps, locales::en::tank_psi, 0),
                                        $HighButton(assets::Right,
                                                    [navigation](lv_event_t* _) {
                                                      navigation->navigate(

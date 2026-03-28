@@ -18,7 +18,8 @@ namespace foundation
 
   enum class FlexPreset {
     ColumnCenter,   // Столбик, всё по центру
-    RowBetween,     // Строка, элементы враспор (justify-between)
+    RowBetween, // Строка, элементы враспор (justify-between)
+    RowStart,
     RowCenter,      // Строка, всё по центру
     Center,         // И по вертикали, и по горизонтали в центр
     ColumnStart,   // Список сверху вниз, прижат к левому краю
@@ -131,6 +132,11 @@ namespace foundation
           align_items = LV_FLEX_ALIGN_START;
           track_cross_place = LV_FLEX_ALIGN_START;
           break;
+        case FlexPreset::RowStart:
+          flex_direction = LV_FLEX_FLOW_ROW;
+          justify_content = LV_FLEX_ALIGN_START;
+          align_items = LV_FLEX_ALIGN_START;
+          track_cross_place = LV_FLEX_ALIGN_START;
         case FlexPreset::SpaceCenter:
           justify_content = LV_FLEX_ALIGN_SPACE_BETWEEN;
           align_items = LV_FLEX_ALIGN_CENTER;

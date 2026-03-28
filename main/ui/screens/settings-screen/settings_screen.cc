@@ -9,15 +9,10 @@ namespace ON2Solutions {
 
   void SettingsScreen::on_focus() {
     NavigationScreen::on_focus();
-    this->uart_handler = std::make_unique<UartHandler>(
-        UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, 115200, 16384);
-    this->uart_handler->init();
-    this->uart_handler->enable_rx(true);
   }
 
   void SettingsScreen::on_blur() {
     NavigationScreen::on_blur();
-    this->uart_handler->stop();
   };
 
   template <typename T>
@@ -35,7 +30,7 @@ namespace ON2Solutions {
 
     ESP_LOGI("SettingsScreen", "Updating settings: %s", serialized.c_str());
 
-    auto status = this->uart_handler->send(serialized);
+    auto status = this->props.uart->send(serialized);
   }
 
   void SettingsScreen::update_param(const ParamSpec& spec,
@@ -48,7 +43,7 @@ namespace ON2Solutions {
 
     ESP_LOGI("SettingsScreen", "Updating settings: %s", serialized.c_str());
 
-    auto status = this->uart_handler->send(serialized);
+    auto status = this->props.uart->send(serialized);
   }
 
   void SettingsScreen::hour_run_reset() const {
@@ -57,7 +52,7 @@ namespace ON2Solutions {
     };
 
     std::string serialized = parser::serialize(command);
-    auto status = this->uart_handler->send(serialized);
+    auto status = this->props.uart->send(serialized);
   }
 
   template void SettingsScreen::update_param<float>(const ParamSpec& spec,

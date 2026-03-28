@@ -19,11 +19,11 @@ namespace ON2Solutions {
   struct SettingsScreenProps final
       : BaseProps<SettingsScreenProps, SettingsScreen> {
     NavigationParam params;
+    std::shared_ptr<UartHandler> uart;
   };
 
   class SettingsScreen final : public NavigationScreen<SettingsScreenProps> {
    private:
-    std::unique_ptr<UartHandler> uart_handler = nullptr;
     std::unique_ptr<Debounce> debounce = nullptr;
    public:
     explicit SettingsScreen(StackNavigator* stack, SettingsScreenProps props)

@@ -72,11 +72,14 @@ namespace ON2Solutions {
     inline constexpr const char* login_password = "Password";
 
     inline constexpr const char* oxygen_level = "Oxygen Level";
-    inline constexpr const char* oxygen_rate = "Oxygen flow rate";
+    inline constexpr const char* oxygen_rate = "Oxygen flow";
     inline constexpr const char* pressure_sensor_type = "Pressure Sensor Type";
 
     inline constexpr const char* oxygen_offset = "Oxygen offset";
     inline constexpr const char* flow_offset = "Flow offset";
+    inline constexpr const char* tank_psi = "Tank (PSI)";
+    inline constexpr const char* booster_psi = "Booster (PSI)";
+    inline constexpr const char* temperature = "Temperature";
     inline constexpr const char* other = "Other";
 
     inline constexpr const char* oxygen_offset_setting = "Oxygen sensors offset";

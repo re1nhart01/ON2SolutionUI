@@ -23,7 +23,9 @@ namespace ON2Solutions {
     return $CommonHeader(CommonHeaderProps::up());
   }
 
-  $$View ChartsScreen::render_card() const {
+  $$View ChartsScreen::render_card(const CircularSelectorType& type,
+                                   const char* title, uint8_t index,
+                                   bool is_small = false) const {
     return $View(
         ViewProps::up()
             .w(160)
@@ -37,7 +39,7 @@ namespace ON2Solutions {
               style.setPadding(0);
             })
             .set_children(children(
-                $SpecificCircular(CircularSelectorType::O2, 0, true),
+                $SpecificCircular(type, index, is_small),
                 $View(ViewProps::up()
                           .w(LV_PCT(100))
                           .h(24)
@@ -47,9 +49,9 @@ namespace ON2Solutions {
                             style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
                           })
                           .flow(FlexPreset::RowCenter)
-                          .set_children(children($ConnectionStat(),
-                                                 $Text(TextProps::up().value(
-                                                     "Oxygen Level"))))))));
+                          .set_children(children(
+                              $ConnectionStat(),
+                              $Text(TextProps::up().value(fmt_str("%s %d", title, index + 1)))))))));
   }
 
   $$View ChartsScreen::render_circular_wrapper(
@@ -75,7 +77,8 @@ namespace ON2Solutions {
   $$View ChartsScreen::render_body() const {
     auto navigation = navigation_ref;
 
-    auto is_last_page = get_param<int>(this->props.params, "page", 0) == 1;
+    auto circular_index = get_param<int>(this->props.params, "page", 0);
+    auto is_last_page = circular_index == 1;
 
     return $View(
         ViewProps::up()
@@ -91,52 +94,67 @@ namespace ON2Solutions {
               style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
             })
             .set_children(children(
-                $View(ViewProps::up()
-                          .w(LV_PCT(100))
-                          .h(LV_SIZE_CONTENT)
-                          .direction(LV_FLEX_FLOW_ROW)
-                          .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
-                          .items(LV_FLEX_ALIGN_CENTER)
-                          .track_cross(LV_FLEX_ALIGN_START)
-                          .set_style([](Styling& style) {
-                            style.setBackgroundOpa(LV_OPA_0);
-                            style.setPadding(0);
-                            style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
-                          })
-                          .set_children(children(
-                              $HighButton(
-                                  assets::Left,
-                                  [navigation, is_last_page](lv_event_t* _) {
-                                    navigation->navigate(
-                                        is_last_page ? "/charts" : "/main",
-                                        {{"page", 0}}, false);
-                                  }),
-                              $View(ViewProps::up()
-                                        .w(LV_SIZE_CONTENT)
-                                        .h(LV_SIZE_CONTENT)
-                                        .flow(FlexPreset::ColumnCenter)
-                                        .set_style(HideAllApply)
-                                        .set_children(children(
-                                            this->render_circular_wrapper(
-                                                children(this->render_card(),
-                                                         this->render_card(),
-                                                         this->render_card())),
-                                            this->render_circular_wrapper(
-                                                children(this->render_card(),
-                                                         this->render_card()),
-                                                true)))
+                $View(
+                    ViewProps::up()
+                        .w(LV_PCT(100))
+                        .h(LV_SIZE_CONTENT)
+                        .direction(LV_FLEX_FLOW_ROW)
+                        .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
+                        .items(LV_FLEX_ALIGN_CENTER)
+                        .track_cross(LV_FLEX_ALIGN_START)
+                        .set_style([](Styling& style) {
+                          style.setBackgroundOpa(LV_OPA_0);
+                          style.setPadding(0);
+                          style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                        })
+                        .set_children(children(
+                            $HighButton(
+                                assets::Left,
+                                [navigation, is_last_page](lv_event_t* _) {
+                                  navigation->navigate(
+                                      is_last_page ? "/charts" : "/main",
+                                      {{"page", 0}}, false);
+                                }),
+                            $View(
+                                ViewProps::up()
+                                    .w(LV_SIZE_CONTENT)
+                                    .h(LV_SIZE_CONTENT)
+                                    .flow(FlexPreset::ColumnCenter)
+                                    .set_style(HideAllApply)
+                                    .set_children(children(
+                                        this->render_circular_wrapper(children(
+                                            this->render_card(
+                                                O2, locales::en::oxygen_level,
+                                                circular_index, true),
+                                            this->render_card(
+                                                Fl, locales::en::oxygen_rate,
+                                                circular_index, true),
+                                            this->render_card(
+                                                Ps, locales::en::tank_psi,
+                                                circular_index, true))),
+                                        this->render_circular_wrapper(
+                                            children(
+                                                this->render_card(
+                                                    Tr,
+                                                    locales::en::booster_psi,
+                                                    circular_index, true),
+                                                this->render_card(
+                                                    Tn,
+                                                    locales::en::temperature,
+                                                    circular_index, true)),
+                                            true)))
 
-                                        ),
+                                    ),
 
-                              !is_last_page ? static_cast<VNodePtr>($HighButton(
-                                                  assets::Right,
-                                                  [navigation](lv_event_t* _) {
-                                                    navigation->navigate(
-                                                        "/charts",
-                                                        {{"page", 1}}, false);
-                                                  }))
-                                            : static_cast<VNodePtr>($Fragment(
-                                                  FragmentProps::up()))))),
+                            !is_last_page ? static_cast<VNodePtr>($HighButton(
+                                                assets::Right,
+                                                [navigation](lv_event_t* _) {
+                                                  navigation->navigate(
+                                                      "/charts", {{"page", 1}},
+                                                      false);
+                                                }))
+                                          : static_cast<VNodePtr>($Fragment(
+                                                FragmentProps::up()))))),
                 this->render_footer())));
   }
 

@@ -21,6 +21,7 @@ namespace ON2Solutions {
   struct InfoScreenProps final
       : BaseProps<InfoScreenProps, InfoScreen> {
     NavigationParam params;
+    std::shared_ptr<UartHandler> uart;
   };
 
   class InfoScreen final : public NavigationScreen<InfoScreenProps> {
@@ -32,6 +33,8 @@ namespace ON2Solutions {
 
     void component_did_mount() override;
     $$CommonHeader render_header() const;
+    std::vector<ErrorModel> generate_test_data_models();
+    $$View create_status_row(const std::string& label, bool is_error);
     $$View render_body();
     lv_obj_t* render() override;
     InfoScreen* append(lv_obj_t* obj) override;

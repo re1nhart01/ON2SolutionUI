@@ -21,13 +21,12 @@ namespace ON2Solutions {
   class MainScreen;
   struct MainScreenProps final : BaseProps<MainScreenProps, MainScreen> {
     NavigationParam params;
+    std::shared_ptr<UartHandler> uart;
   };
 
   class MainScreen final : public NavigationScreen<MainScreenProps> {
-    std::unique_ptr<UartHandler> uart_handler = nullptr;
     $$InfoModal info_modal = nullptr;
     $$ErrorModal error_modal = nullptr;
-    TaskHandle_t xHandle = nullptr;
     std::shared_ptr<AnimatedControl> alarm_control = nullptr;
    public:
     explicit MainScreen(StackNavigator* stack, MainScreenProps props)
@@ -40,16 +39,13 @@ namespace ON2Solutions {
 
     void on_focus() override;
     void on_blur() override;
-    void show_info_modal();
-    void show_errors_modal();
-    void start_random_updater();
-    void add_uart_data_event() const;
     void execute_status_trigger() const;
     template<typename C>
     void update_styles(Component<C>* component, const Delegate<void(Styling&)>& style);
 
     $$CommonHeader render_header() const;
-    $$View render_card(const CircularSelectorType& type, uint8_t index) const;
+    $$View render_card(const CircularSelectorType& type, const char* title,
+                       uint8_t index) const;
     $$View render_footer() const;
     $$View render_body() const;
     $$View render_body_left() const;

@@ -6,7 +6,10 @@
 #include "../../components/foundation/core/application.h"
 #include "../../components/foundation/core/shortcuts.h"
 
+#include <protocols/uart/uart_proto.h>
 #include <ui/components/common_header/common_header.h>
+#include <ui/components/on_circular/on_circular.h>
+
 
 namespace ON2Solutions {
   class ChartsScreen;
@@ -15,6 +18,7 @@ namespace ON2Solutions {
   struct ChartsScreenProps final
       : BaseProps<ChartsScreenProps, ChartsScreen> {
     NavigationParam params;
+    std::shared_ptr<UartHandler> uart;
   };
 
   class ChartsScreen final : public NavigationScreen<ChartsScreenProps> {
@@ -28,7 +32,8 @@ namespace ON2Solutions {
     void execute_status_trigger() const;
     $$CommonHeader render_header() const;
     $$View render_body() const;
-    $$View render_card() const;
+    $$View render_card(const CircularSelectorType& type, const char* title,
+                       uint8_t index, bool is_small) const;
     $$View render_circular_wrapper(std::vector<std::unique_ptr<VNode>> childs,
                                    bool is_around) const;
     $$View render_circular_column() const;

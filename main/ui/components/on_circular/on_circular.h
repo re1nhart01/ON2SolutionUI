@@ -59,10 +59,7 @@ namespace ON2Solutions {
     std::string symbol;
     short min;
     short max;
-    // Указатель на член данных (массив) в структуре OperativeData
-    // Предполагаем, что operative_data — это структура с массивами типа float или int
     using DataPtr = const float (parser::Dataset::*);
-    // Если типы массивов разные, лучше использовать std::function
     std::function<float(const parser::Dataset&, uint8_t)> getValue;
 };
 
@@ -70,12 +67,12 @@ namespace ON2Solutions {
 inline SelectorConfig get_config(CircularSelectorType type) {
     using D = parser::Dataset;
     switch (type) {
-        case O2: return {"%",   0, 100, [](const D& v, uint8_t i) { return v.operative_data.oxygen_levels[i]; }};
-        case Ps: return {"psi", 0, 150, [](const D& v, uint8_t i) { return v.operative_data.primary_tank_pressure[i]; }};
-        case Tr: return {"psi", 0, 60,  [](const D& v, uint8_t i) { return v.operative_data.secondary_tank_pressure[i]; }};
-        case Tn: return {"C",   0, 100, [](const D& v, uint8_t i) { return v.operative_data.tank_temperatures[i]; }};
-        case Fl: return {"l/m", 0, 20,  [](const D& v, uint8_t i) { return v.operative_data.oxygen_speed[i]; }};
-        default: return {"%",   0, 100, [](const D& v, uint8_t i) { return 0; }};
+        case O2: return {" %",   0, 100, [](const D& v, uint8_t i) { return v.operative_data.oxygen_levels[i]; }};
+        case Ps: return {" psi", 0, 150, [](const D& v, uint8_t i) { return v.operative_data.primary_tank_pressure[i]; }};
+        case Tr: return {" psi", 0, 60,  [](const D& v, uint8_t i) { return v.operative_data.secondary_tank_pressure[i]; }};
+        case Tn: return {" c",   0, 100, [](const D& v, uint8_t i) { return v.operative_data.tank_temperatures[i]; }};
+        case Fl: return {" l/m", 0, 20,  [](const D& v, uint8_t i) { return v.operative_data.oxygen_speed[i]; }};
+        default: return {" %",   0, 100, [](const D& v, uint8_t i) { return 0; }};
     }
 }
 
