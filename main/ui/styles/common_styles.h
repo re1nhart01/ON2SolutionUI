@@ -131,8 +131,8 @@ namespace ON2Solutions {
 
   inline foundation::ViewProps& pincode_screen_sign_form_props(
       foundation::ViewProps& p) {
-    p.w(LV_PCT(100))
-        .h(LV_PCT(50))
+        p.w(LV_PCT(100))
+        .h(LV_SIZE_CONTENT)
         .justify(LV_FLEX_ALIGN_CENTER)
         .items(LV_FLEX_ALIGN_CENTER)
         .track_cross(LV_FLEX_ALIGN_CENTER)

@@ -65,7 +65,7 @@ namespace ON2Solutions {
     inline constexpr const char* button_close = "Close";
     inline constexpr const char* button_back = "Back";
     inline constexpr const char* system_settings_header = "SYSTEM SETTINGS";
-    inline constexpr const char* system_auth_header = "AUTHORIZATION";
+    inline constexpr const char* system_auth_header = "Security";
     inline constexpr const char* hour_run_reset = "Hour Run Reset";
 
     inline constexpr const char* login_email = "Email address";

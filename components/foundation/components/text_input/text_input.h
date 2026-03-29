@@ -48,6 +48,11 @@ namespace foundation
       this->set_active(this->props.is_visible);
       lv_obj_update_layout(obj);
 
+      if (this->props.disabled) {
+        lv_obj_add_state(obj, LV_STATE_DISABLED);
+        lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+      }
+
       lv_textarea_set_one_line(obj, props.is_one_line);
       lv_textarea_set_placeholder_text(obj, props.placeholder);
       lv_textarea_set_password_mode(obj, props.is_secure);

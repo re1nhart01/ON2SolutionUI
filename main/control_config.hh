@@ -7,7 +7,7 @@
 
 
 #define USER_PASSWORD "1111"
-#define USER_LOGIN "admin"
+#define USER_LOGIN "112233"
 
 #define default_pincode "0000"
 

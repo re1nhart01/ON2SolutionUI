@@ -14,11 +14,17 @@ namespace ON2Solutions {
       : BaseProps<PinCodeScreenProps, PinCodeScreen> {
     NavigationParam params;
   };
+  inline const char* btnm_map[] = {
+    "1", "2", "3", "\n",
+    "4", "5", "6", "\n",
+    "7", "8", "9", "\n",
+    "*", "0", "#", "\n",
+    LV_SYMBOL_LEFT, "", "",
+  };
 
   class PinCodeScreen : public NavigationScreen<PinCodeScreenProps> {
     std::shared_ptr<KeyboardManager> keyboard;
-    State<std::string> password_state = State<std::string>("");
-    State<std::string> login_state = State<std::string>("");
+    Reactive<std::string> login_state = Reactive<std::string>("");
     std::unique_ptr<Modal> info_modal = nullptr;
 
    public:

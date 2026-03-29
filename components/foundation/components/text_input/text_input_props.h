@@ -16,6 +16,7 @@ namespace foundation
     Delegate<void(std::string value)> on_submit{};
     bool is_secure = false;
     bool is_one_line = false;
+    bool disabled = false;
     char* text = {};
     short secure_timeout = 1500;
     short length = 500;
@@ -49,6 +50,12 @@ namespace foundation
     TextInputProps&& set_length(const short v)
     {
       length = v;
+      return std::move(*this);
+    }
+
+    TextInputProps&& set_disabled(const bool v)
+    {
+      disabled = v;
       return std::move(*this);
     }
 

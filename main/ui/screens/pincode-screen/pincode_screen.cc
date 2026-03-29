@@ -7,7 +7,6 @@ namespace ON2Solutions {
 
   void PinCodeScreen::show_info_modal() {
     const auto login = this->login_state.get();
-    const auto password = this->password_state.get();
 
     info_modal = $Modal(ModalProps::up().set_content(
         $View(ViewProps::up()
@@ -25,11 +24,10 @@ namespace ON2Solutions {
 
   void PinCodeScreen::validate_and_login() {
     const auto login = this->login_state.get();
-    const auto password = this->password_state.get();
 
-    if (login.empty() || password.empty())
+    if (login.empty())
       return;
-    if (login == USER_LOGIN && password == USER_PASSWORD) {
+    if (login == USER_LOGIN) {
       this->navigation_ref->navigate("/settings");
     } else {
       show_info_modal();
@@ -38,7 +36,6 @@ namespace ON2Solutions {
 
   lv_obj_t* PinCodeScreen::render() {
     VNode::render();
-    auto password_v = &this->password_state;
     auto login_v = &this->login_state;
     auto navigation_ref = this->navigation_ref;
 
@@ -51,7 +48,6 @@ namespace ON2Solutions {
               style.setBorder(lv_color_make(255, 255, 255), 0, 0);
             })
             .set_children(children(
-                $StatusBar(StatusBarProps::up()),
                 $View(
                     ViewProps::up()
                         .w(LV_PCT(98))
@@ -60,6 +56,7 @@ namespace ON2Solutions {
                         .items(LV_FLEX_ALIGN_CENTER)
                         .track_cross(LV_FLEX_ALIGN_CENTER)
                         .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
+                        .set_style(NoPaddingApply)
                         .set_children(children(
                             $View(
                                 ViewProps::up()
@@ -77,7 +74,9 @@ namespace ON2Solutions {
                                                     locales::en::button_back)))
                                             .click([navigation_ref](
                                                        lv_event_t* e) {
-                                              navigation_ref->goBack();
+                                              navigation_ref->navigate(
+                                                  "/main", {{"page", 0}},
+                                                  false);
                                             }))))),
                             $View(ViewProps::up()
                                       .w(LV_PCT(78))
@@ -96,37 +95,62 @@ namespace ON2Solutions {
                                       .set_style(NoPaddingApply)
                                       .set_children(children(
                                           $Fragment(FragmentProps::up()))))))),
-                $View(ViewProps::up()
-                          .set_children(children(
-                              $TextInput(
-                                  TextInputProps::up()
-                                      .set_is_one_line(true)
-                                      .set_keyboard(keyboard)
-                                      .hint("Login")
-                                      .set_length(32)
-                                      .on_changed_h(
-                                          [login_v](const std::string& value) {
-                                            login_v->set(value);
-                                          })),
-                              $TextInput(TextInputProps::up()
-                                             .set_is_secure(true)
-                                             .set_is_one_line(true)
-                                             .set_keyboard(keyboard)
-                                             .hint("Password")
-                                             .set_length(64)
-                                             .on_changed_h(
-                                                 [password_v](
-                                                     const std::string& value) {
-                                                   password_v->set(value);
-                                                 })),
-                              $Button(ButtonProps::up()
-                                          .set_child($Text(
-                                              TextProps::up().value("Sign In")))
-                                          .click([this](lv_event_t* e) {
-                                            validate_and_login();
-                                          }))))
-                          .set_style(HeaderContainerApply)
-                          .merge(pincode_screen_sign_form_props))))
+                $View(
+                    ViewProps::up()
+                        .set_children(children(
+                            $TextInput(TextInputProps::up()
+                                           .set_is_one_line(true)
+                                           .set_disabled(true)
+                                           .hint("Pin")
+                                           .watch<std::string>(
+                                               &this->login_state, "login",
+                                               [](const TextInput* self,
+                                                  const std::string& value) {
+                                                 self->set_text(value.c_str());
+                                               })
+                                           .set_length(32)),
+                            $Matrix(MatrixProps::up()
+                                        .set_style([](Styling& style) {
+                                          style.setWidth(210);
+                                          style.setHeight(210);
+                                          style.setBorder(PRIMARY_BG, 0,
+                                                          LV_OPA_0);
+                                          style.setBorderRadius(0);
+                                        })
+                                        .set_btn_style([](Styling& style) {
+                                          style.setBorderRadius(8);
+                                          style.setBorder(PRIMARY_BG, 0,
+                                                          LV_OPA_0);
+                                          style.setBackgroundOpa(0);
+                                          style.setBackgroundColor(TERTIARY_BG);
+                                          style.setFont(&lv_font_montserrat_14);
+                                          style.setShadow(PRIMARY_BG, 0,
+                                                          LV_OPA_0);
+                                        })
+                                        .set_btn_map(btnm_map, LV_SYMBOL_LEFT)
+                                        .set_btn_bg_color(TERTIARY_BG)
+                                        .change([login_v, this](
+                                                    const std::string& value) {
+                                          auto curr = login_state.get();
+                                          if (value != "BACKSPACE") {
+                                            login_v->set(curr + value);
+                                          } else {
+                                            auto new_value =
+                                                curr.size() == 0
+                                                    ? curr
+                                                    : curr.substr(
+                                                          0, curr.size() - 1);
+                                            login_v->set(new_value);
+                                          }
+                                        })),
+                            $Button(ButtonProps::up()
+                                        .set_child($Text(
+                                            TextProps::up().value("Sign In")))
+                                        .click([this](lv_event_t* e) {
+                                          validate_and_login();
+                                        }))))
+                        .set_style(HeaderContainerApply)
+                        .merge(pincode_screen_sign_form_props))))
             .merge(screen_container_props)));
   }
 
