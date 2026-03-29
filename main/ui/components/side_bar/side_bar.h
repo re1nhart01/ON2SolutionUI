@@ -18,8 +18,8 @@ namespace ON2Solutions {
 
     StackNavigator* stack = nullptr;
 
-    SidebarProps&& set_stack(StackNavigator* stack) {
-      this->stack = stack;
+    SidebarProps&& set_stack(StackNavigator* stack_nav) {
+      this->stack = stack_nav;
       return std::move(*this);
     }
   };
@@ -114,7 +114,7 @@ namespace ON2Solutions {
                         this->render_nav_button("/main", assets::Pie),
                         this->render_nav_button("/errors", assets::Warning),
                         this->render_nav_button("/info", assets::Info),
-                        this->render_nav_button("/settings", assets::Settings)))));
+                        this->render_nav_button("/pin_code", assets::Settings)))));
     };
 
     const Styling* styling() const override {

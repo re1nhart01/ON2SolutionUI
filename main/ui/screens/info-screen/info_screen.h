@@ -11,10 +11,12 @@
 #include <ui/styles/common_styles.h>
 #include "constants/theme.h"
 
-
 #include <ui/components/common_header/common_header.h>
+#include <iosfwd>
+#include <vector>
 
 namespace ON2Solutions {
+  struct InfoModel;
   class InfoScreen;
   using namespace foundation;
 
@@ -33,7 +35,7 @@ namespace ON2Solutions {
 
     void component_did_mount() override;
     $$CommonHeader render_header() const;
-    std::vector<ErrorModel> generate_test_data_models();
+    std::vector<InfoModel> generate_test_data_models();
     $$View create_status_row(const std::string& label, bool is_error);
     $$View render_body();
     lv_obj_t* render() override;

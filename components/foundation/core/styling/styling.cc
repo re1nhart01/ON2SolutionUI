@@ -33,6 +33,12 @@ Styling* Styling::setBackgroundOpacity(lv_opa_t opa) {
   return this;
 }
 
+Styling* Styling::setOpacity(lv_opa_t opa) {
+  this->dirty = true;
+  lv_style_set_opa(style.get(), opa);
+  return this;
+}
+
 Styling* Styling::setBorderRadius(lv_coord_t radius) {
   this->dirty = true;
   lv_style_set_radius(style.get(), radius);

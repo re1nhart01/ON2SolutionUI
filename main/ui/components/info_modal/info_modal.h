@@ -8,14 +8,6 @@
 
 using namespace foundation;
 namespace ON2Solutions {
-  class InfoModal;
-
-  using $$InfoModal = std::unique_ptr<InfoModal>;
-
-  inline $$InfoModal $InfoModal(InfoModalProps&& args) {
-    return std::make_unique<InfoModal>(std::forward<InfoModalProps>(args));
-  }
-
   class InfoModal final : public Component<InfoModalProps> {
    public:
     using Component::props;
@@ -137,4 +129,10 @@ namespace ON2Solutions {
       return this;
     };
   };
+
+  using $$InfoModal = std::unique_ptr<InfoModal>;
+
+  inline $$InfoModal $InfoModal(InfoModalProps&& args) {
+    return std::make_unique<InfoModal>(std::forward<InfoModalProps>(args));
+  }
 }  // namespace ON2Solutions

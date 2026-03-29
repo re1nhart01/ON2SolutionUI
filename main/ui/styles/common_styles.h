@@ -47,28 +47,28 @@ namespace ON2Solutions {
   inline lv_color_t button_color_by_status(parser::DatasetStatuses status) {
     switch (status) {
       case parser::DatasetStatuses::StandBy:
-        return STATUS_STANDBY;
+        return PRIMARY_COLOR_2;
 
       case parser::DatasetStatuses::BoosterDelay:
-        return STATUS_BOOSTER_DELAY;
+        return PRIMARY_COLOR_2;
 
       case parser::DatasetStatuses::Startup:
-        return STATUS_STARTUP;
+        return PRIMARY_COLOR_2;
 
       case parser::DatasetStatuses::Running:
-        return STATUS_RUNNING;
+        return PRIMARY_COLOR_2;
 
       case parser::DatasetStatuses::Producing:
-        return STATUS_PRODUCING;
+        return PRIMARY_COLOR_2;
 
       case parser::DatasetStatuses::Alarm:
         return STATUS_ALARM;
 
       case parser::DatasetStatuses::TankFull:
-        return STATUS_TANK_FULL;
+        return PRIMARY_COLOR_2;
 
       case parser::DatasetStatuses::AutoAdjusting:
-        return STATUS_AUTO_ADJUSTING;
+        return PRIMARY_COLOR_2;
 
       default:
         return ACTIVE_INDICATOR;

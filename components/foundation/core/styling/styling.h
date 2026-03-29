@@ -32,6 +32,7 @@ public:
   Styling *setBackgroundColor(lv_color_t color);
   Styling *setBackgroundGradient(lv_color_t start, lv_color_t end, lv_grad_dir_t dir);
   Styling *setBackgroundOpacity(lv_opa_t opa);
+  Styling *setOpacity(lv_opa_t opa);
   Styling *setBorderRadius(lv_coord_t radius);
   Styling *setBorder(lv_color_t color, lv_coord_t width, lv_opa_t opa);
   Styling *setShadow(lv_color_t color, lv_coord_t width, lv_coord_t spread);

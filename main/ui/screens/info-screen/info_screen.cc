@@ -9,57 +9,44 @@ namespace ON2Solutions {
     return $CommonHeader(CommonHeaderProps::up());
   }
 
-  struct ErrorModel {
-    std::string text;
-    bool is_error;
+  struct InfoModel {
+    char* title;
+    std::string value;
+    std::string tag;
   };
 
-  std::vector<ErrorModel> InfoScreen::generate_test_data_models() {
-    std::vector<ErrorModel> items;
+  std::vector<InfoModel> InfoScreen::generate_test_data_models() {
+    std::vector<InfoModel> items;
 
-    // Датчики (Error = true)
     for (int i = 1; i <= 4; ++i) {
-      items.push_back(
-          {"Oxygen sensor " + std::to_string(i) + " disconnected", true});
-    }
-
-    // Резервні канали (Error = false/true чергується)
-    for (int i = 1; i <= 21; ++i) {
-      items.push_back(
-          {"Reserved channel (" + std::to_string(i) + ")", (i % 2 != 0)});
+      items.push_back({.title = "", .value = "", .tag = ""});
     }
 
     return items;
   }
 
-  $$View InfoScreen::create_status_row(const std::string& label,
-                                       bool is_error) {
-    return $View(
-        ViewProps::up()
-            .w(680)  // Трохи менше ширини контейнера
-            .h(45)
-            .flow(FlexPreset::RowBetween)
-            .set_style([](Styling& style) {
-              style.setBackgroundColor(lv_color_hex(0xFFFFFF));
-              style.setBorderRadius(8);
-              style.setPadding(0, 15, 0, 15);  // Відступи всередині рядка
-              style.setGap(0, 15);
-            })
-            .set_children(children(
-                // Кольоровий статусний прямокутник
-                $View(ViewProps::up().w(35).h(18).set_style(
-                    [is_error](Styling& style) {
-                      style.setBackgroundColor(is_error
-                                                   ? lv_color_hex(0xE53935)
-                                                   : lv_color_hex(0x4CAF50));
-                      style.setBorderRadius(4);
-                    })),
-                // Текст повідомлення
-                $Text(
-                    TextProps::up().value(label).set_style([](Styling& style) {
-                      style.setTextColor(lv_color_hex(0x333333));
-                      style.setFont(&lv_font_montserrat_14);
-                    })))));
+  $$View InfoScreen::create_status_row(const std::string& label, bool is_error) {
+    return $View(ViewProps::up()
+                     .w(680)
+                     .h(45)
+                     .flow(FlexPreset::RowBetween)
+                     .set_style([](Styling& style) {
+                       style.setBackgroundColor(lv_color_hex(0xFFFFFF));
+                       style.setBorderRadius(8);
+                       style.setPadding(0, 15, 0, 15);
+                       style.setGap(0, 15);
+                     })
+                     .set_children(children(
+                     $Text(TextProps::up().value(label).set_style(
+                           [](Styling& style) {
+                             style.setTextColor(lv_color_hex(0x333333));
+                             style.setFont(&lv_font_montserrat_14);
+                           })),
+                         $Text(TextProps::up().value(label).set_style(
+                             [](Styling& style) {
+                               style.setTextColor(lv_color_hex(0x333333));
+                               style.setFont(&lv_font_montserrat_14);
+                             })))));
   }
 
   $$View InfoScreen::render_body() {
@@ -87,8 +74,7 @@ namespace ON2Solutions {
                                  .set_renderer(data.size(),
                                                [this, data](int index) {
                                                  return this->create_status_row(
-                                                     data[index].text,
-                                                     data[index].is_error);
+                                                     data[index].title, true);
                                                })
                                  .set_style([](Styling& style) {
                                    // style.align(LV_ALIGN_CENTER, 0, 0);

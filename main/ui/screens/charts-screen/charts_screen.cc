@@ -162,7 +162,7 @@ namespace ON2Solutions {
     return $View(
         ViewProps::up()
             .set_children(children(
-                $TimerView(),
+                $TimerView(this->alarm_control),
                 $Button(
                     ButtonProps::up()
                         .set_style([](Styling& style) {

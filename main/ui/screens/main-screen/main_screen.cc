@@ -110,7 +110,7 @@ namespace ON2Solutions {
     return $View(
         ViewProps::up()
             .set_children(children(
-                $TimerView(),
+                $TimerView(this->alarm_control),
                 $Button(
                     ButtonProps::up()
                         .set_style([](Styling& style) {
@@ -220,56 +220,4 @@ namespace ON2Solutions {
     lv_obj_set_parent(obj, get_component());
     return this;
   }
-}  // namespace ON2Solutions
-
-/*
- *
- *$$Animated MainScreen::render_animated_alarm() const {
-    return $Animated(
-        AnimatedProps::up()
-            .from(255)
-            .to(120)
-            .stop(255)
-            .time(600)
-            .playback(600)
-            .wait(1500)
-            .easing(lv_anim_path_ease_in_out)
-            .set_control("alarm_anim", alarm_control)
-            .set_auto_start(false)
-            .repeat(LV_ANIM_REPEAT_INFINITE)
-            .prop(AnimatedProps::Property::Opacity)
-            .on($Text(TextProps::up()
-                          .set_style(HeaderLabelApply)
-                          .watch<Dataset>(
-                              DatasetStore::getInstance(), "alarm_text",
-                              [this](Text* self, const Dataset& value) {
-                                bool is_alarm_now =
-                                    value.optional.reset_countdown_sec != 0 &&
-                                    GetStatusFromTextValue(
-                                        value.operative_data.status.data()) ==
-                                        DatasetStatuses::Alarm;
-                                uint8_t count =
-                                    value.optional.reset_countdown_sec;
-                                ESP_LOGI("main screen", "alarm_text %d", count);
-
-                                self->set_state([value, is_alarm_now,
-                                                 count](TextProps& props) {
-                                  props.value(
-                                      is_alarm_now
-                                          ? fmt_str("ALARM TO RESET: %d", count)
-                                          : "ON2 SYSTEMS");
-                                  props.set_style(is_alarm_now
-                                                      ? AlarmTextStyleApply
-                                                      : DefaultTextStyleApply);
-                                });
-                                if (is_alarm_now) {
-                                  this->alarm_control->play("alarm_anim");
-                                } else {
-                                  this->alarm_control->stop("alarm_anim");
-                                }
-                              })
-                          .value("ON2 SYSTEMS"))));
-  }
- *
- *
- */
+}

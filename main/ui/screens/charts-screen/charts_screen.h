@@ -22,9 +22,12 @@ namespace ON2Solutions {
   };
 
   class ChartsScreen final : public NavigationScreen<ChartsScreenProps> {
-   public:
+  private:
+    std::shared_ptr<AnimatedControl> alarm_control = nullptr;
+
+  public:
     explicit ChartsScreen(StackNavigator* stack, ChartsScreenProps props)
-        : NavigationScreen(stack, std::move(props)) {}
+        : NavigationScreen(stack, std::move(props)), alarm_control(std::make_shared<AnimatedControl>()) {}
 
     ~ChartsScreen() override = default;
 
