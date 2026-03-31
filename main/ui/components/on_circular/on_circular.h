@@ -60,8 +60,15 @@ namespace ON2Solutions {
     short min;
     short max;
     using DataPtr = const float (parser::Dataset::*);
-    std::function<float(const parser::Dataset&, uint8_t)> getValue;
+    Delegate<float(const parser::Dataset&, uint8_t)> getValue;
 };
+
+  inline lv_color_t get_color_by_value(const int value, const int min,
+                                     const int max) {
+    uint8_t ratio = static_cast<uint32_t>(value - min) * 255 / (max - min);
+
+    return lv_color_mix(NO_ERROR_COLOR, ERROR_COLOR, ratio);
+  }
 
 // Вспомогательная функция для получения настроек
 inline SelectorConfig get_config(CircularSelectorType type) {
@@ -79,19 +86,27 @@ inline SelectorConfig get_config(CircularSelectorType type) {
 inline $$Circular $SpecificCircular(const CircularSelectorType& type, uint8_t index, bool is_small = false) {
     auto config = get_config(type);
 
+  const auto start_value = parser::DatasetStore::getInstance()->get();
+    const auto value = config.getValue(start_value, index);
+
     return $Circular(CircularProgressProps::up()
         .watch<parser::Dataset>(
             parser::DatasetStore::getInstance(), "circular",
             [config, index](CircularProgress* self, const parser::Dataset& value) {
                 self->update_label_text();
                 float val = config.getValue(value, index);
-                self->set_state([val](CircularProgressProps& props) { props.value(val); });
+                self->set_state([val, config](CircularProgressProps& props) {
+                  props.value(val);
+                  // props.set_style([val, config](Styling& style) {
+                  //     style.setArcColor(get_color_by_value(val, config.min, config.max));
+                  // });
+                });
             })
         .label(config.symbol)
         .show_label(true)
         .min(config.min)
         .max(config.max)
-        .value(config.min)
+        .value(value)
         .set_text_style([is_small](Styling& style) {
             style.setFont(is_small ? &lv_font_montserrat_16 : &lv_font_montserrat_34);
         })

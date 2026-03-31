@@ -1,7 +1,7 @@
 #include "main_screen.h"
 
-#include "constants/theme.h"
 #include <hal/uart_ll.h>
+#include "constants/theme.h"
 
 using namespace foundation;
 using namespace ON2Solutions::parser;
@@ -35,75 +35,86 @@ namespace ON2Solutions {
     component->set_state([style](C& props) { props.set_style(style); });
   }
 
-
 #pragma region UI
   $$CommonHeader MainScreen::render_header() const {
     return $CommonHeader(CommonHeaderProps::up());
   }
 
-  $$View MainScreen::render_card(const CircularSelectorType& type, const char* title,
-                                 uint8_t index) const {
-    return $View(
-        ViewProps::up()
-            .w(318)
-            .h(328)
-            .direction(LV_FLEX_FLOW_COLUMN)
-            .flow(FlexPreset::SpaceCenter)
-            .set_style([](Styling& style) {
+  $$View MainScreen::render_card(const CircularSelectorType& type,
+                                 const char* title, uint8_t index) const {
+    return $View(ViewProps::up()
+                     .w(318)
+                     .h(328)
+                     .direction(LV_FLEX_FLOW_COLUMN)
+                     .flow(FlexPreset::SpaceCenter)
+                     .set_style([](Styling& style) {
 
-            })
-            .set_children(children(
-                $SpecificCircular(type, index, false),
-                $View(ViewProps::up()
-                          .w(LV_PCT(100))
-                          .h(24)
-                          .set_style([](Styling& style) {
-                            style.setGap(8, 8);
-                            style.setPadding(0);
-                            style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
-                          })
-                          .flow(FlexPreset::RowCenter)
-                          .set_children(children($ConnectionStat(),
-                                                 $Text(TextProps::up().value(fmt_str("%s %d", title, index + 1)))))))));
+                     })
+                     .set_children(children(
+                         $SpecificCircular(type, index, false),
+                         $View(ViewProps::up()
+                                   .w(LV_PCT(100))
+                                   .h(24)
+                                   .set_style([](Styling& style) {
+                                     style.setGap(8, 8);
+                                     style.setPadding(0);
+                                     style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                                   })
+                                   .flow(FlexPreset::RowCenter)
+                                   .set_children(children(
+                                       $ConnectionStat(),
+                                       $Text(TextProps::up().value(fmt_str(
+                                           "%s %d", title, index + 1)))))))));
   }
 
   $$View MainScreen::render_body() const {
     auto navigation = navigation_ref;
 
-    return $View(ViewProps::up()
-                     .w(LV_PCT(100))
-                     .h(LV_PCT(100))
-                     .direction(LV_FLEX_FLOW_COLUMN)
-                     .justify(LV_FLEX_ALIGN_START)
-                     .items(LV_FLEX_ALIGN_CENTER)
-                     .track_cross(LV_FLEX_ALIGN_START)
-                     .set_style([](Styling& style) {
-                       style.setBackgroundOpa(LV_OPA_0);
-                       style.setPadding(0);
-                       style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
-                     })
-                     .set_children(children(
-                         $View(ViewProps::up()
-                                   .w(LV_PCT(100))
-                                   .h(LV_SIZE_CONTENT)
-                                   .direction(LV_FLEX_FLOW_ROW)
-                                   .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
-                                   .items(LV_FLEX_ALIGN_CENTER)
-                                   .track_cross(LV_FLEX_ALIGN_START)
-                                   .set_style([](Styling& style) {
-                                     style.setBackgroundOpa(LV_OPA_0);
-                                     style.setPadding(0);
-                                     style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
-                                   })
-                                   .set_children(children(
-                                       this->render_card(O2, locales::en::oxygen_level, 0),
-                                       this->render_card(Ps, locales::en::tank_psi, 0),
-                                       $HighButton(assets::Right,
-                                                   [navigation](lv_event_t* _) {
-                                                     navigation->navigate(
-                                                         "/charts", { { "page", 0 } }, false);
-                                                   })))),
-                         this->render_footer())));
+    return $View(
+        ViewProps::up()
+            .w(LV_PCT(100))
+            .h(LV_PCT(100))
+            .direction(LV_FLEX_FLOW_COLUMN)
+            .justify(LV_FLEX_ALIGN_START)
+            .items(LV_FLEX_ALIGN_CENTER)
+            .track_cross(LV_FLEX_ALIGN_START)
+            .set_style([](Styling& style) {
+              style.setBackgroundOpa(LV_OPA_0);
+              style.setPadding(0);
+              style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+            })
+            .set_children(children(
+                $View(
+                    ViewProps::up()
+                        .w(LV_PCT(100))
+                        .h(LV_SIZE_CONTENT)
+                        .direction(LV_FLEX_FLOW_ROW)
+                        .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
+                        .items(LV_FLEX_ALIGN_CENTER)
+                        .track_cross(LV_FLEX_ALIGN_START)
+                        .set_style([](Styling& style) {
+                          style.setBackgroundOpa(LV_OPA_0);
+                          style.setPadding(0);
+                          style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                        })
+                        .set_children(children(
+                            this->render_card(O2, locales::en::oxygen_level, 0),
+                            this->render_card(Ps, locales::en::tank_psi, 0),
+                            $HighButton(
+                                assets::Right,
+                                [navigation](lv_event_t* _) {
+                                  lv_async_call(
+                                      [](void* data) {
+                                        auto* nav =
+                                            static_cast<StackNavigator*>(data);
+                                        if (nav) {
+                                          nav->navigate("/charts",
+                                                        {{"page", 0}}, false);
+                                        }
+                                      },
+                                      navigation);
+                                })))),
+                this->render_footer())));
   }
 
   $$View MainScreen::render_footer() const {
@@ -220,4 +231,4 @@ namespace ON2Solutions {
     lv_obj_set_parent(obj, get_component());
     return this;
   }
-}
+}  // namespace ON2Solutions

@@ -26,32 +26,32 @@ namespace ON2Solutions {
   $$View ChartsScreen::render_card(const CircularSelectorType& type,
                                    const char* title, uint8_t index,
                                    bool is_small = false) const {
-    return $View(
-        ViewProps::up()
-            .w(160)
-            .h(LV_PCT(100))
-            .direction(LV_FLEX_FLOW_COLUMN)
-            .flow(FlexPreset::SpaceCenter)
-            .set_style([](Styling& style) {
-              style.setBackgroundColor(PRIMARY_BG);
-              style.setBackgroundOpa(LV_OPA_0);
-              style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
-              style.setPadding(0);
-            })
-            .set_children(children(
-                $SpecificCircular(type, index, is_small),
-                $View(ViewProps::up()
-                          .w(LV_PCT(100))
-                          .h(24)
-                          .set_style([](Styling& style) {
-                            style.setGap(8, 8);
-                            style.setPadding(0);
-                            style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
-                          })
-                          .flow(FlexPreset::RowCenter)
-                          .set_children(children(
-                              $ConnectionStat(),
-                              $Text(TextProps::up().value(fmt_str("%s %d", title, index + 1)))))))));
+    return $View(ViewProps::up()
+                     .w(160)
+                     .h(LV_PCT(100))
+                     .direction(LV_FLEX_FLOW_COLUMN)
+                     .flow(FlexPreset::SpaceCenter)
+                     .set_style([](Styling& style) {
+                       style.setBackgroundColor(PRIMARY_BG);
+                       style.setBackgroundOpa(LV_OPA_0);
+                       style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                       style.setPadding(0);
+                     })
+                     .set_children(children(
+                         $SpecificCircular(type, index, is_small),
+                         $View(ViewProps::up()
+                                   .w(LV_PCT(100))
+                                   .h(24)
+                                   .set_style([](Styling& style) {
+                                     style.setGap(8, 8);
+                                     style.setPadding(0);
+                                     style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                                   })
+                                   .flow(FlexPreset::RowCenter)
+                                   .set_children(children(
+                                       $ConnectionStat(),
+                                       $Text(TextProps::up().value(fmt_str(
+                                           "%s %d", title, index + 1)))))))));
   }
 
   $$View ChartsScreen::render_circular_wrapper(
@@ -111,9 +111,28 @@ namespace ON2Solutions {
                             $HighButton(
                                 assets::Left,
                                 [navigation, is_last_page](lv_event_t* _) {
-                                  navigation->navigate(
-                                      is_last_page ? "/charts" : "/main",
-                                      {{"page", 0}}, false);
+                                  struct AsyncArg {
+                                    StackNavigator* nav;
+                                    bool is_last_page;
+                                  };
+
+                                  auto arg =
+                                      new AsyncArg{navigation, is_last_page};
+
+                                  lv_async_call(
+                                      [](void* data) {
+                                        const auto* async_arg =
+                                            static_cast<AsyncArg*>(data);
+                                        if (async_arg) {
+                                          async_arg->nav->navigate(
+                                              async_arg->is_last_page
+                                                  ? "/charts"
+                                                  : "/main",
+                                              {{"page", 0}}, false);
+                                          delete async_arg;
+                                        }
+                                      },
+                                      arg);
                                 }),
                             $View(
                                 ViewProps::up()
@@ -146,15 +165,25 @@ namespace ON2Solutions {
 
                                     ),
 
-                            !is_last_page ? static_cast<VNodePtr>($HighButton(
-                                                assets::Right,
-                                                [navigation](lv_event_t* _) {
-                                                  navigation->navigate(
-                                                      "/charts", {{"page", 1}},
-                                                      false);
-                                                }))
-                                          : static_cast<VNodePtr>($Fragment(
-                                                FragmentProps::up()))))),
+                            !is_last_page
+                                ? static_cast<VNodePtr>($HighButton(
+                                      assets::Right,
+                                      [navigation](lv_event_t* _) {
+                                        lv_async_call(
+                                            [](void* data) {
+                                              auto* nav =
+                                                  static_cast<StackNavigator*>(
+                                                      data);
+                                              if (nav) {
+                                                nav->navigate("/charts",
+                                                              {{"page", 1}},
+                                                              false);
+                                              }
+                                            },
+                                            navigation);
+                                      }))
+                                : static_cast<VNodePtr>(
+                                      $Fragment(FragmentProps::up()))))),
                 this->render_footer())));
   }
 

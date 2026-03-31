@@ -46,6 +46,7 @@ public:
   Styling *setTextColor(lv_color_t color);
   Styling *setFont(const lv_font_t *font);
   Styling *setTextAlign(lv_text_align_t align);
+  Styling *setArcColor(lv_color_t color);
   Styling *setTextOpacity(lv_opa_t opa);
   Styling *setLineColor(lv_color_t color);
   Styling *setLineWidth(lv_coord_t width);

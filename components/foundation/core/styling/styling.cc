@@ -53,6 +53,11 @@ Styling* Styling::setBorder(lv_color_t color, lv_coord_t width, lv_opa_t opa) {
   return this;
 }
 
+Styling* Styling::setArcColor(lv_color_t color) {
+  lv_style_set_arc_color(style.get(), color);
+  return this;
+};
+
 Styling* Styling::setBorder() {
   this->dirty = true;
   lv_style_set_border_color(style.get(), lv_color_hex(0xffffff));
