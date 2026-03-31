@@ -4,17 +4,19 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 
-#include "core/structures/delegate.h"
-#include "core/state/reactive.h"
-#include "esp_log.h"
-#include <memory>
-#include <vector>
-#include <string>
+#include <components/vnode.h>
 #include <algorithm>
+#include <memory>
+#include <string>
+#include <vector>
+#include "core/state/reactive.h"
+#include "core/structures/delegate.h"
+#include "esp_log.h"
 
 namespace foundation
 {
-    template <typename T>
+  class VNode;
+  template <typename T>
     class ThreadReactive : public IReactive
     {
     private:
@@ -141,16 +143,17 @@ namespace foundation
           value_store = next;
 
           for (auto& b : bindings) {
-            b.updater(b.component, value_store);
+            if (b.component != nullptr) {
+              b.updater(b.component, value_store);
+            }
           }
         }
       }
 
-      void set(const T& newValue) {
+    void set(const T& newValue) {
         if (!_mutex) return;
 
         std::vector<Binding> snapshot;
-
         {
           Lock lock(_mutex);
           value_store = newValue;
@@ -158,7 +161,24 @@ namespace foundation
         }
 
         for (auto& b : snapshot) {
-          b.updater(b.component, newValue);
+          if (b.component == nullptr) continue;
+
+          struct UpdateTask {
+            Binding binding;
+            T val;
+          };
+          auto* task = new UpdateTask{b, newValue};
+
+          lv_async_call([](void* arg) {
+            auto* p = static_cast<UpdateTask*>(arg);
+            auto* node = static_cast<foundation::VNode*>(p->binding.component);
+
+            if (node->get_component() && lv_obj_is_valid(node->get_component())) {
+                p->binding.updater(p->binding.component, p->val);
+            }
+
+            delete p;
+          }, task);
         }
       }
 

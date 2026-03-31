@@ -92,9 +92,10 @@ inline $$Circular $SpecificCircular(const CircularSelectorType& type, uint8_t in
     return $Circular(CircularProgressProps::up()
         .watch<parser::Dataset>(
             parser::DatasetStore::getInstance(), "circular",
-            [config, index](CircularProgress* self, const parser::Dataset& value) {
+            [config, index](CircularProgress* self, const parser::Dataset& dataset_value) {\
+                if (!self) return;
                 self->update_label_text();
-                float val = config.getValue(value, index);
+                float val = config.getValue(dataset_value, index);
                 self->set_state([val, config](CircularProgressProps& props) {
                   props.value(val);
                   // props.set_style([val, config](Styling& style) {

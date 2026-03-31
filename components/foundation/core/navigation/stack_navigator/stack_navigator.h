@@ -109,10 +109,31 @@ public:
     }
 
   void navigate(const std::string& name, bool with_save = true) {
+        static uint32_t last_update = 0;
+        const uint32_t now = xTaskGetTickCount();
+        constexpr uint32_t interval = pdMS_TO_TICKS(250);
+
+        if (now - last_update < interval) {
+            return;
+        }
+
+        last_update = now;
+
         _mount_screen(name, with_save, {});
   }
 
   void navigate(const std::string& name, const NavigationParam& params, bool with_save = true) {
+
+        static uint32_t last_update = 0;
+        const uint32_t now = xTaskGetTickCount();
+        constexpr uint32_t interval = pdMS_TO_TICKS(250);
+
+        if (now - last_update < interval) {
+            return;
+        }
+
+        last_update = now;
+
         _mount_screen(name, with_save, params);
   }
 

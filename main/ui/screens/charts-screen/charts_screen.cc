@@ -111,28 +111,9 @@ namespace ON2Solutions {
                             $HighButton(
                                 assets::Left,
                                 [navigation, is_last_page](lv_event_t* _) {
-                                  struct AsyncArg {
-                                    StackNavigator* nav;
-                                    bool is_last_page;
-                                  };
-
-                                  auto arg =
-                                      new AsyncArg{navigation, is_last_page};
-
-                                  lv_async_call(
-                                      [](void* data) {
-                                        const auto* async_arg =
-                                            static_cast<AsyncArg*>(data);
-                                        if (async_arg) {
-                                          async_arg->nav->navigate(
-                                              async_arg->is_last_page
-                                                  ? "/charts"
-                                                  : "/main",
-                                              {{"page", 0}}, false);
-                                          delete async_arg;
-                                        }
-                                      },
-                                      arg);
+                                  navigation->navigate(
+                                      is_last_page ? "/charts" : "/main",
+                                      {{"page", 0}}, false);
                                 }),
                             $View(
                                 ViewProps::up()
@@ -165,25 +146,15 @@ namespace ON2Solutions {
 
                                     ),
 
-                            !is_last_page
-                                ? static_cast<VNodePtr>($HighButton(
-                                      assets::Right,
-                                      [navigation](lv_event_t* _) {
-                                        lv_async_call(
-                                            [](void* data) {
-                                              auto* nav =
-                                                  static_cast<StackNavigator*>(
-                                                      data);
-                                              if (nav) {
-                                                nav->navigate("/charts",
-                                                              {{"page", 1}},
-                                                              false);
-                                              }
-                                            },
-                                            navigation);
-                                      }))
-                                : static_cast<VNodePtr>(
-                                      $Fragment(FragmentProps::up()))))),
+                            !is_last_page ? static_cast<VNodePtr>($HighButton(
+                                                assets::Right,
+                                                [navigation](lv_event_t* _) {
+                                                  navigation->navigate(
+                                                      "/charts", {{"page", 1}},
+                                                      false);
+                                                }))
+                                          : static_cast<VNodePtr>($Fragment(
+                                                FragmentProps::up()))))),
                 this->render_footer())));
   }
 
@@ -207,6 +178,7 @@ namespace ON2Solutions {
                         .watch<Dataset>(
                             DatasetStore::getInstance(), "main_button_body",
                             [](Button* self, const Dataset& value) {
+                              if (!self) return;
                               auto color =
                                   button_color_by_status(GetStatusFromTextValue(
                                       value.operative_data.status.data()));
@@ -221,6 +193,7 @@ namespace ON2Solutions {
                                 .watch<Dataset>(
                                     DatasetStore::getInstance(), "main_button",
                                     [](Text* self, const Dataset& value) {
+                                      if (!self) return;
                                       std::string status_str =
                                           GetTextValueFromStatus(
                                               GetStatusFromTextValue(

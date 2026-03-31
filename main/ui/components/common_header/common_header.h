@@ -76,7 +76,7 @@ namespace ON2Solutions {
                                               TextProps::up().value("Inputs:")),
                                           $DotIndicator(
                                               DotIndicatorProps::up()
-                                                  .set_dot_amount(8)
+                                                  .set_dot_amount(4)
                                                   .w(50)
                                                   .h(20)
                                                   .watch<Dataset>(
@@ -85,6 +85,7 @@ namespace ON2Solutions {
                                                       "inputs",
                                                       [](DotIndicator* self,
                                                          const Dataset& value) {
+                                                        if (!self) return;
                                                         self->set_state(
                                                             [v = value
                                                                      .operative_data
@@ -120,6 +121,7 @@ namespace ON2Solutions {
                                                       "outputs",
                                                       [](DotIndicator* self,
                                                          const Dataset& value) {
+                                                        if (!self) return;
                                                         self->set_state(
                                                             [v = value
                                                                      .operative_data

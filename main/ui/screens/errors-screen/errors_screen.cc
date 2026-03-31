@@ -77,9 +77,11 @@ namespace ON2Solutions {
               style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
             })
             .set_children(children(
-                $Text(TextProps::up().value(locales::en::header_errors).set_style([](Styling& style) {
-                  style.setFont(&lv_font_montserrat_18);
-                })),
+                $Text(TextProps::up()
+                          .value(locales::en::header_errors)
+                          .set_style([](Styling& style) {
+                            style.setFont(&lv_font_montserrat_18);
+                          })),
                 $PaginatedList(
                     PaginatedListProps()
                         .w(712)
@@ -92,15 +94,18 @@ namespace ON2Solutions {
                                 return;
 
                               static uint32_t last_update = 0;
-                              uint32_t now = xTaskGetTickCount();
                               static uint32_t last_error_bits = UINT32_MAX;
                               const uint32_t error_bits =
                                   value.operative_data.errors;
 
-                              if (error_bits == last_error_bits || now - last_update < 100) {
-                                last_update = now;
+                              const uint32_t now = xTaskGetTickCount();
+                              constexpr uint32_t interval = pdMS_TO_TICKS(250);
+
+                              if (error_bits == last_error_bits || now - last_update < interval) {
                                 return;
                               }
+
+                              last_update = now;
 
                               const auto new_data =
                                   this->generate_data_models();

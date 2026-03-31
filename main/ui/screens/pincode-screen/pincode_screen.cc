@@ -136,6 +136,7 @@ namespace ON2Solutions {
                                                &this->login_state, "login",
                                                [](const TextInput* self,
                                                   const std::string& value) {
+                                                 if (!self) return;
                                                  self->set_text(value.c_str());
                                                })
                                            .set_length(32)),

@@ -38,6 +38,8 @@ namespace foundation {
         lv_dropdown_add_option(obj, option, LV_DROPDOWN_POS_LAST);
       }
 
+      lv_dropdown_set_selected(obj, props.selected);
+
       lv_obj_add_event_cb(obj, event_adapter, LV_EVENT_ALL, this);
 
       return obj;
@@ -68,9 +70,9 @@ namespace foundation {
       switch (event->code) {
         case LV_EVENT_VALUE_CHANGED:
           if (events.on_change) {
-            char buf[32]{0};
+            char buf[64]{0};
             lv_dropdown_get_selected_str(instance->get_component(), buf, sizeof(buf));
-            instance->props.on_change(buf);
+            instance->props.on_change(std::string(buf));
           };
           break;
         default:

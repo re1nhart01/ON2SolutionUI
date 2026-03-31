@@ -15,6 +15,18 @@ namespace ON2Solutions {
     NavigationScreen::on_blur();
   };
 
+  int find_index(const std::vector<const char*>& options,
+                 const std::string& value) {
+    auto it = std::find_if(
+        options.begin(), options.end(),
+        [&value](const char* opt) { return std::string(opt) == value; });
+
+    if (it != options.end()) {
+      return std::distance(options.begin(), it);
+    }
+    return 0;
+  }
+
   template <typename T>
   void SettingsScreen::update_param(const ParamSpec& spec, T value, T min,
                                     T max) const {
@@ -245,11 +257,21 @@ namespace ON2Solutions {
                                 locales::en::pressure_sensor_type)),
                             $Dropdown(
                                 DropdownProps::up()
+                                    .set_selected(find_index(
+                                        parser::PRESSURE_TYPE_OPTIONS,
+                                        std::string(
+                                            std::begin(
+                                                dataset
+                                                    .tank_pressure_sensor_type),
+                                            std::end(
+                                                dataset
+                                                    .tank_pressure_sensor_type))))
                                     .set_options(parser::PRESSURE_TYPE_OPTIONS)
-                                    .change([this](const char* option) {
+                                    .change([this](const std::string& option) {
                                       this->debounce->exec([this, option]() {
                                         this->update_param(
-                                            PressureTypeSensorSpec, option);
+                                            PressureTypeSensorSpec,
+                                            option.c_str());
                                       });
                                     }))))),
                 $Button(ButtonProps::up()

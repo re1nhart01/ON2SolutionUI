@@ -100,20 +100,11 @@ namespace ON2Solutions {
                         .set_children(children(
                             this->render_card(O2, locales::en::oxygen_level, 0),
                             this->render_card(Ps, locales::en::tank_psi, 0),
-                            $HighButton(
-                                assets::Right,
-                                [navigation](lv_event_t* _) {
-                                  lv_async_call(
-                                      [](void* data) {
-                                        auto* nav =
-                                            static_cast<StackNavigator*>(data);
-                                        if (nav) {
-                                          nav->navigate("/charts",
-                                                        {{"page", 0}}, false);
-                                        }
-                                      },
-                                      navigation);
-                                })))),
+                            $HighButton(assets::Right,
+                                        [navigation](lv_event_t* _) {
+                                          navigation->navigate(
+                                              "/charts", {{"page", 0}}, false);
+                                        })))),
                 this->render_footer())));
   }
 
@@ -137,6 +128,7 @@ namespace ON2Solutions {
                         .watch<Dataset>(
                             DatasetStore::getInstance(), "main_button_body",
                             [](Button* self, const Dataset& value) {
+                              if (!self) return;
                               auto color =
                                   button_color_by_status(GetStatusFromTextValue(
                                       value.operative_data.status.data()));
@@ -151,6 +143,7 @@ namespace ON2Solutions {
                                 .watch<Dataset>(
                                     DatasetStore::getInstance(), "main_button",
                                     [](Text* self, const Dataset& value) {
+                                      if (!self) return;
                                       std::string status_str =
                                           GetTextValueFromStatus(
                                               GetStatusFromTextValue(

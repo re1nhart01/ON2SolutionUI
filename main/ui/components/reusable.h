@@ -81,6 +81,7 @@ namespace ON2Solutions {
                                     [alarm_control](
                                         Text* self,
                                         const parser::Dataset& value) {
+                                      if (!self) return;
                                       bool is_alarm_now =
                                           (value.operative_data.status[0] ==
                                            'F');
