@@ -16,20 +16,18 @@ namespace ON2Solutions {
     bool is_error;
   };
 
-  std::vector<ErrorModel> ErrorsScreen::generate_data_models() const {
+  std::vector<ErrorModel> ErrorsScreen::generate_data_models(
+      const parser::Dataset& data) const {
     std::vector<ErrorModel> items;
-
-    const auto error_bits =
-        DatasetStore::getInstance()->get().operative_data.errors;
+    const auto error_bits = data.operative_data.errors;
 
     for (size_t i = 0; i < std::size(locales::en::info_bits_error); i++) {
       if (is_up_bit_pos(error_bits, static_cast<short>(i))) {
         items.push_back({locales::en::info_bits_error[i], true});
       }
     }
-
     return items;
-  };
+  }
 
   $$View ErrorsScreen::create_status_row(const std::string& label,
                                          bool is_error, int index) {
@@ -61,7 +59,7 @@ namespace ON2Solutions {
   }
 
   $$View ErrorsScreen::render_body() {
-    const auto initial_data = this->generate_data_models();
+    const auto initial_data = this->generate_data_models(*DatasetStore::getInstance()->get());
 
     return $View(
         ViewProps::up()
@@ -101,14 +99,14 @@ namespace ON2Solutions {
                               const uint32_t now = xTaskGetTickCount();
                               constexpr uint32_t interval = pdMS_TO_TICKS(250);
 
-                              if (error_bits == last_error_bits || now - last_update < interval) {
+                              if (error_bits == last_error_bits ||
+                                  now - last_update < interval) {
                                 return;
                               }
 
                               last_update = now;
 
-                              const auto new_data =
-                                  this->generate_data_models();
+                              const auto new_data = this->generate_data_models(value);
 
                               self->set_state(
                                   [this, new_data](PaginatedListProps& props) {

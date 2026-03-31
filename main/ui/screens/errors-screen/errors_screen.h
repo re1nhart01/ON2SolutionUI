@@ -36,7 +36,7 @@ namespace ON2Solutions {
     $$View create_status_row(const std::string& label, bool is_error,
                              int index);
 
-    std::vector<ErrorModel> generate_data_models() const;
+    std::vector<ErrorModel> generate_data_models(const Dataset& data) const;
     $$View render_body();
     lv_obj_t* render() override;
     ErrorsScreen* append(lv_obj_t* obj) override;

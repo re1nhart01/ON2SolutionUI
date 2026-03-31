@@ -66,7 +66,7 @@ namespace ON2Solutions {
 
     const auto& current_data = DatasetStore::getInstance()->get();
 
-    std::string initial_value = field_info.getter(current_data);
+    std::string initial_value = field_info.getter(*current_data);
 
     return $View(
         ViewProps::up()

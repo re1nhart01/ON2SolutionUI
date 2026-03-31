@@ -143,7 +143,7 @@ namespace ON2Solutions {
 
   $$View SettingsScreen::render_sensors_tab() const {
     parser::DatasetSettings dataset =
-        parser::DatasetStore::getInstance()->get().settings;
+        parser::DatasetStore::getInstance()->get()->settings;
     return $View(
         ViewProps::up()
             .direction(LV_FLEX_FLOW_ROW_WRAP)
@@ -170,7 +170,7 @@ namespace ON2Solutions {
 
   $$View SettingsScreen::render_timers_tab() const {
     parser::DatasetSettings dataset =
-        parser::DatasetStore::getInstance()->get().settings;
+        parser::DatasetStore::getInstance()->get()->settings;
 
     return $View(
         ViewProps::up()
@@ -194,7 +194,7 @@ namespace ON2Solutions {
 
   $$View SettingsScreen::render_limits_tab() const {
     parser::DatasetSettings dataset =
-        parser::DatasetStore::getInstance()->get().settings;
+        parser::DatasetStore::getInstance()->get()->settings;
 
     return $View(
         ViewProps::up()
@@ -225,7 +225,7 @@ namespace ON2Solutions {
 
   $$View SettingsScreen::render_service_tab() const {
     parser::DatasetSettings dataset =
-        parser::DatasetStore::getInstance()->get().settings;
+        parser::DatasetStore::getInstance()->get()->settings;
 
     return $View(
         ViewProps::up()

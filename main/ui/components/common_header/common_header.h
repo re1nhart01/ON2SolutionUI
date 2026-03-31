@@ -36,6 +36,10 @@ namespace ON2Solutions {
     lv_obj_t* render() override {
       Component::render();
 
+      const auto operative_data = DatasetStore::getInstance()->get()->operative_data;
+      const auto current_output_hex = operative_data.outputs;
+      const auto current_input_hex = operative_data.outputs;
+
       return this->delegate($View(
           ViewProps::up()
               .w(LV_PCT(100))
@@ -78,7 +82,8 @@ namespace ON2Solutions {
                                               DotIndicatorProps::up()
                                                   .set_dot_amount(4)
                                                   .w(50)
-                                                  .h(20)
+                                                  .h(10)
+                                                  .set_value_hex(current_input_hex)
                                                   .watch<Dataset>(
                                                       DatasetStore::
                                                           getInstance(),
@@ -115,6 +120,7 @@ namespace ON2Solutions {
                                                   .set_dot_amount(16)
                                                   .w(100)
                                                   .h(20)
+                                                  .set_value_hex(current_output_hex)
                                                   .watch<Dataset>(
                                                       DatasetStore::
                                                           getInstance(),

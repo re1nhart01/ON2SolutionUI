@@ -59,60 +59,81 @@ namespace ON2Solutions {
     std::string symbol;
     short min;
     short max;
-    using DataPtr = const float (parser::Dataset::*);
+    using DataPtr = const float(parser::Dataset::*);
     Delegate<float(const parser::Dataset&, uint8_t)> getValue;
-};
+  };
 
   inline lv_color_t get_color_by_value(const int value, const int min,
-                                     const int max) {
+                                       const int max) {
     uint8_t ratio = static_cast<uint32_t>(value - min) * 255 / (max - min);
 
     return lv_color_mix(NO_ERROR_COLOR, ERROR_COLOR, ratio);
   }
 
-// Вспомогательная функция для получения настроек
-inline SelectorConfig get_config(CircularSelectorType type) {
+  // Вспомогательная функция для получения настроек
+  inline SelectorConfig get_config(CircularSelectorType type) {
     using D = parser::Dataset;
     switch (type) {
-        case O2: return {" %",   0, 100, [](const D& v, uint8_t i) { return v.operative_data.oxygen_levels[i]; }};
-        case Ps: return {" psi", 0, 150, [](const D& v, uint8_t i) { return v.operative_data.primary_tank_pressure[i]; }};
-        case Tr: return {" psi", 0, 60,  [](const D& v, uint8_t i) { return v.operative_data.secondary_tank_pressure[i]; }};
-        case Tn: return {" c",   0, 100, [](const D& v, uint8_t i) { return v.operative_data.tank_temperatures[i]; }};
-        case Fl: return {" l/m", 0, 20,  [](const D& v, uint8_t i) { return v.operative_data.oxygen_speed[i]; }};
-        default: return {" %",   0, 100, [](const D& v, uint8_t i) { return 0; }};
+      case O2:
+        return {" %", 0, 100, [](const D& v, uint8_t i) {
+                  return v.operative_data.oxygen_levels[i];
+                }};
+      case Ps:
+        return {" psi", 0, 150, [](const D& v, uint8_t i) {
+                  return v.operative_data.primary_tank_pressure[i];
+                }};
+      case Tr:
+        return {" psi", 0, 60, [](const D& v, uint8_t i) {
+                  return v.operative_data.secondary_tank_pressure[i];
+                }};
+      case Tn:
+        return {" c", 0, 100, [](const D& v, uint8_t i) {
+                  return v.operative_data.tank_temperatures[i];
+                }};
+      case Fl:
+        return {" l/m", 0, 20, [](const D& v, uint8_t i) {
+                  return v.operative_data.oxygen_speed[i];
+                }};
+      default:
+        return {" %", 0, 100, [](const D& v, uint8_t i) { return 0; }};
     }
-}
+  }
 
-inline $$Circular $SpecificCircular(const CircularSelectorType& type, uint8_t index, bool is_small = false) {
+  inline $$Circular $SpecificCircular(const CircularSelectorType& type,
+                                      uint8_t index, bool is_small = false) {
     auto config = get_config(type);
 
-  const auto start_value = parser::DatasetStore::getInstance()->get();
-    const auto value = config.getValue(start_value, index);
+    const auto start_value = parser::DatasetStore::getInstance()->get();
+    const auto value = config.getValue(*start_value, index);
 
-    return $Circular(CircularProgressProps::up()
-        .watch<parser::Dataset>(
-            parser::DatasetStore::getInstance(), "circular",
-            [config, index](CircularProgress* self, const parser::Dataset& dataset_value) {\
-                if (!self) return;
-                self->update_label_text();
-                float val = config.getValue(dataset_value, index);
-                self->set_state([val, config](CircularProgressProps& props) {
-                  props.value(val);
-                  // props.set_style([val, config](Styling& style) {
-                  //     style.setArcColor(get_color_by_value(val, config.min, config.max));
-                  // });
-                });
+    return $Circular(
+        CircularProgressProps::up()
+            .watch<parser::Dataset>(
+                parser::DatasetStore::getInstance(), "circular",
+                [config, index](CircularProgress* self,
+                                const parser::Dataset& dataset_value) {
+                  if (!self)
+                    return;
+                  self->update_label_text();
+                  float val = config.getValue(dataset_value, index);
+                  self->set_state([val, config](CircularProgressProps& props) {
+                    props.value(val);
+                    // props.set_style([val, config](Styling& style) {
+                    //     style.setArcColor(get_color_by_value(val, config.min, config.max));
+                    // });
+                  });
+                })
+            .label(config.symbol)
+            .show_label(true)
+            .min(config.min)
+            .max(config.max)
+            .value(value)
+            .set_text_style([is_small](Styling& style) {
+              style.setFont(is_small ? &lv_font_montserrat_16
+                                     : &lv_font_montserrat_34);
             })
-        .label(config.symbol)
-        .show_label(true)
-        .min(config.min)
-        .max(config.max)
-        .value(value)
-        .set_text_style([is_small](Styling& style) {
-            style.setFont(is_small ? &lv_font_montserrat_16 : &lv_font_montserrat_34);
-        })
-        .w(is_small ? 98 : 232)
-        .h(is_small ? 98 : 232));
-}
+            .w(is_small ? 98 : 232)
+            .h(is_small ? 98 : 232));
+  }
 
 };  // namespace ON2Solutions
