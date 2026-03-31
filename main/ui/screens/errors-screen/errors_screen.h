@@ -23,6 +23,8 @@ namespace ON2Solutions {
   };
 
   class ErrorsScreen final : public NavigationScreen<ErrorsScreenProps> {
+  private:
+
    public:
     explicit ErrorsScreen(StackNavigator* stack, ErrorsScreenProps props)
         : NavigationScreen(stack, std::move(props)) {}
@@ -31,9 +33,10 @@ namespace ON2Solutions {
 
     void component_did_mount() override;
     $$CommonHeader render_header() const;
-    $$View create_status_row(const std::string& label, bool is_error);
-    std::vector<ErrorModel> generate_test_data_models();
-    std::vector<std::unique_ptr<VNode>> generate_test_data();
+    $$View create_status_row(const std::string& label, bool is_error,
+                             int index);
+
+    std::vector<ErrorModel> generate_data_models() const;
     $$View render_body();
     lv_obj_t* render() override;
     ErrorsScreen* append(lv_obj_t* obj) override;

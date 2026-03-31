@@ -1,5 +1,7 @@
 #include "pincode_screen.h"
 
+#include <constants/assets.h>
+
 using namespace foundation;
 
 namespace ON2Solutions {
@@ -22,6 +24,46 @@ namespace ON2Solutions {
     info_modal->show();
   }
 
+  $$Button PinCodeScreen::render_nav_button() const {
+    if (this->navigation_ref == nullptr)
+      return $Button(ButtonProps::up());
+
+    return $Button(
+        ButtonProps::up()
+            .click([this](lv_event_t*) {
+              struct AsyncArg {
+                std::string path;
+              };
+
+              auto delegate = new Delegate<void()>(
+                  [this]() { this->navigation_ref->navigate("/main", false); });
+
+              lv_async_call(
+                  [](void* arg) {
+                    auto* callback = static_cast<Delegate<void()>*>(arg);
+
+                    if (callback) {
+                      (*callback)();
+                      delete callback;
+                    }
+                  },
+                  delegate);
+            })
+            .set_style([](Styling& style) {
+              style.set_clear_default();
+              style.setWidth(32);
+              style.setHeight(32);
+              style.setPadding(0);
+              style.setBorderRadius(8);
+              style.setBackgroundOpacity(LV_OPA_100);
+              style.setBackgroundColor(TERTIARY_BG);
+            })
+            .set_child($Image(
+                ImageProps::up().source(assets::Close).width(10).height(10)))
+
+    );
+  }
+
   void PinCodeScreen::validate_and_login() {
     const auto login = this->login_state.get();
 
@@ -37,7 +79,6 @@ namespace ON2Solutions {
   lv_obj_t* PinCodeScreen::render() {
     VNode::render();
     auto login_v = &this->login_state;
-    auto navigation_ref = this->navigation_ref;
 
     return this->delegate($View(
         ViewProps::up()
@@ -48,53 +89,42 @@ namespace ON2Solutions {
               style.setBorder(lv_color_make(255, 255, 255), 0, 0);
             })
             .set_children(children(
-                $View(
-                    ViewProps::up()
-                        .w(LV_PCT(98))
-                        .h(60)
-                        .direction(LV_FLEX_FLOW_ROW)
-                        .items(LV_FLEX_ALIGN_CENTER)
-                        .track_cross(LV_FLEX_ALIGN_CENTER)
-                        .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
-                        .set_style(NoPaddingApply)
-                        .set_children(children(
-                            $View(
-                                ViewProps::up()
-                                    .w(LV_PCT(20))
-                                    .h(60)
-                                    .direction(LV_FLEX_FLOW_ROW)
-                                    .items(LV_FLEX_ALIGN_CENTER)
-                                    .justify(LV_FLEX_ALIGN_START)
-                                    .track_cross(LV_FLEX_ALIGN_CENTER)
-                                    .set_style(NoPaddingApply)
-                                    .set_children(children($Button(
-                                        ButtonProps::up()
-                                            .set_child(
-                                                $Text(TextProps::up().value(
-                                                    locales::en::button_back)))
-                                            .click([navigation_ref](
-                                                       lv_event_t* e) {
-                                              navigation_ref->navigate(
-                                                  "/main", {{"page", 0}},
-                                                  false);
-                                            }))))),
-                            $View(ViewProps::up()
-                                      .w(LV_PCT(78))
-                                      .h(60)
-                                      .set_style(NoPaddingApply)
-                                      .direction(LV_FLEX_FLOW_ROW)
-                                      .items(LV_FLEX_ALIGN_CENTER)
-                                      .justify(LV_FLEX_ALIGN_CENTER)
-                                      .track_cross(LV_FLEX_ALIGN_CENTER)
-                                      .set_children(
-                                          children($Text(TextProps::up().value(
-                                              locales::en::
-                                                  system_auth_header))))),
-                            $View(ViewProps::up()
-                                      .w(LV_PCT(20))
-                                      .set_style(NoPaddingApply)
-                                      .set_children(children(
-                                          $Fragment(FragmentProps::up()))))))),
+                $View(ViewProps::up()
+                          .w(LV_PCT(98))
+                          .h(60)
+                          .direction(LV_FLEX_FLOW_ROW)
+                          .items(LV_FLEX_ALIGN_CENTER)
+                          .track_cross(LV_FLEX_ALIGN_CENTER)
+                          .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
+                          .set_style(NoPaddingApply)
+                          .set_children(children(
+                              $View(ViewProps::up()
+                                        .w(LV_PCT(20))
+                                        .h(60)
+                                        .direction(LV_FLEX_FLOW_ROW)
+                                        .items(LV_FLEX_ALIGN_CENTER)
+                                        .justify(LV_FLEX_ALIGN_START)
+                                        .track_cross(LV_FLEX_ALIGN_CENTER)
+                                        .set_style(NoPaddingApply)
+                                        .set_children(children(
+                                            this->render_nav_button()))),
+                              $View(ViewProps::up()
+                                        .w(LV_PCT(78))
+                                        .h(60)
+                                        .set_style(NoPaddingApply)
+                                        .direction(LV_FLEX_FLOW_ROW)
+                                        .items(LV_FLEX_ALIGN_CENTER)
+                                        .justify(LV_FLEX_ALIGN_CENTER)
+                                        .track_cross(LV_FLEX_ALIGN_CENTER)
+                                        .set_children(children(
+                                            $Text(TextProps::up().value(
+                                                locales::en::
+                                                    system_auth_header))))),
+                              $View(ViewProps::up()
+                                        .w(LV_PCT(20))
+                                        .set_style(NoPaddingApply)
+                                        .set_children(children($Fragment(
+                                            FragmentProps::up()))))))),
                 $View(
                     ViewProps::up()
                         .set_children(children(
@@ -112,7 +142,7 @@ namespace ON2Solutions {
                             $Matrix(MatrixProps::up()
                                         .set_style([](Styling& style) {
                                           style.setWidth(210);
-                                          style.setHeight(210);
+                                          style.setHeight(250);
                                           style.setBorder(PRIMARY_BG, 0,
                                                           LV_OPA_0);
                                           style.setBorderRadius(0);
@@ -144,6 +174,16 @@ namespace ON2Solutions {
                                           }
                                         })),
                             $Button(ButtonProps::up()
+                                        .set_style([](Styling& style) {
+                                          style.setFont(&lv_font_montserrat_14);
+                                          style.setBackgroundColor(PRIMARY_COLOR_2);
+                                          style.setBorderRadius(12);
+                                          style.setSize(100, 44);
+                                          style.setBorder(
+                                              lv_color_hex(0x5B5AFF), 0, 0);
+                                          style.setPadding(8, 8, 16, 16);
+                                          style.setBorderRadius(14);
+                                        })
                                         .set_child($Text(
                                             TextProps::up().value("Sign In")))
                                         .click([this](lv_event_t* e) {

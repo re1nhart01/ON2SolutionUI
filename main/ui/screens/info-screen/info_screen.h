@@ -35,8 +35,7 @@ namespace ON2Solutions {
 
     void component_did_mount() override;
     $$CommonHeader render_header() const;
-    std::vector<InfoModel> generate_test_data_models();
-    $$View create_status_row(const std::string& label, bool is_error);
+    $$View create_status_row(int index);
     $$View render_body();
     lv_obj_t* render() override;
     InfoScreen* append(lv_obj_t* obj) override;

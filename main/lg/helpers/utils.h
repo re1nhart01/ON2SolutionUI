@@ -1,7 +1,7 @@
 
 #pragma once
 
-inline bool is_up_bit_pos(int value, short pos = 0)
+inline bool is_up_bit_pos(uint32_t value, short pos = 0)
 {
   short bit_pos = (value >> pos) & 1;
 

@@ -53,6 +53,14 @@ Styling* Styling::setBorder(lv_color_t color, lv_coord_t width, lv_opa_t opa) {
   return this;
 }
 
+Styling* Styling::setBorder() {
+  this->dirty = true;
+  lv_style_set_border_color(style.get(), lv_color_hex(0xffffff));
+  lv_style_set_border_width(style.get(), 0);
+  lv_style_set_border_opa(style.get(), LV_OPA_0);
+  return this;
+}
+
 Styling* Styling::setShadow(lv_color_t color, lv_coord_t width,
                             lv_coord_t spread) {
   this->dirty = true;

@@ -1,6 +1,10 @@
 
 #include "info_screen.h";
 
+#include <constants/localization.h>
+
+#include <control_config.hh>
+
 namespace ON2Solutions {
   void InfoScreen::component_did_mount() {
     ESP_LOGI("preloader_screen", "Preloading screen");
@@ -9,76 +13,125 @@ namespace ON2Solutions {
     return $CommonHeader(CommonHeaderProps::up());
   }
 
-  struct InfoModel {
-    char* title;
-    std::string value;
-    std::string tag;
+  using SystemInfoGetter = Delegate<std::string(const Dataset&)>;
+
+  struct SystemField {
+    const char* label;
+    SystemInfoGetter getter;
   };
 
-  std::vector<InfoModel> InfoScreen::generate_test_data_models() {
-    std::vector<InfoModel> items;
+  static const SystemField system_fields[] = {
+      {"Moto Hours",
+       [](const Dataset& s) {
+         return std::string(s.operative_data.moto_hours.data());
+       }},
+      {"Device Name",
+       [](const Dataset& s) {
+         return std::string(s.system_info.device_name.data());
+       }},
+      {"Firmware Ver",
+       [](const Dataset& s) {
+         return std::string(s.system_info.firmware_version.data());
+       }},
+      {"Loader Ver",
+       [](const Dataset& s) {
+         return std::string(s.system_info.loader_version.data());
+       }},
+      {"Module Name",
+       [](const Dataset& s) {
+         return std::string(s.system_info.module_name.data());
+       }},
+      {"Module Ver",
+       [](const Dataset& s) {
+         return std::string(s.system_info.module_version.data());
+       }},
+      {"Checksum",
+       [](const Dataset& s) {
+         return std::string(s.system_info.firmware_checksum.data());
+       }},
+      {"Serial Number",
+       [](const Dataset& s) {
+         return std::string(s.system_info.serial_number.data());
+       }},
+      {"LAN IP",
+       [](const Dataset& s) {
+         return std::string(s.system_info.lan_ip_address.data());
+       }},
+      {"LCD FIRMWARE", [](const Dataset& s) { return LCD_FIRMWARE_VERSION; }},
+      {"LCD BOOTLOADER", [](const Dataset& s) { return LCD_LOADER_VERSION; }},
+  };
 
-    for (int i = 1; i <= 4; ++i) {
-      items.push_back({.title = "", .value = "", .tag = ""});
-    }
+  $$View InfoScreen::create_status_row(int index) {
+    const auto& field_info = system_fields[index];
 
-    return items;
-  }
+    const auto& current_data = DatasetStore::getInstance()->get();
 
-  $$View InfoScreen::create_status_row(const std::string& label, bool is_error) {
-    return $View(ViewProps::up()
-                     .w(680)
-                     .h(45)
-                     .flow(FlexPreset::RowBetween)
-                     .set_style([](Styling& style) {
-                       style.setBackgroundColor(lv_color_hex(0xFFFFFF));
-                       style.setBorderRadius(8);
-                       style.setPadding(0, 15, 0, 15);
-                       style.setGap(0, 15);
-                     })
-                     .set_children(children(
-                     $Text(TextProps::up().value(label).set_style(
-                           [](Styling& style) {
-                             style.setTextColor(lv_color_hex(0x333333));
-                             style.setFont(&lv_font_montserrat_14);
-                           })),
-                         $Text(TextProps::up().value(label).set_style(
-                             [](Styling& style) {
-                               style.setTextColor(lv_color_hex(0x333333));
-                               style.setFont(&lv_font_montserrat_14);
-                             })))));
+    std::string initial_value = field_info.getter(current_data);
+
+    return $View(
+        ViewProps::up()
+            .w(696)
+            .h(38)
+            .flow(FlexPreset::RowBetween)
+            .set_style([index](Styling& style) {
+              style.setBackgroundColor(index % 2 == 0 ? TERTIARY_BG
+                                                      : PRIMARY_BG);
+              style.setPadding(0, 0, 16, 16);
+              style.setBorder();
+              style.setGap(0, 20);
+              style.setBorderRadius(8);
+            })
+            .set_children(children(
+                $Text(TextProps::up().value(field_info.label)),
+                $Text(TextProps::up()
+                          .value(initial_value)
+                          .watch<parser::Dataset>(
+                              parser::DatasetStore::getInstance(),
+                              "system_info",
+                              [field_info](VNode* self,
+                                           const parser::Dataset& value) {
+                                if (!self || !self->get_component())
+                                  return;
+
+                                const std::string val = field_info.getter(value);
+                                lv_label_set_text(self->get_component(),
+                                                  val.c_str());
+                              })))));
   }
 
   $$View InfoScreen::render_body() {
-    auto data = generate_test_data_models();
-
-    return $View(ViewProps::up()
-                     .w(LV_PCT(100))
-                     .h(LV_PCT(100))
-                     .direction(LV_FLEX_FLOW_COLUMN)
-                     .justify(LV_FLEX_ALIGN_START)
-                     .items(LV_FLEX_ALIGN_START)
-                     .track_cross(LV_FLEX_ALIGN_START)
-                     .set_style([](Styling& style) {
-                       style.setBackgroundOpa(LV_OPA_0);
-                       style.setPadding(0);
-                       style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
-                     })
-                     .set_children(children(
-                         $Text(TextProps::up().value("Information")),
-                         $PaginatedList(
-                             PaginatedListProps()
-                                 .w(720)
-                                 .h(355)
-                                 .set_items_per_page(4)
-                                 .set_renderer(data.size(),
-                                               [this, data](int index) {
-                                                 return this->create_status_row(
-                                                     data[index].title, true);
-                                               })
-                                 .set_style([](Styling& style) {
-                                   // style.align(LV_ALIGN_CENTER, 0, 0);
-                                 })))));
+    return $View(
+        ViewProps::up()
+            .w(LV_PCT(100))
+            .h(LV_PCT(100))
+            .direction(LV_FLEX_FLOW_COLUMN)
+            .justify(LV_FLEX_ALIGN_START)
+            .items(LV_FLEX_ALIGN_START)
+            .track_cross(LV_FLEX_ALIGN_START)
+            .set_style([](Styling& style) {
+              style.setBackgroundOpa(LV_OPA_0);
+              style.setPadding(0);
+              style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+            })
+            .set_children(children(
+                $Text(TextProps::up()
+                          .value(locales::en::header_information)
+                          .set_style([](Styling& style) {
+                            style.setFont(&lv_font_montserrat_18);
+                          })),
+                $PaginatedList(
+                    PaginatedListProps()
+                        .w(712)
+                        .h(355)
+                        .set_renderer(std::size(system_fields),
+                                      [this](int index) {
+                                        return this->create_status_row(index);
+                                      })
+                        .set_items_per_page(6)
+                        .set_style([](Styling& style) {
+                          style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                          style.setShadow(lv_color_hex(0x1018281A), 12, 0);
+                        })))));
   }
 
   lv_obj_t* InfoScreen::render() {

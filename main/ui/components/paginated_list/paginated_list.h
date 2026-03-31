@@ -26,9 +26,10 @@ namespace ON2Solutions {
     }
 
     PaginatedListProps&& set_renderer(
-        int total, Delegate<std::unique_ptr<VNode>(int)> renderer) {
+      int total, Delegate<std::unique_ptr<VNode>(int)> renderer) {
       total_items = total;
       row_renderer = std::move(renderer);
+
       return std::move(*this);
     }
 
@@ -46,8 +47,6 @@ namespace ON2Solutions {
       height = v;
       return std::move(*this);
     }
-
-    // ... інші сеттери (w, h)
   };
 
   class PaginatedList final : public Component<PaginatedListProps> {
@@ -55,29 +54,35 @@ namespace ON2Solutions {
     using Component::props;
     std::shared_ptr<Ref<View>> items_container_ref =
         std::make_shared<Ref<View>>("items_container");
+    std::shared_ptr<Ref<Pagination>> pagination_ref =
+        std::make_shared<Ref<Pagination>>("pagination");
     explicit PaginatedList(PaginatedListProps&& props)
         : Component(nullptr, nullptr, std::move(props)) {
       this->apply_reactive<PaginatedList>(this, this->props.reactive_delegates);
+
+      if (this->props.ref != nullptr) {
+        this->props.ref->set(this);
+      }
     };
 
-    std::vector<std::unique_ptr<VNode>> get_current_page_items() {
-      std::vector<std::unique_ptr<VNode>> page_items;
+    ~PaginatedList() override {
+      if (this->props.ref != nullptr) {
+        this->props.ref->unlink();
+      }
 
-      size_t start = (props.current_page - 1) * props.items_per_page;
-      size_t end =
-          std::min(start + (size_t)props.items_per_page, props.children.size());
-
-      return page_items;
+      if (!this->props.reactive_link.empty())
+      {
+        this->detach_reactives<PaginatedList>(this, this->props.reactive_link);
+      }
     }
 
     void do_rebuild() override {
       if (this->items_container_ref->get()) {
-        int total_pages = (props.total_items + props.items_per_page - 1) /
-                          props.items_per_page;
-
-        size_t start_idx = (props.current_page - 1) * props.items_per_page;
-        size_t end_idx = std::min(start_idx + (size_t)props.items_per_page,
-                                  (size_t)props.total_items);
+        int total_pages =
+          (props.total_items + props.items_per_page - 1) / props.items_per_page;
+        const size_t start_idx = (props.current_page - 1) * props.items_per_page;
+        const size_t end_idx = std::min(start_idx + static_cast<size_t>(props.items_per_page),
+                                  static_cast<size_t>(props.total_items));
 
         Children rows;
         for (size_t i = start_idx; i < end_idx; ++i) {
@@ -86,6 +91,17 @@ namespace ON2Solutions {
 
         this->items_container_ref->get()->props.children = std::move(rows);
         this->items_container_ref->get()->refresh_childrens();
+
+        if (this->pagination_ref) {
+          this->pagination_ref->get()->set_state(
+              [total_pages](PaginationProps& pagination_props) {
+              pagination_props.pages(total_pages);
+              if (pagination_props.current_page > total_pages) {
+                pagination_props.active_page(1);
+              }
+          });
+        }
+
       }
     };
 
@@ -107,35 +123,37 @@ namespace ON2Solutions {
               .h(props.height)
               .flow(FlexPreset::ColumnCenter)
               .set_style([](Styling& style) {
-                style.setBackgroundColor(
-                    lv_color_hex(0xF8F9FA));  // Світлий фон як на фото
+                style.setBackgroundColor(PRIMARY_BG);
                 style.setBorderRadius(16);
-                style.setPadding(12);
+                style.setPadding(8);
+                style.setBorder(BORDER_SECONDARY, 1, LV_OPA_100);
                 style.setGap(10, 0);
               })
               .set_children(children(
-                  // Контейнер для списку
                   $View(ViewProps::up()
-                            .w(static_cast<short>(props.width - 40))
+                            .w(static_cast<short>(props.width - 10))
                             .flow(FlexPreset::ColumnStart)
                             .set_ref(items_container_ref)
                             .set_style([](Styling& style) {
                               style.setPadding(0);
+                              style.setBorder(BORDER_SECONDARY, 0, LV_OPA_0);
                               style.setGap(8, 0);
                               style.setFlexGrow(1);
                             })
                             .set_children(std::move(rows))),
 
                   $View(ViewProps::up()
-                            .w(static_cast<short>(props.width - 40))
+                            .w(static_cast<short>(props.width - 10))
                             .h(60)
                             .flow(FlexPreset::Center)
                             .set_style([](Styling& style) {
                               style.setBorder(lv_color_hex(0xEEEEEE), 1,
                                               LV_OPA_COVER);
                             })
-                            .set_children(children($Pagination(
+                            .set_children(children(
+                              $Pagination(
                                 PaginationProps()
+                                    .set_ref(pagination_ref)
                                     .pages(total_pages)
                                     .active_page(props.current_page)
                                     .change([this](int page) {
@@ -149,7 +167,6 @@ namespace ON2Solutions {
                                       style.setHeight(36);
                                       style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
                                       style.setBackgroundOpa(0);
-                                      style.setShadow(PRIMARY_BG, 0, LV_OPA_0);
                                     })
                                     .set_btn_style([](Styling& style) {
                                       style.setBorderRadius(8);
@@ -157,7 +174,8 @@ namespace ON2Solutions {
                                       style.setBackgroundOpa(0);
                                       style.setFont(&lv_font_montserrat_14);
                                       style.setShadow(PRIMARY_BG, 0, LV_OPA_0);
-                                    })))))))));
+                                    }))
+                                    )))))));
     };
 
     const Styling* styling() const override { return &this->style; };

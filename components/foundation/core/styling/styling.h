@@ -35,6 +35,7 @@ public:
   Styling *setOpacity(lv_opa_t opa);
   Styling *setBorderRadius(lv_coord_t radius);
   Styling *setBorder(lv_color_t color, lv_coord_t width, lv_opa_t opa);
+  Styling* setBorder();
   Styling *setShadow(lv_color_t color, lv_coord_t width, lv_coord_t spread);
   Styling *setPadding(lv_coord_t top, lv_coord_t bottom, lv_coord_t left,
                       lv_coord_t right);

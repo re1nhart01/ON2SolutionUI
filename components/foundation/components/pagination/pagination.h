@@ -17,11 +17,11 @@ namespace foundation {
       map_strings.clear();
       map_ptrs.clear();
 
-      map_strings.push_back(LV_SYMBOL_LEFT);
+      map_strings.emplace_back(LV_SYMBOL_LEFT);
       for (int i = 1; i <= props.total_pages; ++i) {
         map_strings.push_back(std::to_string(i));
       }
-      map_strings.push_back(LV_SYMBOL_RIGHT);
+      map_strings.emplace_back(LV_SYMBOL_RIGHT);
 
       for (const auto& s : map_strings) {
         map_ptrs.push_back(s.c_str());
@@ -35,6 +35,21 @@ namespace foundation {
     explicit Pagination(PaginationProps&& props)
         : Component(nullptr, nullptr, std::move(props)) {
       this->apply_reactive<Pagination>(this, this->props.reactive_delegates);
+
+      if (this->props.ref != nullptr) {
+        this->props.ref->set(this);
+      }
+    }
+
+    ~Pagination() override {
+      if (this->props.ref != nullptr) {
+        this->props.ref->unlink();
+      }
+
+      if (!this->props.reactive_link.empty())
+      {
+        this->detach_reactives<Pagination>(this, this->props.reactive_link);
+      }
     }
 
     lv_obj_t* render() override {
@@ -60,25 +75,32 @@ namespace foundation {
       lv_obj_add_event_cb(obj, pagination_event_adapter, LV_EVENT_VALUE_CHANGED,
                           this);
 
+
+      if (props.style_override) {
+        props.style_override(style);
+      }
+      lv_obj_add_style(obj, style.getStyle(), LV_PART_MAIN);
+
+      if (props.btn_style_override) {
+        props.btn_style_override(btn_style);
+      }
+      lv_obj_add_style(obj, btn_style.getStyle(), LV_PART_ITEMS);
+
       do_rebuild();
       return obj;
     }
 
     void do_rebuild() override {
       lv_obj_t* obj = this->get_component();
-      if (!obj)
-        return;
+      if (!obj) return;
 
-      if (props.current_page < 1)
-        props.current_page = 1;
-      if (props.current_page > props.total_pages)
-        props.current_page = props.total_pages;
+      update_map_buffer();
+      lv_btnmatrix_set_map(obj, map_ptrs.data());
 
-      lv_btnmatrix_set_btn_ctrl(obj, props.current_page,
-                                LV_BTNMATRIX_CTRL_CHECKED);
+      if (props.current_page < 1) props.current_page = 1;
+      if (props.current_page > props.total_pages) props.current_page = props.total_pages;
 
-      const auto style_ptr = this->styling();
-      lv_obj_add_style(obj, style_ptr->getStyle(), LV_PART_MAIN);
+      lv_btnmatrix_set_btn_ctrl(obj, props.current_page, LV_BTNMATRIX_CTRL_CHECKED);
 
       int btn_count = props.total_pages + 2;
       int gap = 8;
@@ -88,13 +110,6 @@ namespace foundation {
       lv_obj_set_style_pad_gap(obj, gap, LV_PART_MAIN);
       lv_obj_set_style_pad_all(obj, 0, LV_PART_MAIN);
       lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN);
-
-      if (props.btn_style_override) {
-        props.btn_style_override(btn_style);
-      }
-      lv_obj_add_style(obj, btn_style.getStyle(), LV_PART_ITEMS);
-
-      lv_obj_invalidate(obj);
     }
 
     const Styling* styling() const override {

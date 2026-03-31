@@ -12,6 +12,9 @@ using namespace foundation;
 namespace ON2Solutions {
 
   inline $$Button $HighButton(const char* source, auto on_press) {
+
+
+
     return $Button(ButtonProps::up()
                        .click(on_press)
                        .set_style([](Styling& style) {

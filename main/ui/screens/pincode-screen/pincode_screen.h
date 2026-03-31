@@ -36,6 +36,7 @@ namespace ON2Solutions {
 
     void component_did_mount() override;
     void show_info_modal();
+    $$Button render_nav_button() const;
     void validate_and_login();
     lv_obj_t* render() override;
     const Styling* styling() const override;
