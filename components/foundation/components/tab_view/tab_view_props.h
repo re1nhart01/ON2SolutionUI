@@ -15,11 +15,18 @@
       lv_coord_t header_size = 40;
       std::vector<std::string> tabs;
       std::vector<std::unique_ptr<VNode>> childrens;
+      Delegate<void(Styling& style)> btn_style_override;
+      const char* tab_label = nullptr;
 
       Delegate<void(uint16_t), 64> on_change_cb{};
 
       TabViewProps&& set_tabs(const std::vector<std::string>& t) {
         this->tabs = t;
+        return std::move(*this);
+      }
+
+      TabViewProps&& set_label(const char* label) {
+        this->tab_label = label;
         return std::move(*this);
       }
 
@@ -32,6 +39,12 @@
         this->header_size = size;
         return std::move(*this);
       }
+
+      TabViewProps&& set_btn_style(Delegate<void(Styling&)> cb) {
+        this->btn_style_override = std::move(cb);
+        return std::move(*this);
+      }
+
 
       TabViewProps&& on_change(Delegate<void(uint16_t), 64> cb) {
         this->on_change_cb = std::move(cb);

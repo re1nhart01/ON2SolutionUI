@@ -174,7 +174,7 @@ namespace ON2Solutions::parser::paramspec {
 
   // NOTE: max depends on WC!
   inline constexpr ParamSpec LowLimitConcentrationSpec{
-      .label = "Low Limit Concentration",
+      .label = "Low Concentration",
       .min = 80.0f,
       .max = 99.9f,  // base max, clamp by WC
       .step = 0.1f,

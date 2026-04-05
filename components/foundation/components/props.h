@@ -12,6 +12,7 @@ namespace foundation {
   struct BaseProps {
     std::shared_ptr<Ref<RefT>> ref = nullptr;
     Delegate<void(Styling&)> style_override{};
+    Delegate<void(lv_obj_t*)> ref_control{};
     mutable std::vector<Delegate<void(void*), 40>> reactive_delegates{};
     std::vector<IReactive*> reactive_link{};
 
@@ -67,6 +68,11 @@ namespace foundation {
 
     Derived&& set_ref(const std::shared_ptr<Ref<RefT>>& r) {
       ref = r;
+      return std::move(static_cast<Derived&>(*this));
+    }
+
+    Derived&& control_ref(Delegate<void(lv_obj_t*)> controller) {
+      this->ref_control = controller;
       return std::move(static_cast<Derived&>(*this));
     }
 

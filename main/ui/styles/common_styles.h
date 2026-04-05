@@ -44,6 +44,18 @@ namespace ON2Solutions {
     return p;
   }
 
+  inline foundation::ViewProps& centered_screen_container_props(
+      foundation::ViewProps& p) {
+    p.w(LV_PCT(100));
+    p.h(LV_PCT(100));
+    p.justify(LV_FLEX_ALIGN_CENTER);
+    p.items(LV_FLEX_ALIGN_CENTER);
+    p.track_cross(LV_FLEX_ALIGN_CENTER);
+    p.direction(LV_FLEX_FLOW_COLUMN);
+
+    return p;
+  }
+
   inline lv_color_t button_color_by_status(parser::DatasetStatuses status) {
     switch (status) {
       case parser::DatasetStatuses::StandBy:
@@ -131,7 +143,7 @@ namespace ON2Solutions {
 
   inline foundation::ViewProps& pincode_screen_sign_form_props(
       foundation::ViewProps& p) {
-        p.w(LV_PCT(100))
+        p.w(LV_PCT(60))
         .h(LV_SIZE_CONTENT)
         .justify(LV_FLEX_ALIGN_CENTER)
         .items(LV_FLEX_ALIGN_CENTER)

@@ -91,8 +91,11 @@ namespace ON2Solutions {
     return $View(
         ViewProps::up()
             .w(LV_PCT(100))
-            .h(40)
-            .set_style(NoPaddingApply)
+            .h(20)
+            .set_style([](Styling& style) {
+              style.setPadding(0);
+              style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+            })
             .set_children(children($Text(TextProps::up().value(heading))))
             .merge(centered_row));
   }
@@ -106,7 +109,11 @@ namespace ON2Solutions {
             .w(338)
             .h(52)
             .flow(FlexPreset::RowBetween)
-            .set_style([](Styling& style) { style.setPadding(0, 0, 16, 16); })
+            .set_style([](Styling& style) {
+              style.setPadding(0, 0, 16, 16);
+              style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+              style.setBackgroundColor(TERTIARY_BG);
+            })
             .set_children(children(
                 $Text(TextProps::up().value(spec.label)),
                 $Stepper(
@@ -115,12 +122,18 @@ namespace ON2Solutions {
                         .set_step(spec.step)
                         .set_precision(spec.precision)
                         .range(min, max)
-                        .btn_width(36)
-                        .btn_height(32)
+                        .btn_width(34)
+                        .btn_height(34)
+                        .set_buttons_style([](Styling& style) {
+                          style.setBackgroundColor(PRIMARY_COLOR_3);
+                          style.setBorder(PRIMARY_COLOR_2, 1, LV_OPA_100);
+                          style.setTextColor(PRIMARY_COLOR_2);
+                          style.setShadow(PRIMARY_BG, 0, 0);
+                        })
                         .set_style([](Styling& style) { style.setPadding(0); })
                         .set_spinbox_style(
                             [](Styling& style) { style.setPadding(0); })
-                        .size(56, 32)
+                        .size(56, 34)
                         .template watch<parser::Dataset>(
                             parser::DatasetStore::getInstance(),
                             fmt_str("param_%s", spec.label),
@@ -146,24 +159,61 @@ namespace ON2Solutions {
         parser::DatasetStore::getInstance()->get()->settings;
     return $View(
         ViewProps::up()
-            .direction(LV_FLEX_FLOW_ROW_WRAP)
-            .justify(LV_FLEX_ALIGN_CENTER)
+            .direction(LV_FLEX_FLOW_COLUMN)
+            .justify(LV_FLEX_ALIGN_START)
+            .items(LV_FLEX_ALIGN_START)
+            .track_cross(LV_FLEX_ALIGN_START)
             .set_style([](Styling& style) {
-              style.setPadding(12);
+              style.setPadding(0);
               style.setBorderRadius(12);
               style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+              style.setBackgroundColor(SECONDARY_BG);
             })
             .set_children(children(
-                render_section_header(locales::en::oxygen_offset_setting),
-                make_param(OxygenShiftASpec, dataset.oxygen_sensor_offset[0]),
-                make_param(OxygenShiftBSpec, dataset.oxygen_sensor_offset[1]),
-                make_param(OxygenShiftCSpec, dataset.oxygen_sensor_offset[2]),
-                make_param(OxygenShiftDSpec, dataset.oxygen_sensor_offset[3]),
-                render_section_header(locales::en::oxygen_flow_setting),
-                make_param(FlowShiftASpec, dataset.flow_sensor_offset[0]),
-                make_param(FlowShiftBSpec, dataset.flow_sensor_offset[1]),
-                make_param(FlowShiftCSpec, dataset.flow_sensor_offset[2]),
-                make_param(FlowShiftDSpec, dataset.flow_sensor_offset[3])))
+                $View(ViewProps::up()
+                          .w(LV_PCT(100))
+                          .h(LV_SIZE_CONTENT)
+                          .direction(LV_FLEX_FLOW_ROW_WRAP)
+                          .justify(LV_FLEX_ALIGN_CENTER)
+                          .set_style([](Styling& style) {
+                            style.setPadding(12);
+                            style.setBorderRadius(16);
+                            style.setBackgroundColor(PRIMARY_BG);
+                            style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                          })
+                          .set_children(children(
+                              render_section_header(
+                                  locales::en::oxygen_offset_setting),
+                              make_param(OxygenShiftASpec,
+                                         dataset.oxygen_sensor_offset[0]),
+                              make_param(OxygenShiftBSpec,
+                                         dataset.oxygen_sensor_offset[1]),
+                              make_param(OxygenShiftCSpec,
+                                         dataset.oxygen_sensor_offset[2]),
+                              make_param(OxygenShiftDSpec,
+                                         dataset.oxygen_sensor_offset[3])))),
+                $View(ViewProps::up()
+                          .w(LV_PCT(100))
+                          .h(LV_SIZE_CONTENT)
+                          .direction(LV_FLEX_FLOW_ROW_WRAP)
+                          .justify(LV_FLEX_ALIGN_CENTER)
+                          .set_style([](Styling& style) {
+                            style.setPadding(12);
+                            style.setBorderRadius(16);
+                            style.setBackgroundColor(PRIMARY_BG);
+                            style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                          })
+                          .set_children(children(
+                              render_section_header(
+                                  locales::en::oxygen_flow_setting),
+                              make_param(FlowShiftASpec,
+                                         dataset.flow_sensor_offset[0]),
+                              make_param(FlowShiftBSpec,
+                                         dataset.flow_sensor_offset[1]),
+                              make_param(FlowShiftCSpec,
+                                         dataset.flow_sensor_offset[2]),
+                              make_param(FlowShiftDSpec,
+                                         dataset.flow_sensor_offset[3]))))))
             .w(LV_PCT(100))
             .h(LV_SIZE_CONTENT));
   }
@@ -251,6 +301,8 @@ namespace ON2Solutions {
                         .flow(FlexPreset::RowBetween)
                         .set_style([](Styling& style) {
                           style.setPadding(0, 0, 16, 16);
+                          style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                          style.setBackgroundColor(TERTIARY_BG);
                         })
                         .set_children(children(
                             $Text(TextProps::up().value(
@@ -275,7 +327,16 @@ namespace ON2Solutions {
                                       });
                                     }))))),
                 $Button(ButtonProps::up()
-                            .set_child($Text(TextProps::up().value(
+                          .set_style([](Styling& style) {
+                            style.setBackgroundColor(PRIMARY_COLOR_2);
+                            style.setHeight(44);
+                            style.setWidth(170);
+                            style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                            style.setShadow(PRIMARY_BG, 0,0);
+
+                          })
+                            .set_child($Text(TextProps::up()
+                            .value(
                                 locales::en::hour_run_reset)))
                             .click([this](lv_event_t* e) {
                               this->hour_run_reset();
@@ -323,7 +384,24 @@ namespace ON2Solutions {
                                     })
                                     .set_children(children($TabView(
                                         TabViewProps::up()
-                                            .set_header_size(45)
+                                            .set_header_size(36)
+                                            .set_label(
+                                                locales::en::
+                                                    system_settings_header)
+                                            .set_btn_style([](Styling& style) {
+                                              style.setWidth(85);
+                                              style.setHeight(36);
+                                              style.setCheckedBg(
+                                                  PRIMARY_COLOR_2);
+                                              style.setBackgroundColor(
+                                                  PRIMARY_BG);
+                                              style.setBorderRadius(10);
+                                              style.setFont(
+                                                  &lv_font_montserrat_14);
+                                              style.setShadow(PRIMARY_BG, 0, 0);
+                                              style.setBorder(PRIMARY_BG, 0,
+                                                              LV_OPA_0);
+                                            })
                                             .set_tabs({"Sensors", "Timers",
                                                        "Limits", "Service"})
                                             .set_children(children(

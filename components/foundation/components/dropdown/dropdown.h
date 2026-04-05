@@ -38,6 +38,10 @@ namespace foundation {
         lv_dropdown_add_option(obj, option, LV_DROPDOWN_POS_LAST);
       }
 
+      if (const auto style = this->styling()) {
+        lv_obj_add_style(obj, style->getStyle(), LV_PART_MAIN);
+      }
+
       lv_dropdown_set_selected(obj, props.selected);
 
       lv_obj_add_event_cb(obj, event_adapter, LV_EVENT_ALL, this);

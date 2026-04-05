@@ -40,17 +40,20 @@ namespace ON2Solutions {
     };
 
     void on_navigation_press(const std::string& path) const {
-      if (this->props.stack == nullptr) return;
-      if (this->props.stack->get_current_route() == path) return;
+      if (this->props.stack == nullptr)
+        return;
+      if (this->props.stack->get_current_route() == path)
+        return;
 
       this->props.stack->navigate(path, false);
     }
 
-    $$Button render_nav_button(const std::string& path,
-                               const char* icon) const {
+    $$Button render_nav_button(const std::string& path, const char* icon,
+                               bool is_active_additional = false) const {
       if (this->props.stack == nullptr)
         return $Button(ButtonProps::up());
-      bool is_active = this->props.stack->get_current_route() == path;
+      bool is_active = this->props.stack->get_current_route() == path ||
+                       is_active_additional;
 
       return $Button(
           ButtonProps::up()
@@ -95,7 +98,10 @@ namespace ON2Solutions {
                         this->render_nav_button("/main", assets::Pie),
                         this->render_nav_button("/errors", assets::Warning),
                         this->render_nav_button("/info", assets::Info),
-                        this->render_nav_button("/pin_code", assets::Settings)))));
+                        this->render_nav_button(
+                            "/pin_code", assets::Settings,
+                            this->props.stack->get_current_route() ==
+                                "/settings")))));
     };
 
     const Styling* styling() const override {

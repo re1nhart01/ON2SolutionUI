@@ -68,10 +68,13 @@ namespace ON2Solutions {
       this->dots_ref.clear();
 
       for (int i = 0; i < this->props.dot_amount; i++) {
+        bool is_enabled = is_up_bit_pos(static_cast<int>(this->props.active_hex), i);
+        
         auto dot =
-            $View(ViewProps::up().w(8).h(8).set_style([](Styling& style) {
+            $View(ViewProps::up().w(8).h(8).set_style([is_enabled](Styling& style) {
               style.setBorderRadius(100);
-              style.setBackgroundColor(PRIMARY_COLOR_3);
+              style.setBackgroundColor(is_enabled ? PRIMARY_COLOR_2
+                                                : PRIMARY_COLOR_3);
               style.setBorder(lv_color_make(0, 0, 0), 0, LV_OPA_TRANSP);
               style.setPadding(0, 0, 0, 0);
             }));

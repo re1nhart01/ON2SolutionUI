@@ -51,6 +51,14 @@ namespace foundation
 
       lv_obj_add_style(obj, style->getStyle(), LV_PART_MAIN);
 
+      if (style->width > 0) {
+        lv_obj_set_width(obj, style->width);
+      }
+
+      if (style->height > 0) {
+        lv_obj_set_height(obj, style->height);
+      }
+
       if (this->props.child != nullptr) {
           this->props.child->set_parent(obj);
           this->props.child->set_active(true);

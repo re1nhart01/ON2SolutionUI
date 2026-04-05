@@ -108,7 +108,8 @@ namespace foundation {
       lv_obj_set_style_pad_all(btn_plus, 0, 0);
       lv_obj_center(label_plus);
 
-      lv_obj_add_style(obj, this->btn_style.getStyle(), LV_PART_MAIN);
+      lv_obj_add_style(this->btn_plus, this->btn_style.getStyle(), LV_PART_MAIN);
+      lv_obj_add_style(this->btn_minus, this->btn_style.getStyle(), LV_PART_MAIN);
 
       lv_obj_add_event_cb(
           btn_minus,

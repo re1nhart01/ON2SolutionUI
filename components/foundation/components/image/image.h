@@ -43,6 +43,11 @@ namespace foundation
       {
         lv_img_set_src(comp, &this->props.img_dsc);
       }
+
+      if (props.ref_control && comp != nullptr) {
+        props.ref_control(comp);
+      }
+
       lv_obj_set_width(comp, this->props.real_width);
       lv_obj_set_height(comp, this->props.real_height);
       lv_obj_align(comp, LV_ALIGN_CENTER, 0, 0);

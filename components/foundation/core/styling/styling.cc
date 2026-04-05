@@ -19,6 +19,12 @@ Styling* Styling::setBackgroundColor(lv_color_t color) {
   return this;
 }
 
+Styling* Styling::setBackgroundImage(const char* asset) {
+  lv_style_set_bg_img_src(style.get(), asset);
+  this->dirty = true;
+  return this;
+}
+
 Styling* Styling::setBackgroundGradient(lv_color_t start, lv_color_t end,
                                         lv_grad_dir_t dir) {
   this->dirty = true;
@@ -211,6 +217,11 @@ Styling* Styling::setWidth(const short width) {
   this->dirty = true;
   this->width = width;
   lv_style_set_width(style.get(), width);
+  return this;
+}
+
+Styling* Styling::setCheckedBg(const lv_color_t color) {
+  this->checked_bg = color;
   return this;
 }
 

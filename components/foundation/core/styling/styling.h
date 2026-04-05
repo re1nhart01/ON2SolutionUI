@@ -14,6 +14,7 @@ public:
   short height = -1;
   bool dirty = false;
   bool clear_default = false;
+  lv_color_t checked_bg = lv_color_hex(0xffffffff);
 
   Styling() : style(std::make_shared<lv_style_t>()) {
     lv_style_init(style.get());
@@ -30,6 +31,7 @@ public:
   static Styling create() { return Styling{}; };
 
   Styling *setBackgroundColor(lv_color_t color);
+  Styling* setBackgroundImage(const char* asset);
   Styling *setBackgroundGradient(lv_color_t start, lv_color_t end, lv_grad_dir_t dir);
   Styling *setBackgroundOpacity(lv_opa_t opa);
   Styling *setOpacity(lv_opa_t opa);
@@ -61,6 +63,7 @@ public:
   Styling *setAlign(lv_align_t align);
   Styling *setTransition(const lv_style_transition_dsc_t *transition);
   Styling *setWidth(const short width);
+  Styling* setCheckedBg(lv_color_t color);
   Styling *setHeight(const short height);
   Styling *setSizeW(const short width, const short height);
   Styling *setMaxHeight(const short height);
