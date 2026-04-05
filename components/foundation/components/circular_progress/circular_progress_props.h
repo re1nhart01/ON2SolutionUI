@@ -8,6 +8,7 @@ namespace foundation
     std::string label_symbol = "%";
     bool show_label_default = false;
     Delegate<void(Styling&)> text_style_override{};
+    Delegate<void(Styling&)> arc_style_override{};
     short min_dy = 0;
     short max_dy = 100;
     short default_dy = 0;
@@ -29,6 +30,8 @@ namespace foundation
       min_dy = v;
       return std::move(*this);
     }
+
+
 
     CircularProgressProps&& max(short v) {
       max_dy = v;
@@ -60,9 +63,12 @@ namespace foundation
       return std::move(*this);
     }
 
-    CircularProgressProps&& set_text_style(Delegate<void(Styling&)> fn)
-    {
+    CircularProgressProps&& set_text_style(Delegate<void(Styling&)> fn) {
       text_style_override = std::move(fn);
+      return std::move(*this);
+    }
+    CircularProgressProps&& set_arc_style(Delegate<void(Styling&)> fn) {
+      arc_style_override = std::move(fn);
       return std::move(*this);
     }
   };

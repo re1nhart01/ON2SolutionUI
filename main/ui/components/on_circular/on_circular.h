@@ -63,11 +63,20 @@ namespace ON2Solutions {
     Delegate<float(const parser::Dataset&, uint8_t)> getValue;
   };
 
-  inline lv_color_t get_color_by_value(const int value, const int min,
+  inline lv_color_t get_color_by_value(const float value, const int min,
                                        const int max) {
-    uint8_t ratio = static_cast<uint32_t>(value - min) * 255 / (max - min);
+    if (max <= min)
+      return lv_palette_main(LV_PALETTE_GREY);
 
-    return lv_color_mix(NO_ERROR_COLOR, ERROR_COLOR, ratio);
+    float ratio = (value - min) / (max - min);
+
+    if (ratio < 0.25f) {
+      return ERROR_COLOR;
+    }
+    if (ratio < 0.75f) {
+      return PRIMARY_COLOR;
+    }
+    return TERTIARY_COLOR;
   }
 
   // Вспомогательная функция для получения настроек
@@ -118,9 +127,10 @@ namespace ON2Solutions {
                   float val = config.getValue(dataset_value, index);
                   self->set_state([val, config](CircularProgressProps& props) {
                     props.value(val);
-                    // props.set_style([val, config](Styling& style) {
-                    //     style.setArcColor(get_color_by_value(val, config.min, config.max));
-                    // });
+                    props.set_arc_style([val, config](Styling& style) {
+                      style.setArcColor(
+                          get_color_by_value(val, config.min, config.max));
+                    });
                   });
                 })
             .label(config.symbol)
@@ -128,6 +138,10 @@ namespace ON2Solutions {
             .min(config.min)
             .max(config.max)
             .value(value)
+            .set_arc_style([value, config](Styling& style) {
+              style.setArcColor(
+                  get_color_by_value(value, config.min, config.max));
+            })
             .set_text_style([is_small](Styling& style) {
               style.setFont(is_small ? &lv_font_montserrat_16
                                      : &lv_font_montserrat_34);

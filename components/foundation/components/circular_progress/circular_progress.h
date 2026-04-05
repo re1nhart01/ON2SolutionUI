@@ -8,6 +8,7 @@ namespace foundation
     using Component::props;
     std::unique_ptr<Text> label = nullptr;
     lv_obj_t* arc_reference = nullptr;
+    mutable Styling arc_style{};
     bool is_show_label = false;
 
   public:
@@ -65,6 +66,15 @@ namespace foundation
          );
       }
 
+      if (props.arc_style_override) {
+        props.arc_style_override(arc_style);
+        lv_obj_add_style(
+           arc_reference,
+           arc_style.getStyle(),
+           LV_PART_INDICATOR
+       );
+      }
+
       if (props.show_label_default)
         {
           if (!this->label)
@@ -117,14 +127,12 @@ namespace foundation
         lv_obj_invalidate(container);
       }
 
-      if (props.style_override) {
-          props.style_override(style);
-          lv_obj_add_style(
-             arc_reference,
-             style.getStyle(),
-             LV_PART_MAIN
-         );
+      if (props.arc_style_override) {
+        props.arc_style_override(arc_style);
       }
+
+      lv_obj_refresh_style(arc_reference, LV_PART_INDICATOR, LV_STYLE_PROP_ANY);
+      lv_obj_refresh_style(arc_reference, LV_PART_MAIN, LV_STYLE_PROP_ANY);
 
       lv_obj_center(arc_reference);
 
