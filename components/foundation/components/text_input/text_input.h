@@ -35,6 +35,11 @@ namespace foundation
       set_component(lv_textarea_create(parent));
       lv_obj_t* obj = this->get_component();
 
+      if (props.style_override) {
+        props.style_override(style);
+        lv_obj_add_style(obj, style.getStyle(), LV_PART_MAIN);
+      }
+
       do_rebuild();
 
       return obj;
@@ -65,6 +70,11 @@ namespace foundation
 
       if (auto style = styling(); style->get_is_dirty()) {
         lv_obj_invalidate(obj);
+      }
+
+      if (props.style_override) {
+        props.style_override(style);
+        lv_obj_refresh_style(obj, LV_PART_MAIN, LV_STYLE_PROP_ANY);
       }
 
       lv_obj_remove_event_cb(obj, nullptr);

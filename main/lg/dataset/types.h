@@ -1,5 +1,6 @@
 
 #pragma once
+#include <constants/localization.h>
 #include <array>
 #include <cstring>
 #include <string>
@@ -59,6 +60,14 @@ namespace ON2Solutions::parser {
     Unknown,
   };
 
+  enum BootStatus {
+    BootloaderReady = 0,
+    UploadWaiting = 1,
+    FirmwareUploading = 2,
+    UploadedSuccessfully = 3,
+    UploadFailure = 4,
+  };
+
   template <typename T>
   using data_storage_array = std::array<T, 8>;
 
@@ -100,6 +109,16 @@ namespace ON2Solutions::parser {
     if (strcmp(str, "H") == 0) return DatasetStatuses::AutoAdjusting;
 
     return DatasetStatuses::Unknown;
+  }
+
+  inline const char* GetBootloaderStatus(int8_t str)
+  {
+    if (str == 0) return locales::en::bootloader_status_1;
+    if (str == 1) return locales::en::bootloader_status_2;
+    if (str == 2) return locales::en::bootloader_status_3;
+    if (str == 3) return locales::en::bootloader_status_4;
+
+    return "";
   }
 
   inline std::string GetTextValueFromStatus(const DatasetStatuses status)
@@ -174,6 +193,7 @@ namespace ON2Solutions::parser {
 
   struct __attribute__((packed)) DatasetOptional {
     uint8_t reset_countdown_sec;
+    int8_t bootloader_mode = -1;
   };
 
   struct Dataset {

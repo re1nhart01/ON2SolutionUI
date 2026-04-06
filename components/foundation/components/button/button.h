@@ -117,6 +117,11 @@ namespace foundation
         lv_obj_invalidate(obj);
       }
 
+      if (props.style_override) {
+        props.style_override(style);
+        lv_obj_refresh_style(obj, LV_PART_MAIN, LV_STYLE_PROP_ANY);
+      }
+
       if (props.child != nullptr) {
           props.child->do_rebuild();
       }

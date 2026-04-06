@@ -1,10 +1,19 @@
 
+#include <constants/localization.h>
+#include <lg/dataset/store/dataset.store.h>
+
 #include "preloader_screen.h";
 
 namespace ON2Solutions {
+  using namespace parser;
   void PreloaderScreen::component_did_mount() {
     ESP_LOGI("preloader_screen", "Preloading screen");
-    this->navigate_after();
+    const int8_t bootloader_mode =
+        parser::DatasetStore::getInstance()->get()->optional.bootloader_mode;
+
+    if (bootloader_mode != parser::BootStatus::BootloaderReady) {
+      this->navigate_after();
+    }
   }
 
   void PreloaderScreen::navigate_after() const {
@@ -26,6 +35,10 @@ namespace ON2Solutions {
   lv_obj_t* PreloaderScreen::render() {
     NavigationScreen::render();
 
+    const bool is_active_bootloader_mode =
+        parser::DatasetStore::getInstance()->get()->optional.bootloader_mode ==
+        -1;
+
     return this->delegate($View(
         ViewProps::up()
             .set_style([](Styling& style) {
@@ -38,8 +51,48 @@ namespace ON2Solutions {
                            .source(assets::LogoBig)
                            .width(310)
                            .height(192)),
+
                 $Activity(ActivityIndicatorProps::up().sz(86).arc(80).set_color(
-                    PRIMARY_COLOR))))
+                    PRIMARY_COLOR)),
+                $Text(TextProps::up()
+                          .watch<Dataset>(
+                              DatasetStore::getInstance(), "bootloader_text",
+                              [this](Text* self, const Dataset& value) {
+                                if (!self)
+                                  return;
+                                const int8_t status =
+                                    value.optional.bootloader_mode;
+                                std::string status_str =
+                                    GetBootloaderStatus(status);
+                                self->set_state([status_str, status,
+                                                 this](TextProps& props) {
+                                  props.value(status_str);
+
+                                  if (status ==
+                                      BootStatus::UploadedSuccessfully) {
+                                    this->navigate_after();
+                                    DatasetStore::getInstance()->set_silent(
+                                        [](const Dataset& prev) {
+                                          Dataset next = prev;
+                                          next.optional.bootloader_mode = -1;
+                                          return next;
+                                        });
+                                  }
+
+                                  props.set_style([status](Styling& style) {
+                                    if (status != -1) {
+                                      style.setOpacity(LV_OPA_100);
+                                    } else {
+                                      style.setOpacity(LV_OPA_0);
+                                    }
+                                  });
+                                });
+                              })
+                          .value(locales::en::bootloader_status_1)
+                          .set_style([](Styling& style) {
+                            style.setOpacity(LV_OPA_0);
+                            style.setFont(&lv_font_montserrat_18);
+                          }))))
             .w(LV_PCT(100))
             .h(LV_PCT(100))
             .justify(LV_FLEX_ALIGN_CENTER)

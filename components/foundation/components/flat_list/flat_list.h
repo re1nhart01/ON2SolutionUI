@@ -35,7 +35,7 @@ namespace foundation
 
         lv_obj_set_size(list, props.width, props.height);
 
-      lv_obj_clear_flag(list, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+        lv_obj_clear_flag(list, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
         lv_obj_set_scroll_snap_y(list, LV_SCROLL_SNAP_NONE);
         lv_obj_clear_flag(list, LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM);
 
@@ -70,6 +70,11 @@ namespace foundation
 
         if (auto style = styling(); style->get_is_dirty()) {
             lv_obj_invalidate(list);
+        }
+
+        if (props.style_override) {
+            props.style_override(style);
+            lv_obj_refresh_style(list, LV_PART_MAIN, LV_STYLE_PROP_ANY);
         }
 
         for (const auto& child : props.children) {

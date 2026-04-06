@@ -110,6 +110,17 @@ namespace foundation {
       lv_obj_set_style_pad_gap(obj, gap, LV_PART_MAIN);
       lv_obj_set_style_pad_all(obj, 0, LV_PART_MAIN);
       lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN);
+
+      if (props.style_override) {
+        props.style_override(style);
+        lv_obj_refresh_style(obj, LV_PART_MAIN, LV_STYLE_PROP_ANY);
+      }
+
+      if (props.btn_style_override) {
+        props.btn_style_override(btn_style);
+        lv_obj_refresh_style(obj, LV_PART_ITEMS, LV_STYLE_PROP_ANY);
+      }
+
     }
 
     const Styling* styling() const override {

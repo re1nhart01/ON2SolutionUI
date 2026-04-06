@@ -90,6 +90,18 @@ namespace ON2Solutions {
           }});
     }
 
+    void on_event_bootloader_mode() const {
+      auto navigation_ref = this->stack_navigator;
+
+      DatasetStore::getInstance()->add_event_listener("event_bootloader_mode", [navigation_ref](const std::shared_ptr<const Dataset>& dataset) {
+          const uint8_t current_state = dataset.get()->optional.bootloader_mode;
+
+          if (current_state == BootStatus::BootloaderReady && navigation_ref) {
+             navigation_ref->navigate("/preloader");
+          }
+      });
+    }
+
     void on_init() override {
       auto navigator = this->stack_navigator;
 
@@ -157,6 +169,7 @@ namespace ON2Solutions {
       this->uart_handler->init();
       this->uart_handler->enable_rx(true);
       this->add_uart_data_event();
+      this->on_event_bootloader_mode();
     }
 
     void after_load_application() override {

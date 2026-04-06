@@ -49,6 +49,16 @@ namespace foundation {
       return obj;
     };
 
+    void do_rebuild() override {
+      lv_obj_t* obj = this->get_component();
+      if (!obj) return;
+      
+      if (props.style_override) {
+        props.style_override(style);
+        lv_obj_refresh_style(obj, LV_PART_MAIN, LV_STYLE_PROP_ANY);
+      }
+    };
+
     const Styling* styling() const override {
       apply_base_style(style);
 

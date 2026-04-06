@@ -87,6 +87,12 @@ namespace ON2Solutions {
     inline constexpr const char* oxygen_flow_setting = "Flow sensors offset";
 
 
+    inline constexpr const char* bootloader_status_1 = "Bootloader is ready";
+    inline constexpr const char* bootloader_status_2 = "Waiting firmware upload";
+    inline constexpr const char* bootloader_status_3 = "Uploading Firmware";
+    inline constexpr const char* bootloader_status_4 = "Update successfully completed";
+
+
 
     inline constexpr const char* status = "STAND BY";
 

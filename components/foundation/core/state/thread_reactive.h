@@ -22,6 +22,7 @@ namespace foundation
       struct Binding {
         std::string key;
         uintptr_t component_id;
+        bool is_listener = false;
         Delegate<void(void*, std::shared_ptr<const T>), 64> updater;
       };
 
@@ -72,6 +73,31 @@ namespace foundation
         this->bindings.push_back(std::move(binding));
       }
 
+
+      void add_event_listener(std::string key, Delegate<void(std::shared_ptr<const T>), 64> updater) {
+        if (!_mutex) return;
+        Lock lock(_mutex);
+
+        Binding binding;
+        binding.key = std::move(key);
+        binding.component_id = reinterpret_cast<uintptr_t>(this);
+
+        binding.updater = [updater](void* _, std::shared_ptr<const T> val) {
+          if (updater) {
+            updater(std::move(val));
+          }
+        };
+      }
+
+      void remove_event_listener(const std::string& key) {
+        if (!_mutex) return;
+        Lock lock(_mutex);
+
+        auto it = std::remove_if(bindings.begin(), bindings.end(), [key](const Binding& b) {
+            return b.key == key;
+        });
+      }
+
       void detach(const void* component) override
       {
         if (!_mutex || !component) return;
@@ -95,6 +121,14 @@ namespace foundation
         // Створюємо нові дані на основі старих
         T next = fn(*value_store);
         _broadcast(std::make_shared<const T>(std::move(next)));
+      }
+
+      void set_silent(Delegate<T(const T&)> fn) {
+        if (!_mutex || !fn) return;
+        Lock lock(_mutex);
+
+        T next = fn(*value_store);
+        value_store = std::make_shared<const T>(std::move(next));;
       }
 
       void set(const T& newValue) {

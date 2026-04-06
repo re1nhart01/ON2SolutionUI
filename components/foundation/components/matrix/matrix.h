@@ -89,6 +89,11 @@ namespace foundation
       if (auto style = styling(); style->get_is_dirty()) {
         lv_obj_invalidate(obj);
       }
+
+      if (props.style_override) {
+        props.style_override(style);
+        lv_obj_refresh_style(obj, LV_PART_MAIN, LV_STYLE_PROP_ANY);
+      }
     }
 
     const Styling* styling() const override

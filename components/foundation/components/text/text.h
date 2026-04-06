@@ -64,6 +64,11 @@ namespace foundation
         lv_obj_invalidate(obj);
       }
 
+      if (props.style_override) {
+        props.style_override(style);
+        lv_obj_refresh_style(obj, LV_PART_MAIN, LV_STYLE_PROP_ANY);
+      }
+
       lv_obj_update_layout(obj);
       lv_label_set_text(obj, this->props.text.c_str());
     };

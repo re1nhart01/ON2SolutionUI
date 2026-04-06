@@ -66,7 +66,7 @@ namespace ON2Solutions {
   inline lv_color_t get_color_by_value(const float value, const int min,
                                        const int max) {
     if (max <= min)
-      return lv_palette_main(LV_PALETTE_GREY);
+      return BORDER_PRIMARY;
 
     float ratio = (value - min) / (max - min);
 
@@ -74,9 +74,9 @@ namespace ON2Solutions {
       return ERROR_COLOR;
     }
     if (ratio < 0.75f) {
-      return PRIMARY_COLOR;
+      return TERTIARY_COLOR;
     }
-    return TERTIARY_COLOR;
+    return NO_ERROR_COLOR;
   }
 
   // Вспомогательная функция для получения настроек

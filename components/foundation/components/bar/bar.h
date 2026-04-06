@@ -41,6 +41,11 @@ namespace foundation
       lv_obj_set_size(obj, this->props.width, this->props.height);
       lv_bar_set_value(obj, this->props.value, LV_ANIM_OFF);
 
+      if (props.style_override) {
+        props.style_override(style);
+        lv_obj_add_style(obj, style.getStyle(), LV_PART_MAIN);
+      }
+
       if (this->props.reversed) {
         lv_obj_set_style_base_dir(obj, LV_BASE_DIR_RTL, 0);
       } else {
@@ -60,6 +65,11 @@ namespace foundation
 
       if (auto style = styling(); style->get_is_dirty()) {
         lv_obj_invalidate(obj);
+      }
+
+      if (props.style_override) {
+        props.style_override(style);
+        lv_obj_refresh_style(obj, LV_PART_MAIN, LV_STYLE_PROP_ANY);
       }
 
       if (this->props.reversed) {

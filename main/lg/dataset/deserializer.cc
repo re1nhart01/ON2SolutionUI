@@ -32,7 +32,7 @@ namespace ON2Solutions::parser {
       return PacketType::SETTINGS;
     if (packet_string[0] == '#' && packet_string[3] == 'G')
       return PacketType::SYSTEM_INFO;
-    if (packet_string[0] == '#' && packet_string[3] == 'R')
+    if (packet_string[0] == '#' && (packet_string[3] == 'R' || packet_string[3] == 'B'))
       return PacketType::OPTIONAL;
 
     return PacketType::UNKNOWN;
@@ -91,12 +91,17 @@ namespace ON2Solutions::parser {
       }
     }
 
-    // OPTIONAL (RESET COUNTDOWN)
+    // OPTIONAL (RESET COUNTDOWN || BOOTLOADER SECTION)
     if (type == PacketType::OPTIONAL) {
       if (key_len == 2 && key[0] == 'R' && key[1] == 'S') {
         uint8_t out;
         if (parse_value(val, val_len, out)) {
           dataset->optional.reset_countdown_sec = out;
+        }
+      } else if (key_len == 2 && key[0] == 'B' && key[1] == 'L') {
+        uint8_t out;
+        if (parse_value(val, val_len, out)) {
+          dataset->optional.bootloader_mode = out;
         }
       }
     }

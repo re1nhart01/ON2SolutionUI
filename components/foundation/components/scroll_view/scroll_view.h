@@ -126,6 +126,11 @@ namespace foundation {
         lv_obj_invalidate(comp);
       }
 
+      if (props.style_override) {
+        props.style_override(style);
+        lv_obj_refresh_style(comp, LV_PART_MAIN, LV_STYLE_PROP_ANY);
+      }
+
       for (const auto& child : props.children) {
         child->do_rebuild();
       }
