@@ -33,10 +33,10 @@ namespace foundation
       struct Lock {
           SemaphoreHandle_t m;
           explicit Lock(SemaphoreHandle_t m) : m(m) {
-              if (m) xSemaphoreTake(m, portMAX_DELAY);
+              if (m) xSemaphoreTakeRecursive(m, portMAX_DELAY);
           }
           ~Lock() {
-              if (m) xSemaphoreGive(m);
+              if (m) xSemaphoreGiveRecursive(m);
           }
       };
 
@@ -44,7 +44,7 @@ namespace foundation
       ThreadReactive(const T& default_val)
         : value_store(std::make_shared<const T>(default_val))
       {
-        _mutex = xSemaphoreCreateMutex();
+        _mutex = xSemaphoreCreateRecursiveMutex();
       }
 
       virtual ~ThreadReactive() override {
@@ -87,6 +87,7 @@ namespace foundation
             updater(std::move(val));
           }
         };
+        this->bindings.push_back(std::move(binding));
       }
 
       void remove_event_listener(const std::string& key) {
@@ -96,6 +97,8 @@ namespace foundation
         auto it = std::remove_if(bindings.begin(), bindings.end(), [key](const Binding& b) {
             return b.key == key;
         });
+
+        bindings.erase(it);
       }
 
       void detach(const void* component) override
@@ -114,13 +117,34 @@ namespace foundation
         }
       }
 
+      void set(const T& newValue) {
+        if (!_mutex) return;
+        std::vector<Binding> snapshot;
+        std::shared_ptr<const T> new_val;
+
+        {
+          Lock lock(_mutex);                              // берём mutex
+          new_val = std::make_shared<const T>(newValue);
+          value_store = new_val;
+          snapshot = bindings;                            // копируем под mutex
+        }                                                   // mutex отпускается здесь
+
+        _notify(snapshot, new_val);                         // колбеки БЕЗ mutex
+      }
+
       void set(Delegate<T(const T&)> fn) {
         if (!_mutex || !fn) return;
-        Lock lock(_mutex);
+        std::vector<Binding> snapshot;
+        std::shared_ptr<const T> new_val;
 
-        // Створюємо нові дані на основі старих
-        T next = fn(*value_store);
-        _broadcast(std::make_shared<const T>(std::move(next)));
+        {
+          Lock lock(_mutex);
+          new_val = std::make_shared<const T>(fn(*value_store));
+          value_store = new_val;
+          snapshot = bindings;
+        }                                                   // mutex отпускается здесь
+
+        _notify(snapshot, new_val);                         // колбеки БЕЗ mutex
       }
 
       void set_silent(Delegate<T(const T&)> fn) {
@@ -131,11 +155,6 @@ namespace foundation
         value_store = std::make_shared<const T>(std::move(next));;
       }
 
-      void set(const T& newValue) {
-        if (!_mutex) return;
-        Lock lock(_mutex);
-        _broadcast(std::make_shared<const T>(newValue));
-      }
 
       std::shared_ptr<const T> get() {
         if (!_mutex) return nullptr;
@@ -144,15 +163,10 @@ namespace foundation
       }
 
     private:
-      void _broadcast(std::shared_ptr<const T> new_val) {
-        value_store = new_val;
-
-        auto snapshot = bindings;
-
+      void _notify(const std::vector<Binding>& snapshot,
+                 std::shared_ptr<const T> val) {
         for (auto& b : snapshot) {
-          if (b.updater) {
-            b.updater(nullptr, value_store);
-          }
+          if (b.updater) b.updater(nullptr, val);
         }
       }
     };

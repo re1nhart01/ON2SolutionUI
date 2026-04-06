@@ -21,7 +21,6 @@ namespace ON2Solutions {
   class WaveApplication final : public foundation::Application {
     std::shared_ptr<foundation::StackNavigator> stack_navigator;
     std::shared_ptr<UartHandler> uart_handler;
-    TaskHandle_t xHandle = nullptr;
 
    public:
     explicit WaveApplication(lv_obj_t* screen) : Application(screen) {
@@ -31,39 +30,6 @@ namespace ON2Solutions {
 
       this->uart_handler = std::make_unique<UartHandler>(
           UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
-      // start_random_updater();
-      ESP_LOGI("main_screen", "on_FOCUS");
-
-      // this->uart_handler->stop();
-      // if (xHandle != nullptr) {
-      // vTaskDelete(xHandle);
-      // xHandle = nullptr;
-      // }
-    }
-
-    void start_random_updater() {
-      xTaskCreate(
-          [](void* pvParameters) {
-            auto* const self = static_cast<MainScreen*>(pvParameters);
-            while (true) {
-              if (self) {
-                current_packet = CH_PACKETS[esp_random() % 15];
-                const char* p = current_packet;
-
-                if (lvgl_port_lock(-1)) {
-                  DatasetStore::getInstance()->set([&](const Dataset& current) {
-                    Dataset next = current;
-                    parse(&next, p, strlen(p));
-                    return next;
-                  });
-
-                  lvgl_port_unlock();
-                }
-              }
-              vTaskDelay(pdMS_TO_TICKS(1500));
-            }
-          },
-          "rand_task", 16384, this, 5, &xHandle);
     }
 
     void add_uart_data_event() const {
@@ -81,7 +47,7 @@ namespace ON2Solutions {
                 strlen(uart_data.response.packet) > 0) {
               const char* p = uart_data.response.packet;
 
-              DatasetStore::getInstance()->set([&](const Dataset& current) {
+              DatasetStore::getInstance()->set([p](const Dataset& current) {
                 Dataset next = current;
                 parse(&next, p, strlen(p));
                 return next;
@@ -93,13 +59,33 @@ namespace ON2Solutions {
     void on_event_bootloader_mode() const {
       auto navigation_ref = this->stack_navigator;
 
-      DatasetStore::getInstance()->add_event_listener("event_bootloader_mode", [navigation_ref](const std::shared_ptr<const Dataset>& dataset) {
-          const uint8_t current_state = dataset.get()->optional.bootloader_mode;
+      DatasetStore::getInstance()->add_event_listener(
+          "event_bootloader_mode",
+          [navigation_ref](const std::shared_ptr<const Dataset>& dataset) {
+            if (dataset->optional.bootloader_mode !=
+                BootStatus::BootloaderReady)
+              return;
+            if (!navigation_ref)
+              return;
 
-          if (current_state == BootStatus::BootloaderReady && navigation_ref) {
-             navigation_ref->navigate("/preloader");
-          }
-      });
+            auto* nav =
+                new std::shared_ptr<foundation::StackNavigator>(navigation_ref);
+
+            if (lvgl_port_lock(-1)) {
+              lv_async_call(
+                  [](void* user_data) {
+                    auto* nav = static_cast<
+                        std::shared_ptr<foundation::StackNavigator>*>(
+                        user_data);
+                    (*nav)->navigate("/preloader");
+                    delete nav;
+                  },
+                  nav);
+              lvgl_port_unlock();
+            } else {
+              delete nav;
+            }
+          });
     }
 
     void on_init() override {
@@ -158,15 +144,30 @@ namespace ON2Solutions {
 
     void before_load_application() override {
       ESP_LOGI("MyApp", "before_load_application called");
-      // Setting pull-up hardware uart to erase gibberish into uart from start of main controller
-      gpio_set_direction(GPIO_NUM_43, GPIO_MODE_OUTPUT);
-      gpio_set_level(GPIO_NUM_43, 1);  // idle state UART
+      uart_driver_delete(UART_NUM_2);
+      // 1. Сначала настраиваем как выход
+      gpio_config_t io_conf = {};
+      io_conf.intr_type = GPIO_INTR_DISABLE;
+      io_conf.mode = GPIO_MODE_OUTPUT;
+      io_conf.pin_bit_mask = (1ULL << GPIO_NUM_43);
+      io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+      io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+      gpio_config(&io_conf);
+
+      gpio_set_level(GPIO_NUM_43, 0);
+      vTaskDelay(pdMS_TO_TICKS(50));
+
+      gpio_set_level(GPIO_NUM_43, 1);
       gpio_set_pull_mode(GPIO_NUM_43, GPIO_PULLUP_ONLY);
+      vTaskDelay(pdMS_TO_TICKS(50));
 
       gpio_set_direction(GPIO_NUM_44, GPIO_MODE_INPUT);
       gpio_set_pull_mode(GPIO_NUM_44, GPIO_PULLUP_ONLY);
 
       this->uart_handler->init();
+
+      uart_flush_input(UART_NUM_2);
+
       this->uart_handler->enable_rx(true);
       this->add_uart_data_event();
       this->on_event_bootloader_mode();
