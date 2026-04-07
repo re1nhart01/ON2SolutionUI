@@ -1,5 +1,5 @@
 #pragma once
-#include "components/props.h";
+#include "components/props.h"
 
 namespace foundation
 {

@@ -1,5 +1,5 @@
 
-#include "info_screen.h";
+#include "info_screen.h"
 
 #include <constants/localization.h>
 

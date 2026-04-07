@@ -1,4 +1,4 @@
-#include "charts_screen.h";
+#include "charts_screen.h"
 
 #include <ui/components/common_header/common_header.h>
 #include <ui/components/side_bar/side_bar.h>
@@ -27,7 +27,7 @@ namespace ON2Solutions {
                                    const char* title, uint8_t index,
                                    bool is_small = false) const {
     return $View(ViewProps::up()
-                     .w(160)
+                     .w(170)
                      .h(LV_PCT(100))
                      .direction(LV_FLEX_FLOW_COLUMN)
                      .flow(FlexPreset::SpaceCenter)
@@ -130,7 +130,7 @@ namespace ON2Solutions {
                                                 Fl, locales::en::oxygen_rate,
                                                 circular_index, true),
                                             this->render_card(
-                                                Ps, locales::en::tank_psi,
+                                                Ps, locales::en::tank_pressure,
                                                 circular_index, true))),
                                         this->render_circular_wrapper(
                                             children(
@@ -159,16 +159,31 @@ namespace ON2Solutions {
   }
 
   $$View ChartsScreen::render_footer() const {
+
+    const auto dataset = DatasetStore::getInstance()->get();
+
+    const auto current_status =
+       dataset->operative_data.status;
+    uint8_t count = dataset->optional.reset_countdown_sec;
+
+    const std::string status_str =
+        GetTextValueFromStatus(GetStatusFromTextValue(current_status.data()));
+
+    const auto current_opacity =
+    GetStatusFromTextValue(current_status.data()) == DatasetStatuses::Alarm
+        ? LV_OPA_100
+        : LV_OPA_0;
+
     return $View(
         ViewProps::up()
             .set_children(children(
-                $TimerView(this->alarm_control),
+                $TimerView(this->alarm_control, fmt_str("%d", count), current_opacity),
                 $Button(
                     ButtonProps::up()
-                        .set_style([](Styling& style) {
+                        .set_style([current_status](Styling& style) {
                           style.setFont(&lv_font_montserrat_16);
-                          style.setBackgroundColor(button_color_by_status(
-                              parser::DatasetStatuses::StandBy));
+                          style.setBackgroundColor(button_color_by_status(GetStatusFromTextValue(
+                              current_status.data())));
                           style.setBorderRadius(12);
                           style.setSize(300, 44);
                           style.setBorder(lv_color_hex(0x5B5AFF), 0, 0);
@@ -178,7 +193,8 @@ namespace ON2Solutions {
                         .watch<Dataset>(
                             DatasetStore::getInstance(), "main_button_body",
                             [](Button* self, const Dataset& value) {
-                              if (!self) return;
+                              if (!self)
+                                return;
                               auto color =
                                   button_color_by_status(GetStatusFromTextValue(
                                       value.operative_data.status.data()));
@@ -193,7 +209,8 @@ namespace ON2Solutions {
                                 .watch<Dataset>(
                                     DatasetStore::getInstance(), "main_button",
                                     [](Text* self, const Dataset& value) {
-                                      if (!self) return;
+                                      if (!self)
+                                        return;
                                       std::string status_str =
                                           GetTextValueFromStatus(
                                               GetStatusFromTextValue(
@@ -205,7 +222,7 @@ namespace ON2Solutions {
                                           });
                                     })
                                 .set_style(HeaderLabelApply)
-                                .value(locales::en::status)))
+                                .value(status_str)))
                         .click([this](lv_event_t* e) {
                           this->execute_status_trigger();
                         })),

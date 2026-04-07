@@ -13,7 +13,7 @@ namespace ON2Solutions {
     info_modal = $Modal(ModalProps::up().set_content(
         $View(ViewProps::up()
                   .set_style([](Styling& style) {
-                    style.setBackgroundColor(ERROR_COLOR_2);
+                    style.setBackgroundColor(ERROR_COLOR_3);
                     style.setBorder(ERROR_COLOR, 1, LV_OPA_100);
                   })
                   .set_children(children(
@@ -39,23 +39,7 @@ namespace ON2Solutions {
     return $Button(
         ButtonProps::up()
             .click([this](lv_event_t*) {
-              struct AsyncArg {
-                std::string path;
-              };
-
-              auto delegate = new Delegate<void()>(
-                  [this]() { this->navigation_ref->navigate("/main", false); });
-
-              lv_async_call(
-                  [](void* arg) {
-                    auto* callback = static_cast<Delegate<void()>*>(arg);
-
-                    if (callback) {
-                      (*callback)();
-                      delete callback;
-                    }
-                  },
-                  delegate);
+              this->navigation_ref->navigate("/main", false);
             })
             .set_style([](Styling& style) {
               style.set_clear_default();

@@ -1,4 +1,4 @@
-#include "settings_screen.h";
+#include "settings_screen.h"
 
 #include <lg/dataset/store/dataset.store.h>
 #include <lg/helpers/utils.h>
@@ -40,8 +40,6 @@ namespace ON2Solutions {
     };
     std::string serialized = parser::serialize(command);
 
-    ESP_LOGI("SettingsScreen", "Updating settings: %s", serialized.c_str());
-
     auto status = this->props.uart->send(serialized);
   }
 
@@ -52,8 +50,6 @@ namespace ON2Solutions {
         .data = option,
     };
     std::string serialized = parser::serialize(command);
-
-    ESP_LOGI("SettingsScreen", "Updating settings: %s", serialized.c_str());
 
     auto status = this->props.uart->send(serialized);
   }

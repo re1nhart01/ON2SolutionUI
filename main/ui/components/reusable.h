@@ -12,9 +12,6 @@ using namespace foundation;
 namespace ON2Solutions {
 
   inline $$Button $HighButton(const char* source, auto on_press) {
-
-
-
     return $Button(ButtonProps::up()
                        .click(on_press)
                        .set_style([](Styling& style) {
@@ -44,7 +41,9 @@ namespace ON2Solutions {
   }
 
   inline $$Animated $TimerView(
-      const std::shared_ptr<AnimatedControl>& alarm_control) {
+      const std::shared_ptr<AnimatedControl>& alarm_control,
+      const std::string start_time = "0",
+      const uint8_t start_opacity = LV_OPA_0) {
     return $Animated(
         AnimatedProps::up()
             .from(0)
@@ -62,17 +61,17 @@ namespace ON2Solutions {
                 ViewProps::up()
                     .w(166)
                     .h(44)
-                    .set_style([](Styling& style) {
+                    .set_style([start_opacity](Styling& style) {
                       style.setPadding(10, 10, 16, 16);
                       style.setBorderRadius(14);
                       style.setBackgroundColor(PRIMARY_COLOR_3);
                       style.setBorder(BORDER_PRIMARY, 1, LV_OPA_100);
-                      style.setOpacity(LV_OPA_0);
-                      style.setTextOpacity(LV_OPA_0);
+                      style.setOpacity(start_opacity);
+                      style.setTextOpacity(start_opacity);
                     })
                     .flow(FlexPreset::RowCenter)
                     .set_children(children(
-                        $Text(TextProps::up().value(locales::en::timer)),
+                        $Text(TextProps::up().value(locales::en::restart)),
                         $Text(
                             TextProps::up()
                                 .watch<parser::Dataset>(
@@ -102,7 +101,9 @@ namespace ON2Solutions {
                                             "alarm_anim");
                                       }
                                     })
-                                .value("0")))))));
+                                .value(start_time)),
+                        $Text(TextProps::up().value(locales::en::sec))
+                    )))));
   }
 
   inline $$View $FooterFragment() {

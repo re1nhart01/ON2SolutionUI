@@ -35,7 +35,7 @@ extern "C" {
 }
 
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file, uint32_t * pos_p) {
-  *pos_p = ftell((FILE *)file);
+  *pos_p = ftell(static_cast<FILE*>(file));
   return LV_FS_RES_OK;
 }
 
@@ -47,7 +47,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file, uint32_t pos, lv_fs_w
     case LV_FS_SEEK_END: w = SEEK_END; break;
     default: return LV_FS_RES_INV_PARAM;
   }
-  fseek((FILE *)file, pos, w);
+  fseek(static_cast<FILE*>(file), pos, w);
   return LV_FS_RES_OK;
 }
 
@@ -63,16 +63,14 @@ static void* fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode) {
   FILE* f = fopen(full_path, fs_mode);
 
   if (f == NULL) {
-      ESP_LOGE("LV_FS", "Не удалось открыть файл: %s", full_path);
   } else {
-      ESP_LOGI("LV_FS", "Файл открыт: %s", full_path);
   }
 
-  return (void*)f;
+  return f;
 }
 
 static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file) {
-  fclose((FILE*)file);
+  fclose(static_cast<FILE*>(file));
   return LV_FS_RES_OK;
 }
 

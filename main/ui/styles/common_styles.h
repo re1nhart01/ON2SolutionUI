@@ -60,7 +60,7 @@ namespace ON2Solutions {
     switch (status) {
       case parser::DatasetStatuses::StandBy:
         return PRIMARY_COLOR_2;
-
+ 
       case parser::DatasetStatuses::BoosterDelay:
         return PRIMARY_COLOR_2;
 
@@ -71,7 +71,7 @@ namespace ON2Solutions {
         return PRIMARY_COLOR_2;
 
       case parser::DatasetStatuses::Producing:
-        return PRIMARY_COLOR_2;
+        return TERTIARY_COLOR;
 
       case parser::DatasetStatuses::Alarm:
         return STATUS_ALARM;

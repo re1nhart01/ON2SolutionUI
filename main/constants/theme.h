@@ -11,6 +11,7 @@ namespace ON2Solutions {
   const lv_color_t PRIMARY_COLOR_3 = lv_color_hex(0xDDEFEF);
   const lv_color_t ERROR_COLOR = lv_color_hex(0xE61F23);
   const lv_color_t ERROR_COLOR_2 = lv_color_hex(0xE61F230A);
+  const lv_color_t ERROR_COLOR_3 = lv_color_hex(0xFF7578);
   const lv_color_t TERTIARY_COLOR = lv_color_hex(0x2368DE);
 
 

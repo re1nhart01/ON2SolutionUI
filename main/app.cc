@@ -40,8 +40,8 @@ namespace ON2Solutions {
             if (strlen(uart_data.response.packet) <= 0)
               return;
 
-            ESP_LOGI("main_screen", "Received data from UART %s",
-                     uart_data.response.packet);
+            // ESP_LOGI("main_screen", "Received data from UART %s",
+            //          uart_data.response.packet);
 
             if (uart_data.response.packet &&
                 strlen(uart_data.response.packet) > 0) {

@@ -103,11 +103,9 @@ namespace foundation
 
 
       if (const auto style = this->styling(); style != nullptr) {
-        ESP_LOGI("button", "Style changed %d", style->width);
         if (style->width > 0) {
           lv_obj_set_width(obj, style->width);
         }
-        ESP_LOGI("button", "Style changed h %d", style->height);
         if (style->height > 0) {
           lv_obj_set_height(obj, style->height);
         }
@@ -132,7 +130,6 @@ namespace foundation
       apply_base_style(style);
 
       if (props.style_override) {
-        ESP_LOGI("styling", "styling called");
           props.style_override(style);
       }
 
