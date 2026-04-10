@@ -62,8 +62,8 @@ namespace ON2Solutions {
               })
               .set_style([is_active](Styling& style) {
                 style.set_clear_default();
-                style.setWidth(32);
-                style.setHeight(32);
+                style.setWidth(42);
+                style.setHeight(42);
                 style.setPadding(0);
                 style.setBorderRadius(8);
                 style.setBackgroundOpacity(LV_OPA_100);
@@ -92,7 +92,7 @@ namespace ON2Solutions {
                       style.setGap(4, 0);
                       style.setBorder(BORDER_SECONDARY, 1, LV_OPA_100);
                       style.setBorderRadius(0);
-                      style.setPadding(12, 12, 12, 12);
+                      style.setPadding(12, 12, 2, 2);
                     })
                     .set_children(children(
                         this->render_nav_button("/main", assets::Pie),

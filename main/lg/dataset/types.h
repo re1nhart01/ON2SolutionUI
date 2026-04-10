@@ -46,7 +46,7 @@ namespace ON2Solutions::parser {
 
   static const std::string unknown = "UN";
 
-  static const std::vector<const char*> PRESSURE_TYPE_OPTIONS{ "A", "B", "C" };
+  static const std::vector<const char*> PRESSURE_TYPE_OPTIONS{ "A", "B", "C", "D", "E", "F"  };
 
   enum class DatasetStatuses {
     StandBy,

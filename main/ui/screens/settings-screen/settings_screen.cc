@@ -15,18 +15,6 @@ namespace ON2Solutions {
     NavigationScreen::on_blur();
   };
 
-  int find_index(const std::vector<const char*>& options,
-                 const std::string& value) {
-    auto it = std::find_if(
-        options.begin(), options.end(),
-        [&value](const char* opt) { return std::string(opt) == value; });
-
-    if (it != options.end()) {
-      return std::distance(options.begin(), it);
-    }
-    return 0;
-  }
-
   template <typename T>
   void SettingsScreen::update_param(const ParamSpec& spec, T value, T min,
                                     T max) const {
@@ -50,6 +38,8 @@ namespace ON2Solutions {
         .data = option,
     };
     std::string serialized = parser::serialize(command);
+
+    ESP_LOGI("serialized", serialized.c_str());
 
     auto status = this->props.uart->send(serialized);
   }
@@ -305,34 +295,30 @@ namespace ON2Solutions {
                                 locales::en::pressure_sensor_type)),
                             $Dropdown(
                                 DropdownProps::up()
+                                   .watch<parser::Dataset>(DatasetStore::getInstance(), "dropdown_pressure", [](Dropdown* self, const Dataset& value) {
+                                     self->set_state([value](DropdownProps& props) {
+                                       props.set_selected(find_index(
+                                        parser::PRESSURE_TYPE_OPTIONS,
+                                        value.settings.tank_pressure_sensor_type.data()));
+                                     });
+                                   })
                                     .set_selected(find_index(
                                         parser::PRESSURE_TYPE_OPTIONS,
-                                        std::string(
-                                            std::begin(
-                                                dataset
-                                                    .tank_pressure_sensor_type),
-                                            std::end(
-                                                dataset
-                                                    .tank_pressure_sensor_type))))
+                                        dataset.tank_pressure_sensor_type.data()))
                                     .set_options(parser::PRESSURE_TYPE_OPTIONS)
                                     .change([this](const std::string& option) {
-                                      this->debounce->exec([this, option]() {
-                                        this->update_param(
-                                            PressureTypeSensorSpec,
-                                            option.c_str());
-                                      });
+                                      this->update_param(PressureTypeSensorSpec,
+                                                         option.c_str());
                                     }))))),
                 $Button(ButtonProps::up()
-                          .set_style([](Styling& style) {
-                            style.setBackgroundColor(PRIMARY_COLOR_2);
-                            style.setHeight(44);
-                            style.setWidth(170);
-                            style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
-                            style.setShadow(PRIMARY_BG, 0,0);
-
-                          })
-                            .set_child($Text(TextProps::up()
-                            .value(
+                            .set_style([](Styling& style) {
+                              style.setBackgroundColor(PRIMARY_COLOR_2);
+                              style.setHeight(44);
+                              style.setWidth(170);
+                              style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                              style.setShadow(PRIMARY_BG, 0, 0);
+                            })
+                            .set_child($Text(TextProps::up().value(
                                 locales::en::hour_run_reset)))
                             .click([this](lv_event_t* e) {
                               this->hour_run_reset();

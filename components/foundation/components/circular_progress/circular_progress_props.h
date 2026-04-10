@@ -11,7 +11,8 @@ namespace foundation
     Delegate<void(Styling&)> arc_style_override{};
     short min_dy = 0;
     short max_dy = 100;
-    short default_dy = 0;
+    double current_value = 0;
+    short precision = 0;
 
     short width = 10;
     short height = 10;
@@ -38,18 +39,13 @@ namespace foundation
       return std::move(*this);
     }
 
-    CircularProgressProps&& value(const short v) {
-      default_dy = v;
+    CircularProgressProps&& value(const double v) {
+      current_value = v;
       return std::move(*this);
     }
 
-    CircularProgressProps&& value(const float v) {
-      default_dy = v;
-      return std::move(*this);
-    }
-
-    CircularProgressProps&& value(const int v) {
-      default_dy = v;
+    CircularProgressProps&& decimals(int p) {
+      precision = p;
       return std::move(*this);
     }
 

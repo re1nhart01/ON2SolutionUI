@@ -21,10 +21,6 @@ namespace ON2Solutions {
   };
 
   static const SystemField system_fields[] = {
-      {"Moto Hours",
-       [](const Dataset& s) {
-         return std::string(s.operative_data.moto_hours.data());
-       }},
       {"Device Name",
        [](const Dataset& s) {
          return std::string(s.system_info.device_name.data());
@@ -57,6 +53,10 @@ namespace ON2Solutions {
        [](const Dataset& s) {
          return std::string(s.system_info.lan_ip_address.data());
        }},
+      {"WIFI IP",
+       [](const Dataset& s) {
+         return std::string(s.system_info.wifi_ip_address.data());
+       }},
       {"LCD FIRMWARE", [](const Dataset& s) { return LCD_FIRMWARE_VERSION; }},
       {"LCD BOOTLOADER", [](const Dataset& s) { return LCD_LOADER_VERSION; }},
   };
@@ -83,20 +83,20 @@ namespace ON2Solutions {
             })
             .set_children(children(
                 $Text(TextProps::up().value(field_info.label)),
-                $Text(TextProps::up()
-                          .value(initial_value)
-                          .watch<parser::Dataset>(
-                              parser::DatasetStore::getInstance(),
-                              "system_info",
-                              [field_info](VNode* self,
-                                           const parser::Dataset& value) {
-                                if (!self || !self->get_component())
-                                  return;
+                $Text(
+                    TextProps::up()
+                        .value(initial_value)
+                        .watch<parser::Dataset>(
+                            parser::DatasetStore::getInstance(), "system_info",
+                            [field_info](VNode* self,
+                                         const parser::Dataset& value) {
+                              if (!self || !self->get_component())
+                                return;
 
-                                const std::string val = field_info.getter(value);
-                                lv_label_set_text(self->get_component(),
-                                                  val.c_str());
-                              })))));
+                              const std::string val = field_info.getter(value);
+                              lv_label_set_text(self->get_component(),
+                                                val.c_str());
+                            })))));
   }
 
   $$View InfoScreen::render_body() {

@@ -36,9 +36,11 @@ namespace ON2Solutions {
     lv_obj_t* render() override {
       Component::render();
 
-      const auto operative_data = DatasetStore::getInstance()->get()->operative_data;
+      const auto operative_data =
+          DatasetStore::getInstance()->get()->operative_data;
       const auto current_output_hex = operative_data.outputs;
       const auto current_input_hex = operative_data.outputs;
+      const auto hour_run_initial = operative_data.moto_hours.data();
 
       return this->delegate($View(
           ViewProps::up()
@@ -50,11 +52,52 @@ namespace ON2Solutions {
               .direction(LV_FLEX_FLOW_ROW)
               .set_style(CommonHeaderWrapperApply)
               .set_children(children(
-                  $Image(ImageProps::up()
-                             .source(assets::LogoSmall)
-                             .width(54)
-                             .height(32)),
+                  $View(
+                      ViewProps::up()
+                          .w(320)
+                          .h(LV_PCT(100))
+                          .direction(LV_FLEX_FLOW_ROW)
+                          .items(LV_FLEX_ALIGN_CENTER)
+                          .justify(LV_FLEX_ALIGN_START)
+                          .track_cross(LV_FLEX_ALIGN_START)
+                          .set_style([](Styling& style) {
+                            style.setBackgroundColor(PRIMARY_BG);
+                            style.setBorder(lv_color_make(0, 0, 0), 0,
+                                            LV_OPA_TRANSP);
+                            style.setBorderRadius(0);
+                            style.setPadding(0, 0, 0, 0);
+                            style.setGap(16, 16);
+                          })
+                          .set_children(children(
+                              $Image(ImageProps::up()
+                                         .source(assets::LogoSmall)
+                                         .width(54)
+                                         .height(32)),
+                              $Text(TextProps::up()
+                                        .watch<parser::Dataset>(
+                                            DatasetStore::getInstance(),
+                                            "alarm_text",
+                                            [](Text* self,
+                                               const parser::Dataset& value) {
+                                              if (!self)
+                                                return;
 
+                                              auto current_hour_run =
+                                                  value.operative_data
+                                                      .moto_hours.data();
+
+                                              self->set_state(
+                                                  [current_hour_run](
+                                                      TextProps& props) {
+                                                    props.value(fmt_str(
+                                                        "%s %s",
+                                                        locales::en::moto_hour,
+                                                        current_hour_run));
+                                                  });
+                                            })
+                                        .value(fmt_str("%s %s",
+                                                       locales::en::moto_hour,
+                                                       hour_run_initial)))))),
                   $View(
                       ViewProps::up()
                           .w(320)
@@ -83,14 +126,16 @@ namespace ON2Solutions {
                                                   .set_dot_amount(4)
                                                   .w(50)
                                                   .h(10)
-                                                  .set_value_hex(current_input_hex)
+                                                  .set_value_hex(
+                                                      current_input_hex)
                                                   .watch<Dataset>(
                                                       DatasetStore::
                                                           getInstance(),
                                                       "inputs",
                                                       [](DotIndicator* self,
                                                          const Dataset& value) {
-                                                        if (!self) return;
+                                                        if (!self)
+                                                          return;
                                                         self->set_state(
                                                             [v = value
                                                                      .operative_data
@@ -120,14 +165,16 @@ namespace ON2Solutions {
                                                   .set_dot_amount(16)
                                                   .w(100)
                                                   .h(20)
-                                                  .set_value_hex(current_output_hex)
+                                                  .set_value_hex(
+                                                      current_output_hex)
                                                   .watch<Dataset>(
                                                       DatasetStore::
                                                           getInstance(),
                                                       "outputs",
                                                       [](DotIndicator* self,
                                                          const Dataset& value) {
-                                                        if (!self) return;
+                                                        if (!self)
+                                                          return;
                                                         self->set_state(
                                                             [v = value
                                                                      .operative_data

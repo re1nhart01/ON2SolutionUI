@@ -31,7 +31,7 @@ namespace ON2Solutions {
       case Tn:
         return "C";
       case Fl:
-        return "l/m";
+        return "lpm";
       default:
         return "%";
     }
@@ -61,6 +61,7 @@ namespace ON2Solutions {
     short max;
     using DataPtr = const float(parser::Dataset::*);
     Delegate<float(const parser::Dataset&, uint8_t)> getValue;
+    short precision = 0;
   };
 
   inline lv_color_t get_color_by_value(const float value, const int min,
@@ -86,7 +87,7 @@ namespace ON2Solutions {
       case O2:
         return {" %", 0, 100, [](const D& v, uint8_t i) {
                   return v.operative_data.oxygen_levels[i];
-                }};
+                }, 1};
       case Ps:
         return {" psi", 0, 150, [](const D& v, uint8_t i) {
                   return v.operative_data.primary_tank_pressure[i];
@@ -98,13 +99,13 @@ namespace ON2Solutions {
       case Tn:
         return {" c", 0, 100, [](const D& v, uint8_t i) {
                   return v.operative_data.tank_temperatures[i];
-                }};
+                }, 1};
       case Fl:
-        return {" l/m", 0, 20, [](const D& v, uint8_t i) {
+        return {" lpm", 0, 20, [](const D& v, uint8_t i) {
                   return v.operative_data.oxygen_speed[i];
                 }};
       default:
-        return {" %", 0, 100, [](const D& v, uint8_t i) { return 0; }};
+        return {"", 0, 100, [](const D& v, uint8_t i) { return 0; }};
     }
   }
 
@@ -137,6 +138,7 @@ namespace ON2Solutions {
             .show_label(true)
             .min(config.min)
             .max(config.max)
+            .decimals(config.precision)
             .value(value)
             .set_arc_style([value, config](Styling& style) {
               style.setArcColor(

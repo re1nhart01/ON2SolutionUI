@@ -82,12 +82,20 @@ public:
                 if (save_to_history) {
                         history.push_back(StackHistoryRoute{.id = history_counter++, .name = current->name, .params = param});
                 }
+
         }
 
         lv_obj_t* active_parent = parent ? parent : lv_scr_act();
         lv_obj_clean(active_parent);
 
         auto screen_instance = it->second(param);
+
+        if (current.has_value() && current->instance) {
+            auto* old_obj = current->instance->get_component();
+            if (old_obj && lv_obj_is_valid(old_obj)) {
+                lv_obj_del_async(old_obj);
+            }
+        }
 
         current.reset();
 

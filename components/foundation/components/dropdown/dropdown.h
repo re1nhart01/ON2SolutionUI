@@ -57,6 +57,8 @@ namespace foundation {
         props.style_override(style);
         lv_obj_refresh_style(obj, LV_PART_MAIN, LV_STYLE_PROP_ANY);
       }
+
+      lv_dropdown_set_selected(obj, props.selected);
     };
 
     const Styling* styling() const override {

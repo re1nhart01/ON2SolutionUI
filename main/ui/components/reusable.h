@@ -17,7 +17,7 @@ namespace ON2Solutions {
                        .set_style([](Styling& style) {
                          style.setBackgroundColor(PRIMARY_COLOR_3);
                          style.setWidth(44);
-                         style.setHeight(220);
+                         style.setHeight(260);
                          style.setPadding(0);
                        })
                        .set_child($Image(
@@ -72,38 +72,35 @@ namespace ON2Solutions {
                     .flow(FlexPreset::RowCenter)
                     .set_children(children(
                         $Text(TextProps::up().value(locales::en::restart)),
-                        $Text(
-                            TextProps::up()
-                                .watch<parser::Dataset>(
-                                    parser::DatasetStore::getInstance(),
-                                    "alarm_text",
-                                    [alarm_control](
-                                        Text* self,
-                                        const parser::Dataset& value) {
-                                      if (!self) return;
-                                      bool is_alarm_now =
-                                          (value.operative_data.status[0] ==
-                                           'F');
+                        $Text(TextProps::up()
+                                  .watch<parser::Dataset>(
+                                      parser::DatasetStore::getInstance(),
+                                      "alarm_text",
+                                      [alarm_control](
+                                          Text* self,
+                                          const parser::Dataset& value) {
+                                        if (!self)
+                                          return;
+                                        bool is_alarm_now =
+                                            (value.operative_data.status[0] ==
+                                             'F');
 
-                                      uint8_t count =
-                                          value.optional.reset_countdown_sec;
+                                        uint8_t count =
+                                            value.optional.reset_countdown_sec;
 
-                                      self->set_state(
-                                          [count](TextProps& props) {
-                                            props.value(fmt_str("%d", count));
-                                          });
+                                        self->set_state(
+                                            [count](TextProps& props) {
+                                              props.value(fmt_str("%d", count));
+                                            });
 
-                                      if (is_alarm_now) {
-                                        alarm_control->play(
-                                            "alarm_anim");
-                                      } else {
-                                        alarm_control->stop(
-                                            "alarm_anim");
-                                      }
-                                    })
-                                .value(start_time)),
-                        $Text(TextProps::up().value(locales::en::sec))
-                    )))));
+                                        if (is_alarm_now) {
+                                          alarm_control->play("alarm_anim");
+                                        } else {
+                                          alarm_control->stop("alarm_anim");
+                                        }
+                                      })
+                                  .value(start_time)),
+                        $Text(TextProps::up().value(locales::en::sec)))))));
   }
 
   inline $$View $FooterFragment() {
