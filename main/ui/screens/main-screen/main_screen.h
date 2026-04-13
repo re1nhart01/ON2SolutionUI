@@ -4,7 +4,6 @@
 #include <lg/dataset/store/dataset.store.h>
 #include <protocols/uart/uart_proto.h>
 #include <ui/components/dot_indicator/dot_indicator.h>
-#include <ui/components/info_modal/info_modal.h>
 #include <ui/styles/common_styles.h>
 #include "../../components/foundation/core/shortcuts.h"
 #include "../../components/foundation/core/state/state.h"
@@ -25,7 +24,6 @@ namespace ON2Solutions {
   };
 
   class MainScreen final : public NavigationScreen<MainScreenProps> {
-    $$InfoModal info_modal = nullptr;
     $$ErrorModal error_modal = nullptr;
     std::shared_ptr<AnimatedControl> alarm_control = nullptr;
    public:

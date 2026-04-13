@@ -76,4 +76,7 @@
 #include "core/style_store/style_store.h"
 #include "components/props.h"
 #include "core/structures/delegate.h"
+#include "core/structures/ui_queue.h"
+#include "core/structures/ui_queue_c.h"
+#include "components/registry.h"
 

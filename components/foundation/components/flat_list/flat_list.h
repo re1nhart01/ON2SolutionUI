@@ -2,6 +2,10 @@
 #include "components/component.h"
 #include "flat_list_props.h"
 
+
+#define FD_FLAT_LIST_ENABLED false
+
+
 namespace foundation
 {
   class FlatList final : public Component<FlatListProps>
@@ -27,9 +31,12 @@ namespace foundation
 
     lv_obj_t* render() override
     {
+#if FD_FLAT_LIST_ENABLED
+
         if (get_component() == nullptr || this->parent == nullptr) {
             this->set_component(lv_list_create(this->parent));
         }
+#endif
 
         lv_obj_t* list = get_component();
 

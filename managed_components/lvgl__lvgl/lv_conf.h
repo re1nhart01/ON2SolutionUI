@@ -38,7 +38,7 @@
    HAL SETTINGS
  *====================*/
 #define LV_DISP_DEF_REFR_PERIOD 16      /* 60 FPS (1000/60) */
-#define LV_INDEV_DEF_READ_PERIOD 20     /* Touch read period */
+#define LV_INDEV_DEF_READ_PERIOD 16     /* Touch read period */
 #define LV_TICK_CUSTOM 0
 #define LV_DPI_DEF 130
 
@@ -197,7 +197,7 @@
 #define LV_USE_IMGBTN     0
 #define LV_USE_KEYBOARD   1
 #define LV_USE_LED        0
-#define LV_USE_LIST       1
+#define LV_USE_LIST       0
 #define LV_USE_MENU       0
 #define LV_USE_METER      1
 #define LV_USE_MSGBOX     0

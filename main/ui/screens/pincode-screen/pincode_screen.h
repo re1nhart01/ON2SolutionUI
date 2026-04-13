@@ -2,7 +2,6 @@
 
 #include <core/style_store/style_store.h>
 #include <protocols/uart/uart_proto.h>
-#include <ui/components/info_modal/info_modal.h>
 #include <ui/styles/common_styles.h>
 #include "../../components/foundation/core/shortcuts.h"
 #include "../../components/foundation/core/state/state.h"
@@ -11,8 +10,8 @@
 namespace ON2Solutions {
   class PinCodeScreen;
   struct PinCodeScreenProps final
-      : BaseProps<PinCodeScreenProps, PinCodeScreen> {
-    NavigationParam params;
+      : foundation::BaseProps<PinCodeScreenProps, PinCodeScreen> {
+    foundation::NavigationParam params;
   };
   inline const char* btnm_map[] = {
     "1", "2", "3", "\n",
@@ -22,15 +21,13 @@ namespace ON2Solutions {
     LV_SYMBOL_LEFT, "", "",
   };
 
-  class PinCodeScreen : public NavigationScreen<PinCodeScreenProps> {
-    std::shared_ptr<KeyboardManager> keyboard;
-    Reactive<std::string> login_state = Reactive<std::string>("");
-    std::unique_ptr<Modal> info_modal = nullptr;
+  class PinCodeScreen : public foundation::NavigationScreen<PinCodeScreenProps> {
+    foundation::Reactive<std::string> login_state = foundation::Reactive<std::string>("");
+    std::unique_ptr<foundation::Modal> info_modal = nullptr;
 
    public:
-    explicit PinCodeScreen(StackNavigator* stack, PinCodeScreenProps props)
-        : NavigationScreen(stack, std::move(props)),
-          keyboard(std::make_shared<KeyboardManager>()) {}
+    explicit PinCodeScreen(foundation::StackNavigator* stack, PinCodeScreenProps props)
+        : NavigationScreen(stack, std::move(props)) {}
 
     ~PinCodeScreen() override = default;
 

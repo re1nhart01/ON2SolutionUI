@@ -40,7 +40,10 @@ namespace ON2Solutions {
           DatasetStore::getInstance()->get()->operative_data;
       const auto current_output_hex = operative_data.outputs;
       const auto current_input_hex = operative_data.outputs;
-      const auto hour_run_initial = operative_data.moto_hours.data();
+      const std::string hour_run_initial(
+          operative_data.moto_hours.data(),
+          strnlen(operative_data.moto_hours.data(),
+                  operative_data.moto_hours.size()));
 
       return this->delegate($View(
           ViewProps::up()
@@ -82,22 +85,27 @@ namespace ON2Solutions {
                                               if (!self)
                                                 return;
 
-                                              auto current_hour_run =
+                                              std::string current_hour_run(
+                                              value.operative_data
+                                                  .moto_hours.data(),
+                                                  strnlen(
                                                   value.operative_data
-                                                      .moto_hours.data();
+                                                  .moto_hours.data(),
+                                                  value.operative_data
+                                                  .moto_hours.size()));
 
                                               self->set_state(
                                                   [current_hour_run](
-                                                      TextProps& props) {
-                                                    props.value(fmt_str(
+                                                      TextProps& t_props) {
+                                                    t_props.value(fmt_str(
                                                         "%s %s",
                                                         locales::en::moto_hour,
-                                                        current_hour_run));
+                                                        current_hour_run.data()));
                                                   });
                                             })
                                         .value(fmt_str("%s %s",
                                                        locales::en::moto_hour,
-                                                       hour_run_initial)))))),
+                                                       hour_run_initial.data())))))),
                   $View(
                       ViewProps::up()
                           .w(320)

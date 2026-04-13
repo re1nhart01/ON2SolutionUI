@@ -4,20 +4,23 @@
 #include "core/structures/delegate.h"
 #include "navigation_screen_base.h"
 
+#include <core/structures/ui_queue.h>
+#include <esp_log.h>
 #include <functional>
 #include <memory>
 #include <optional>
 #include <stack>
 #include <string>
 #include <unordered_map>
-#include <esp_log.h>
 
 namespace foundation {
+using NavigationParam = std::unordered_map<std::string, std::variant<float, int, short, const char*, bool, std::string>>;
 
 struct StackCurrentScreen {
     int id;
     std::string name;
     std::unique_ptr<VNode> instance;
+    NavigationParam params;
 };
 
 struct StackNavigatorConfig {
@@ -26,7 +29,6 @@ struct StackNavigatorConfig {
 
 
 
-using NavigationParam = std::unordered_map<std::string, std::variant<float, int, short, const char*, bool, std::string>>;
 using ScreenFactory = Delegate<std::unique_ptr<VNode>(const NavigationParam& params)>;
 
 struct StackHistoryRoute
@@ -51,6 +53,7 @@ class StackNavigator {
 public:
     std::optional<StackCurrentScreen> current;
     lv_obj_t* parent;
+    uint32_t last_update = 0;
     StackNavigatorConfig config;
     std::unordered_map<std::string, ScreenFactory> factories;
     std::vector<StackHistoryRoute> history{};
@@ -70,8 +73,10 @@ public:
       _mount_screen(initial_route, false, {});
     }
 
-    void _mount_screen(const std::string& name, bool save_to_history, const NavigationParam& param) {
-        auto it = factories.find(name);
+    void _mount_screen(const std::string& name, const bool save_to_history, const NavigationParam& param) {
+        UIQueue::get_instance().clear();
+
+        const auto it = factories.find(name);
         if (it == factories.end()) return;
 
         if (current.has_value()) {
@@ -80,35 +85,30 @@ public:
                 }
 
                 if (save_to_history) {
-                        history.push_back(StackHistoryRoute{.id = history_counter++, .name = current->name, .params = param});
+                        history.push_back(StackHistoryRoute{.id = history_counter++, .name = current->name, .params = current->params});
                 }
 
         }
 
+        current.reset();
+        
         lv_obj_t* active_parent = parent ? parent : lv_scr_act();
         lv_obj_clean(active_parent);
 
         auto screen_instance = it->second(param);
 
-        if (current.has_value() && current->instance) {
-            auto* old_obj = current->instance->get_component();
-            if (old_obj && lv_obj_is_valid(old_obj)) {
-                lv_obj_del_async(old_obj);
-            }
-        }
-
-        current.reset();
 
         current = StackCurrentScreen {
             .id = id_counter++,
             .name = name,
-            .instance = std::move(screen_instance)
+            .instance = std::move(screen_instance),
+            .params = param
         };
 
-        auto screen_ref = current->instance.get();
+        const auto screen_ref = current->instance.get();
 
         screen_ref->set_parent(active_parent);
-        auto ui_obj = screen_ref->render();
+        const auto ui_obj = screen_ref->render();
         screen_ref->set_component(ui_obj);
 
         if (auto* ns = dynamic_cast<NavigationScreenBase*>(screen_ref)) {
@@ -117,7 +117,6 @@ public:
     }
 
   void navigate(const std::string& name, bool with_save = true) {
-        static uint32_t last_update = 0;
         const uint32_t now = xTaskGetTickCount();
         constexpr uint32_t interval = pdMS_TO_TICKS(250);
 
@@ -131,8 +130,6 @@ public:
   }
 
   void navigate(const std::string& name, const NavigationParam& params, bool with_save = true) {
-
-        static uint32_t last_update = 0;
         const uint32_t now = xTaskGetTickCount();
         constexpr uint32_t interval = pdMS_TO_TICKS(250);
 
@@ -149,7 +146,7 @@ public:
       if(history.empty())
       return;
 
-      auto prev = history.back();
+      const auto prev = history.back();
       if (history.size() == 0) return;
       history.pop_back();
 

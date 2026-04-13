@@ -91,7 +91,7 @@ extern "C" {
 #define LVGL_PORT_FULL_REFRESH          (1)
 #elif LVGL_PORT_AVOID_TEAR_MODE == 3
 #define LVGL_PORT_LCD_RGB_BUFFER_NUMS   (2)
-#define LVGL_PORT_DIRECT_MODE           (0)
+#define LVGL_PORT_DIRECT_MODE           (1)
 #endif /* LVGL_PORT_AVOID_TEAR_MODE */
 
 #if EXAMPLE_LVGL_PORT_ROTATION_DEGREE == 0
@@ -153,6 +153,8 @@ void lvgl_port_unlock(void);
  *      - false: The tasks don't need to be re-scheduled
  */
 bool lvgl_port_notify_rgb_vsync(void);
+
+void lvgl_port_task_wake(void);
 
 #ifdef __cplusplus
 }
