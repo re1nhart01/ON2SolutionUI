@@ -34,7 +34,7 @@ namespace ON2Solutions {
     template <typename T>
     void update_param(const ParamSpec& spec, T value, T min, T max) const;
     void update_param(const ParamSpec& spec, const char* option) const;
-    void hour_run_reset() const;
+    void button_uart_action(const SendableCommands& sendable_command) const;
 
     template <typename T>
     $$View make_param(const ParamSpec& spec, T value, float dependable = 0,
@@ -43,6 +43,7 @@ namespace ON2Solutions {
     $$View render_timers_tab() const;
     $$View render_limits_tab() const;
     $$View render_service_tab() const;
+    $$View render_setup_tab() const;
     $$CommonHeader render_header() const;
     $$View render_section_header(const std::string& heading) const;
     lv_obj_t* render() override;

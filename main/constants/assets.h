@@ -18,5 +18,6 @@ namespace ON2Solutions::assets {
     inline constexpr const char* Right = "S:right.bin";
     inline constexpr const char* Settings = "S:settings.bin";
     inline constexpr const char* Warning = "S:warning.bin";
+    inline constexpr const char* Lightbulb = "S:lightbulb.bin";
 }
 

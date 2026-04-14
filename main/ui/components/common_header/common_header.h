@@ -39,11 +39,10 @@ namespace ON2Solutions {
       const auto operative_data =
           DatasetStore::getInstance()->get()->operative_data;
       const auto current_output_hex = operative_data.outputs;
-      const auto current_input_hex = operative_data.outputs;
-      const std::string hour_run_initial(
-          operative_data.moto_hours.data(),
-          strnlen(operative_data.moto_hours.data(),
-                  operative_data.moto_hours.size()));
+      const auto current_input_hex = operative_data.inputs;
+
+      const auto initial_text = fmt<64>("%s %s", locales::en::moto_hour,
+                                        operative_data.moto_hours.data());
 
       return this->delegate($View(
           ViewProps::up()
@@ -76,36 +75,28 @@ namespace ON2Solutions {
                                          .source(assets::LogoSmall)
                                          .width(54)
                                          .height(32)),
-                              $Text(TextProps::up()
-                                        .watch<parser::Dataset>(
-                                            DatasetStore::getInstance(),
-                                            "alarm_text",
-                                            [](Text* self,
-                                               const parser::Dataset& value) {
-                                              if (!self)
-                                                return;
+                              $Text(
+                                  TextProps::up()
+                                      .watch<parser::Dataset>(
+                                          DatasetStore::getInstance(),
+                                          "alarm_text",
+                                          [](Text* self,
+                                             const parser::Dataset& value) {
+                                            if (!self)
+                                              return;
 
-                                              std::string current_hour_run(
-                                              value.operative_data
-                                                  .moto_hours.data(),
-                                                  strnlen(
-                                                  value.operative_data
-                                                  .moto_hours.data(),
-                                                  value.operative_data
-                                                  .moto_hours.size()));
+                                            const auto current_hour_run = fmt<64>(
+                                                "%s %s", locales::en::moto_hour,
+                                                 value.operative_data.moto_hours
+                                                    .data());
 
-                                              self->set_state(
-                                                  [current_hour_run](
-                                                      TextProps& t_props) {
-                                                    t_props.value(fmt_str(
-                                                        "%s %s",
-                                                        locales::en::moto_hour,
-                                                        current_hour_run.data()));
-                                                  });
-                                            })
-                                        .value(fmt_str("%s %s",
-                                                       locales::en::moto_hour,
-                                                       hour_run_initial.data())))))),
+                                            self->set_state(
+                                                [current_hour_run](
+                                                    TextProps& t_props) {
+                                                  t_props.value(current_hour_run.data());
+                                                });
+                                          })
+                                      .value(initial_text.data()))))),
                   $View(
                       ViewProps::up()
                           .w(320)

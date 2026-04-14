@@ -2,6 +2,7 @@
 
 #include <core/state/thread_reactive.h>
 #include <memory>
+#include <utility>
 #include "core/ref/ref.h"
 #include "core/state/reactive.h"
 #include "core/structures/delegate.h"
@@ -21,7 +22,7 @@ namespace foundation {
     static Derived up() { return Derived{}; }
 
     template <typename TVal>
-    Derived&& watch(Reactive<TVal>* reactive, std::string key,
+    Derived&& watch(Reactive<TVal>* reactive, const std::string& key,
                     Delegate<void(RefT*, const TVal&)> updater) {
       if (!reactive)
         return std::move(static_cast<Derived&>(*this));
@@ -37,7 +38,7 @@ namespace foundation {
     }
 
     template <typename TVal>
-    Derived&& watch(ThreadReactive<TVal>* reactive, std::string key,
+    Derived&& watch(ThreadReactive<TVal>* reactive, const std::string& key,
                     Delegate<void(RefT*, const TVal&)> updater) {
       if (!reactive)
         return std::move(static_cast<Derived&>(*this));
@@ -72,7 +73,7 @@ namespace foundation {
     }
 
     Derived&& control_ref(Delegate<void(lv_obj_t*)> controller) {
-      this->ref_control = controller;
+      this->ref_control = std::move(controller);
       return std::move(static_cast<Derived&>(*this));
     }
 

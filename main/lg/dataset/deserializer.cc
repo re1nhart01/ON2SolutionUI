@@ -47,6 +47,16 @@ namespace ON2Solutions::parser {
         if (parse_value(val, val_len, out)) {
           dataset->operative_data.channels_count = out;
         }
+      } else if (key_len == 2 && key[0] == 'P' && key[1] == 'O') {
+        float out;
+        if (parse_value(val, val_len, out)) {
+          dataset->operative_data.primary_screen_oxygen_sensor = out;
+        }
+      } else if (key_len == 2 && key[0] == 'P' && key[1] == 'P') {
+        float out;
+        if (parse_value(val, val_len, out)) {
+          dataset->operative_data.primary_screen_pressure_sensor = out;
+        }
       } else if (key_len == 2 && key[0] == 'S' && key[1] == 'T') {
         copy_string(&dataset->operative_data.status,
                     sizeof(dataset->operative_data.status), val, val_len);
@@ -63,7 +73,7 @@ namespace ON2Solutions::parser {
         parse_list(val, val_len, sp);
         dataset->operative_data.secondary_tank_pressure = sp;
       } else if (key_len == 2 && key[0] == 'T' && key[1] == 'N') {
-        std::array<uint8_t, 2> tn{0, 0};
+        std::array<float, 2> tn{0, 0};
         parse_list(val, val_len, tn);
         dataset->operative_data.tank_temperatures = tn;
       } else if (key_len == 2 && key[0] == 'I' && key[1] == 'I') {
@@ -113,6 +123,14 @@ namespace ON2Solutions::parser {
         std::array<float, 4> oso{0, 0, 0, 0};
         parse_list(val, val_len, oso);
         dataset->settings.oxygen_sensor_offset = oso;
+      } else if (key_len == 2 && key[0] == 'P' && key[1] == 'O') {
+        copy_string(&dataset->settings.primary_screen_oxygen_sensor_st,
+                    sizeof(dataset->settings.primary_screen_oxygen_sensor_st), val,
+                    val_len);
+      } else if (key_len == 2 && key[0] == 'P' && key[1] == 'P') {
+        copy_string(&dataset->settings.primary_screen_pressure_sensor_st,
+                    sizeof(dataset->settings.primary_screen_pressure_sensor_st), val,
+                    val_len);
       } else if (key_len == 2 && key[0] == 'F' && key[1] == 'S') {
         std::array<float, 4> fso{0, 0, 0, 0};
         parse_list(val, val_len, fso);

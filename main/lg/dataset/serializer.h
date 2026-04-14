@@ -14,7 +14,9 @@ namespace ON2Solutions::parser {
 
   enum class SendableCommands {
     StatusCommand,
+    CabinetLight,             // CL
     ResetMotoCommand,
+    SetDefault,
     OxygenShift,              // OS
     FlowShift,                // FS
     CompressorDelay,          // CD
@@ -31,13 +33,19 @@ namespace ON2Solutions::parser {
     TankPressureSensorType,   // PT
     OxygenOverheatTempLimit,  // TO
     FlowError,                // FE
-    SpvValveAutoCalibration   // CV
+    SpvValveAutoCalibration,   // CV
+    PrimaryScreenOxygenSensor, // PO
+    PrimaryScreenPressureSensor, // PP
   };
 
   constexpr std::string_view command_to_string(SendableCommands cmd) {
     switch (cmd) {
       case SendableCommands::OxygenShift:
         return "OS";
+      case SendableCommands::CabinetLight:
+        return "CL";
+      case SendableCommands::SetDefault:
+        return "RD";
       case SendableCommands::FlowShift:
         return "FS";
       case SendableCommands::CompressorDelay:
@@ -70,6 +78,10 @@ namespace ON2Solutions::parser {
         return "FE";
       case SendableCommands::SpvValveAutoCalibration:
         return "CV";
+      case SendableCommands::PrimaryScreenOxygenSensor:
+        return "PO";
+      case SendableCommands::PrimaryScreenPressureSensor:
+        return "PP";
       default:
         return "UNKNOWN";
     }

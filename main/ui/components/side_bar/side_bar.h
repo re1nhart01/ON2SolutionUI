@@ -9,6 +9,10 @@
 #include <constants/assets.h>
 #include "constants/theme.h"
 
+#include <lg/dataset/serializer.h>
+
+#include "protocols/uart/uart_proto.h"
+
 using namespace foundation;
 using namespace ON2Solutions::parser;
 namespace ON2Solutions {
@@ -17,9 +21,15 @@ namespace ON2Solutions {
   struct SidebarProps final : foundation::BaseProps<SidebarProps, Sidebar> {
 
     StackNavigator* stack = nullptr;
+    UartHandler* uart = nullptr;
 
     SidebarProps&& set_stack(StackNavigator* stack_nav) {
       this->stack = stack_nav;
+      return std::move(*this);
+    }
+
+    SidebarProps&& set_uart_handler(UartHandler* handler) {
+      this->uart = handler;
       return std::move(*this);
     }
   };
@@ -76,32 +86,90 @@ namespace ON2Solutions {
       );
     }
 
+    $$Button render_action_button() const {
+      auto* uart_handle = this->props.uart;
+
+      return $Button(ButtonProps::up()
+                         .click([uart_handle](lv_event_t*) {
+                           constexpr auto command =
+                               SerializableCommand<const char*>{
+                                   .command = SendableCommands::CabinetLight,
+                               };
+
+                           const std::string serialized = serialize(command);
+                           auto _ = uart_handle->send(serialized);
+                         })
+                         .set_style([](Styling& style) {
+                           style.set_clear_default();
+                           style.setWidth(42);
+                           style.setHeight(42);
+                           style.setPadding(0);
+                           style.setBorderRadius(8);
+                           style.setBackgroundOpacity(LV_OPA_100);
+                           style.setBackgroundColor(TERTIARY_BG);
+                         })
+                         .set_child($Image(ImageProps::up()
+                                               .source(assets::Lightbulb)
+                                               .width(15)
+                                               .height(15))));
+    }
+
     lv_obj_t* render() override {
       Component::render();
 
-      return this->delegate(
-          $View(ViewProps::up()
-                    .w(56)
-                    .h(LV_PCT(100))
-                    .direction(LV_FLEX_FLOW_COLUMN)
-                    .items(LV_FLEX_ALIGN_CENTER)
-                    .justify(LV_FLEX_ALIGN_START)
-                    .track_cross(LV_FLEX_ALIGN_CENTER)
-                    .set_style([](Styling& style) {
-                      style.setBackgroundColor(PRIMARY_BG);
-                      style.setGap(4, 0);
-                      style.setBorder(BORDER_SECONDARY, 1, LV_OPA_100);
-                      style.setBorderRadius(0);
-                      style.setPadding(12, 12, 2, 2);
-                    })
-                    .set_children(children(
-                        this->render_nav_button("/main", assets::Pie),
-                        this->render_nav_button("/errors", assets::Warning),
-                        this->render_nav_button("/info", assets::Info),
-                        this->render_nav_button(
-                            "/pin_code", assets::Settings,
-                            this->props.stack->get_current_route() ==
-                                "/settings")))));
+      return this->delegate($View(
+          ViewProps::up()
+              .w(56)
+              .h(LV_PCT(88))
+              .direction(LV_FLEX_FLOW_COLUMN)
+              .items(LV_FLEX_ALIGN_CENTER)
+              .track_cross(LV_FLEX_ALIGN_CENTER)
+              .justify(LV_FLEX_ALIGN_SPACE_BETWEEN)
+              .set_style([](Styling& style) {
+                style.setBackgroundColor(PRIMARY_BG);
+                style.setBorder(BORDER_SECONDARY, 1, LV_OPA_100);
+                style.setBorderRadius(0);
+                style.setPadding(12, 12, 0, 0);
+                style.setGap(
+                    0, 0);
+              })
+              .set_children(children(
+                  $View(ViewProps::up()
+                            .direction(LV_FLEX_FLOW_COLUMN)
+                            .items(LV_FLEX_ALIGN_CENTER)
+                            .track_cross(LV_FLEX_ALIGN_CENTER)
+                            .w(LV_PCT(100))
+                            .h(LV_SIZE_CONTENT)
+                            .set_style([](Styling& style) {
+                              style.setBackgroundOpacity(0);
+                              style.setGap(4, 0);
+                              NoPaddingApply(style);
+                            })
+                            .set_children(children(
+                                this->render_nav_button(
+                                    "/main", assets::Pie,
+                                    this->props.stack->get_current_route() ==
+                                        "/charts"),
+                                this->render_nav_button("/errors",
+                                                        assets::Warning),
+                                this->render_nav_button("/info", assets::Info),
+                                this->render_nav_button(
+                                    "/pin_code", assets::Settings,
+                                    this->props.stack->get_current_route() ==
+                                        "/settings")))),
+
+                  $View(ViewProps::up()
+                            .direction(LV_FLEX_FLOW_COLUMN)
+                            .items(LV_FLEX_ALIGN_CENTER)
+                            .track_cross(LV_FLEX_ALIGN_CENTER)
+                            .w(LV_PCT(100))
+                            .h(LV_SIZE_CONTENT)
+                            .set_style([](Styling& style) {
+                              style.setBackgroundOpacity(0);
+                              NoPaddingApply(style);
+                            })
+                            .set_children(
+                                children(this->render_action_button())))))));
     };
 
     const Styling* styling() const override {

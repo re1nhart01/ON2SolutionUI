@@ -71,6 +71,7 @@ namespace ON2Solutions {
     inline constexpr const char* system_settings_header = "System Settings";
     inline constexpr const char* system_auth_header = "Security";
     inline constexpr const char* hour_run_reset = "Hour Run Reset";
+    inline constexpr const char* set_default = "Set Default";
 
     inline constexpr const char* login_email = "Email address";
     inline constexpr const char* login_password = "Password";
@@ -78,6 +79,8 @@ namespace ON2Solutions {
     inline constexpr const char* oxygen_level = "Oxygen Level";
     inline constexpr const char* oxygen_rate = "Oxygen Flow";
     inline constexpr const char* pressure_sensor_type = "Pressure Sensor Type";
+    inline constexpr const char* primary_screen_oxygen_sensor = "Primary Screen Oxygen Sensor";
+    inline constexpr const char* primary_screen_pressure_sensor = "Primary Screen Pressure Sensor";
 
     inline constexpr const char* oxygen_offset = "Oxygen offset";
     inline constexpr const char* flow_offset = "Flow offset";

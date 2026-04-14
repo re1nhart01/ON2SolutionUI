@@ -44,9 +44,9 @@ namespace ON2Solutions {
     auto status = this->props.uart->send(serialized);
   }
 
-  void SettingsScreen::hour_run_reset() const {
+  void SettingsScreen::button_uart_action(const SendableCommands& sendable_command) const {
     auto command = parser::SerializableCommand<const char*>{
-        .command = parser::SendableCommands::ResetMotoCommand,
+        .command = sendable_command,
     };
 
     std::string serialized = parser::serialize(command);
@@ -122,7 +122,7 @@ namespace ON2Solutions {
                         .size(56, 34)
                         .template watch<parser::Dataset>(
                             parser::DatasetStore::getInstance(),
-                            fmt_str("param_%s", spec.label),
+                            fmt<10>("param_%s", spec.label).data(),
                             [spec](Stepper* self,
                                    const parser::Dataset& dataset) {
                               auto [min, max] =
@@ -295,19 +295,122 @@ namespace ON2Solutions {
                                 locales::en::pressure_sensor_type)),
                             $Dropdown(
                                 DropdownProps::up()
-                                   .watch<parser::Dataset>(DatasetStore::getInstance(), "dropdown_pressure", [](Dropdown* self, const Dataset& value) {
-                                     self->set_state([value](DropdownProps& props) {
-                                       props.set_selected(find_index(
-                                        parser::PRESSURE_TYPE_OPTIONS,
-                                        value.settings.tank_pressure_sensor_type.data()));
-                                     });
-                                   })
+                                    .watch<parser::Dataset>(
+                                        DatasetStore::getInstance(),
+                                        "dropdown_pressure",
+                                        [](Dropdown* self,
+                                           const Dataset& value) {
+                                          self->set_state([value](DropdownProps&
+                                                                      props) {
+                                            props.set_selected(find_index(
+                                                parser::PRESSURE_TYPE_OPTIONS,
+                                                value.settings
+                                                    .tank_pressure_sensor_type
+                                                    .data()));
+                                          });
+                                        })
                                     .set_selected(find_index(
                                         parser::PRESSURE_TYPE_OPTIONS,
-                                        dataset.tank_pressure_sensor_type.data()))
+                                        dataset.tank_pressure_sensor_type
+                                            .data()))
                                     .set_options(parser::PRESSURE_TYPE_OPTIONS)
                                     .change([this](const std::string& option) {
                                       this->update_param(PressureTypeSensorSpec,
+                                                         option.c_str());
+                                    })))))))
+            .w(LV_PCT(100))
+            .h(LV_SIZE_CONTENT));
+  }
+
+  $$View SettingsScreen::render_setup_tab() const {
+    parser::DatasetSettings dataset =
+        parser::DatasetStore::getInstance()->get()->settings;
+
+    return $View(
+        ViewProps::up()
+            .direction(LV_FLEX_FLOW_ROW_WRAP)
+            .justify(LV_FLEX_ALIGN_CENTER)
+            .set_style([](Styling& style) {
+              style.setPadding(12);
+              style.setBorderRadius(12);
+              style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+            })
+            .set_children(children(
+                $View(
+                    ViewProps::up()
+                        .w(LV_PCT(100))
+                        .h(52)
+                        .flow(FlexPreset::RowBetween)
+                        .set_style([](Styling& style) {
+                          style.setPadding(0, 0, 16, 16);
+                          style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                          style.setBackgroundColor(TERTIARY_BG);
+                        })
+                        .set_children(children(
+                            $Text(TextProps::up().value(
+                                locales::en::primary_screen_oxygen_sensor)),
+                            $Dropdown(
+                                DropdownProps::up()
+                                    .watch<parser::Dataset>(
+                                        DatasetStore::getInstance(),
+                                        "dropdown_psos",
+                                        [](Dropdown* self,
+                                           const Dataset& value) {
+                                          self->set_state([value](DropdownProps&
+                                                                      props) {
+                                            props.set_selected(find_index(
+                                                parser::PRIMARY_SCREEN_OXYGEN_SENSOR_OPTIONS,
+                                                value.settings
+                                                    .primary_screen_oxygen_sensor_st
+                                                    .data()));
+                                          });
+                                        })
+                                    .set_selected(find_index(
+                                        parser::PRIMARY_SCREEN_OXYGEN_SENSOR_OPTIONS,
+                                        dataset.primary_screen_oxygen_sensor_st
+                                            .data()))
+                                    .set_options(parser::PRIMARY_SCREEN_OXYGEN_SENSOR_OPTIONS)
+                                    .change([this](const std::string& option) {
+                                      this->update_param(PrimaryScreenOxygenSensorSpec,
+                                                         option.c_str());
+                                    }))))),
+
+                $View(
+                    ViewProps::up()
+                        .w(LV_PCT(100))
+                        .h(52)
+                        .flow(FlexPreset::RowBetween)
+                        .set_style([](Styling& style) {
+                          style.setPadding(0, 0, 16, 16);
+                          style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                          style.setBackgroundColor(TERTIARY_BG);
+                        })
+                        .set_children(children(
+                            $Text(TextProps::up().value(
+                                locales::en::primary_screen_pressure_sensor)),
+                            $Dropdown(
+                                DropdownProps::up()
+                                    .watch<parser::Dataset>(
+                                        DatasetStore::getInstance(),
+                                        "dropdown_psps",
+                                        [](Dropdown* self,
+                                           const Dataset& value) {
+                                          self->set_state([value](DropdownProps&
+                                                                      props) {
+                                            props.set_selected(find_index(
+                                                parser::PRIMARY_SCREEN_PRESSURE_SENSOR_OPTIONS,
+                                                value.settings
+                                                    .primary_screen_pressure_sensor_st
+                                                    .data()));
+                                          });
+                                        })
+                                    .set_selected(find_index(
+                                        parser::PRIMARY_SCREEN_PRESSURE_SENSOR_OPTIONS,
+                                        dataset.primary_screen_pressure_sensor_st
+                                            .data()))
+                                    .set_options(parser::PRIMARY_SCREEN_PRESSURE_SENSOR_OPTIONS)
+                                    .change([this](const std::string& option) {
+                                      this->update_param(PrimaryScreenPressureSensorSpec,
                                                          option.c_str());
                                     }))))),
                 $Button(ButtonProps::up()
@@ -319,9 +422,22 @@ namespace ON2Solutions {
                               style.setShadow(PRIMARY_BG, 0, 0);
                             })
                             .set_child($Text(TextProps::up().value(
+                                locales::en::set_default)))
+                            .click([this](lv_event_t* e) {
+                              this->button_uart_action(SendableCommands::SetDefault);
+                            })),
+                $Button(ButtonProps::up()
+                            .set_style([](Styling& style) {
+                              style.setBackgroundColor(PRIMARY_COLOR_2);
+                              style.setHeight(44);
+                              style.setWidth(170);
+                              style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                              style.setShadow(PRIMARY_BG, 0, 0);
+                            })
+                            .set_child($Text(TextProps::up().value(
                                 locales::en::hour_run_reset)))
                             .click([this](lv_event_t* e) {
-                              this->hour_run_reset();
+                              this->button_uart_action(SendableCommands::ResetMotoCommand);
                             }))))
             .w(LV_PCT(100))
             .h(LV_SIZE_CONTENT));
@@ -351,7 +467,9 @@ namespace ON2Solutions {
                         .items(LV_FLEX_ALIGN_START)
                         .track_cross(LV_FLEX_ALIGN_SPACE_BETWEEN)
                         .set_children(children(
-                            $Sidebar(SidebarProps::up().set_stack(
+                            $Sidebar(SidebarProps::up()
+                            .set_uart_handler(this->props.uart.get())
+                            .set_stack(
                                 this->navigation_ref)),
                             $View(
                                 ViewProps::up()
@@ -384,9 +502,11 @@ namespace ON2Solutions {
                                               style.setBorder(PRIMARY_BG, 0,
                                                               LV_OPA_0);
                                             })
-                                            .set_tabs({"Sensors", "Timers",
-                                                       "Limits", "Service"})
+                                            .set_tabs({"Setup", "Sensors",
+                                                       "Timers", "Limits",
+                                                       "Service"})
                                             .set_children(children(
+                                                render_setup_tab(),
                                                 render_sensors_tab(),
                                                 render_timers_tab(),
                                                 render_limits_tab(),

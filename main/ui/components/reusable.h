@@ -17,7 +17,7 @@ namespace ON2Solutions {
                        .set_style([](Styling& style) {
                          style.setBackgroundColor(PRIMARY_COLOR_3);
                          style.setWidth(44);
-                         style.setHeight(260);
+                         style.setHeight(300);
                          style.setPadding(0);
                        })
                        .set_child($Image(

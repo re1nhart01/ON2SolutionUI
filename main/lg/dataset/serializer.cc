@@ -17,10 +17,18 @@ namespace ON2Solutions::parser {
     if (command.command == SendableCommands::ResetMotoCommand) {
       return "<RS>";
     }
+    if (command.command == SendableCommands::CabinetLight) {
+      return "<CL>";
+    }
+    if (command.command == SendableCommands::SetDefault) {
+      return "<RD>";
+    }
     if constexpr (std::is_same_v<T, const char*>) {
       if (command.command == SendableCommands::TankPressureSensorType) {
         return fmt_str("<PT%s>", command.data);
       }
+
+      if (command.command == SendableCommands::TankPressureSensorType) {}
     }
 
     auto command_str = command_to_string(command.command);

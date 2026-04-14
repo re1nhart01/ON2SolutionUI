@@ -16,8 +16,6 @@ extern "C" {
 
 namespace ON2Solutions {
 
-  static const char* current_packet = CH_PACKETS[0];
-
   class WaveApplication final : public foundation::Application {
     std::shared_ptr<foundation::StackNavigator> stack_navigator;
     std::shared_ptr<UartHandler> uart_handler;
@@ -42,6 +40,8 @@ namespace ON2Solutions {
 
             // ESP_LOGI("main_screen", "Received data from UART %s",
             //          uart_data.response.packet);
+
+            heap_caps_print_heap_info(MALLOC_CAP_8BIT);
 
             if (uart_data.response.packet &&
                 strlen(uart_data.response.packet) > 0) {

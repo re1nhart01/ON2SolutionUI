@@ -157,7 +157,9 @@ namespace ON2Solutions {
                           .items(LV_FLEX_ALIGN_START)
                           .track_cross(LV_FLEX_ALIGN_SPACE_BETWEEN)
                           .set_children(children(
-                              $Sidebar(SidebarProps::up().set_stack(
+                              $Sidebar(SidebarProps::up()
+                              .set_uart_handler(this->props.uart.get())
+                              .set_stack(
                                   this->navigation_ref)),
                               $View(ViewProps::up()
                                         .w(800 - 56)

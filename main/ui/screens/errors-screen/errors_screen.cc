@@ -59,7 +59,8 @@ namespace ON2Solutions {
   }
 
   $$View ErrorsScreen::render_body() {
-    const auto initial_data = this->generate_data_models(*DatasetStore::getInstance()->get());
+    const auto initial_data =
+        this->generate_data_models(*DatasetStore::getInstance()->get());
 
     return $View(
         ViewProps::up()
@@ -106,7 +107,8 @@ namespace ON2Solutions {
 
                               last_update = now;
 
-                              const auto new_data = this->generate_data_models(value);
+                              const auto new_data =
+                                  this->generate_data_models(value);
 
                               self->set_state(
                                   [this, new_data](PaginatedListProps& props) {
@@ -156,8 +158,10 @@ namespace ON2Solutions {
                           .items(LV_FLEX_ALIGN_START)
                           .track_cross(LV_FLEX_ALIGN_SPACE_BETWEEN)
                           .set_children(children(
-                              $Sidebar(SidebarProps::up().set_stack(
-                                  this->navigation_ref)),
+                              $Sidebar(
+                                  SidebarProps::up()
+                                      .set_uart_handler(this->props.uart.get())
+                                      .set_stack(this->navigation_ref)),
                               $View(ViewProps::up()
                                         .w(800 - 56)
                                         .h(LV_PCT(100))

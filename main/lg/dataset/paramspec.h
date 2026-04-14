@@ -291,6 +291,24 @@ namespace ON2Solutions::parser::paramspec {
     .default_value = 0.0f,
     .command = SendableCommands::TankPressureSensorType};
 
+  inline constexpr ParamSpec PrimaryScreenOxygenSensorSpec{
+    .label = "Pressure Type Sensor",
+    .min = 0.0f,
+    .max = 9.0f,
+    .step = 1.0f,
+    .precision = 0,
+    .default_value = 0.0f,
+    .command = SendableCommands::PrimaryScreenOxygenSensor};
+
+  inline constexpr ParamSpec PrimaryScreenPressureSensorSpec{
+    .label = "Pressure Type Sensor",
+    .min = 0.0f,
+    .max = 9.0f,
+    .step = 1.0f,
+    .precision = 0,
+    .default_value = 0.0f,
+    .command = SendableCommands::PrimaryScreenPressureSensor};
+
 #pragma endregion SERVICE
 
 #pragma region HELPERS

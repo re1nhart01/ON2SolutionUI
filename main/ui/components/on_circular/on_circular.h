@@ -18,13 +18,17 @@ namespace ON2Solutions {
     Fl,
     Tr,
     Tn,
+    Po,
+    Pp,
   };
 
   inline std::string symbol_by_type(const CircularSelectorType& type) {
     switch (type) {
       case O2:
+      case Po:
         return "%";
       case Ps:
+      case Pp:
         return "psi";
       case Tr:
         return "psi";
@@ -40,8 +44,10 @@ namespace ON2Solutions {
   inline std::array<short, 2> min_max_by_type(
       const CircularSelectorType& type) {
     switch (type) {
+      case Po:
       case O2:
         return {0, 100};
+      case Pp:
       case Ps:
         return {0, 150};
       case Tr:
@@ -84,6 +90,10 @@ namespace ON2Solutions {
   inline SelectorConfig get_config(CircularSelectorType type) {
     using D = parser::Dataset;
     switch (type) {
+      case Po:
+        return {" %", 0, 100, [](const D& v, float i) {
+          return v.operative_data.primary_screen_oxygen_sensor;
+        }, 1};
       case O2:
         return {" %", 0, 100, [](const D& v, uint8_t i) {
                   return v.operative_data.oxygen_levels[i];
@@ -92,12 +102,16 @@ namespace ON2Solutions {
         return {" psi", 0, 150, [](const D& v, uint8_t i) {
                   return v.operative_data.primary_tank_pressure[i];
                 }};
+      case Pp:
+        return {" psi", 0, 150, [](const D& v, uint8_t i) {
+          return v.operative_data.primary_screen_pressure_sensor;
+        }};
       case Tr:
         return {" psi", 0, 60, [](const D& v, uint8_t i) {
                   return v.operative_data.secondary_tank_pressure[i];
                 }};
       case Tn:
-        return {" c", 0, 100, [](const D& v, uint8_t i) {
+        return {"", 0, 100, [](const D& v, uint8_t i) {
                   return v.operative_data.tank_temperatures[i];
                 }, 1};
       case Fl:

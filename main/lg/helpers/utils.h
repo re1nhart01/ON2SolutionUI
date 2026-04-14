@@ -32,6 +32,20 @@ std::string fmt_str(const char* fmt, Args... args) {
   return std::string(buf);
 }
 
+template <size_t N = 64, typename... Args>
+std::array<char, N> fmt(const char* format, Args... args) {
+  std::array<char, N> buf{};
+  snprintf(buf.data(), buf.size(), format, args...);
+  return buf;
+}
+
+template <size_t N = 64, typename Callback, typename... Args>
+void fmt_cb(Callback&& cb, const char* fmt, Args... args) {
+  char buf[N];
+  snprintf(buf, N, fmt, args...);
+  cb(buf);
+}
+
 inline short find_index(const std::vector<const char*>& options, const std::string& value) {
   const auto it = std::ranges::find_if(options,
       [&value](const char* opt) {
@@ -39,4 +53,12 @@ inline short find_index(const std::vector<const char*>& options, const std::stri
       });
 
   return (it != options.end()) ? static_cast<short>(std::distance(options.begin(), it)) : 0;
+}
+
+template <typename T, size_t N>
+inline int find_index(const std::array<T, N>& arr, const std::string_view value) {
+  auto it = std::ranges::find_if(arr.begin(), arr.end(), [value](const T& item) {
+      return std::string_view(item) == value;
+  });
+  return (it != arr.end()) ? std::distance(arr.begin(), it) : 0;
 }

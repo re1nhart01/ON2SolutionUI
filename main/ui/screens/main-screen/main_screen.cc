@@ -64,7 +64,7 @@ namespace ON2Solutions {
                                    .set_children(children(
                                        $ConnectionStat(),
                                        $Text(TextProps::up().value(
-                                           fmt_str("%s", title)))))))));
+                                           fmt<32>("%s", title).data()))))))));
   }
 
   $$View MainScreen::render_body() const {
@@ -98,8 +98,8 @@ namespace ON2Solutions {
                           style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
                         })
                         .set_children(children(
-                            this->render_card(O2, locales::en::oxygen_level, 0),
-                            this->render_card(Ps, locales::en::tank_pressure,
+                            this->render_card(Po, locales::en::oxygen_level, 0),
+                            this->render_card(Pp, locales::en::tank_pressure,
                                               0),
                             $HighButton(assets::Right,
                                         [navigation](lv_event_t* _) {
@@ -209,7 +209,9 @@ namespace ON2Solutions {
                           .items(LV_FLEX_ALIGN_START)
                           .track_cross(LV_FLEX_ALIGN_SPACE_BETWEEN)
                           .set_children(children(
-                              $Sidebar(SidebarProps::up().set_stack(
+                              $Sidebar(SidebarProps::up()
+                              .set_uart_handler(this->props.uart.get())
+                              .set_stack(
                                   this->navigation_ref)),
                               $View(ViewProps::up()
                                         .w(800 - 56)

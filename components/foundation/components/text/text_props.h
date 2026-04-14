@@ -22,6 +22,16 @@ namespace foundation
       return std::move(*this);
     }
 
+    TextProps&& value(std::string&& v) {
+      text = std::move(v);
+      return std::move(*this);
+    }
+
+    TextProps&& value(const char* v) {
+      text = v;
+      return std::move(*this);
+    }
+
     TextProps&& click(lv_event_cb_t fn) {
       on_click = fn;
       return std::move(*this);
