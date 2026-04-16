@@ -140,8 +140,8 @@ namespace ON2Solutions {
     inline constexpr const char* info_bit_25_error = "Reserved (25)";
     inline constexpr const char* info_bit_26_error = "LCD Module Wires Broken";
     inline constexpr const char* info_bit_27_error = "Oxygen Temperature Overheat";
-    inline constexpr const char* info_bit_28_error = "Reserved (28)";
-    inline constexpr const char* info_bit_29_error = "Tank Pressure Sensor Fault (<0.1V)";
+    inline constexpr const char* info_bit_28_error = "Tank Pressure Sensor A Fault";
+    inline constexpr const char* info_bit_29_error = "Tank Pressure Sensor B Fault";
     inline constexpr const char* info_bit_30_error = "Outputs overload protect";
     inline constexpr const char* info_bit_31_error = "Alarm mode";
 

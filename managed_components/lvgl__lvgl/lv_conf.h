@@ -38,7 +38,7 @@
    HAL SETTINGS
  *====================*/
 #define LV_DISP_DEF_REFR_PERIOD 16      /* 60 FPS (1000/60) */
-#define LV_INDEV_DEF_READ_PERIOD 16     /* Touch read period */
+#define LV_INDEV_DEF_READ_PERIOD 10    /* Touch read period */
 #define LV_TICK_CUSTOM 0
 #define LV_DPI_DEF 130
 
@@ -88,8 +88,8 @@
 /*====================
    OTHERS
  *====================*/
-#define LV_USE_PERF_MONITOR 1          /* Для отладки FPS */
-#define LV_USE_MEM_MONITOR 1
+#define LV_USE_PERF_MONITOR 0          /* Для отладки FPS */
+#define LV_USE_MEM_MONITOR 0
 #define LV_USE_REFR_DEBUG 0
 #define LV_SPRINTF_CUSTOM 0
 #define LV_SPRINTF_USE_FLOAT 0

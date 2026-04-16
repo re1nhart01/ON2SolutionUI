@@ -97,7 +97,7 @@
 /*====================
    OTHERS
  *====================*/
-#define LV_USE_PERF_MONITOR 1          /* Для отладки FPS */
+#define LV_USE_PERF_MONITOR 0         /* Для отладки FPS */
 #define LV_USE_MEM_MONITOR 0
 #define LV_USE_REFR_DEBUG 0
 #define LV_SPRINTF_CUSTOM 0

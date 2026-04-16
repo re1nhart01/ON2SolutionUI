@@ -37,7 +37,7 @@ namespace ON2Solutions {
         .command = spec.command,
         .data = option,
     };
-    std::string serialized = parser::serialize(command);
+    const std::string serialized = parser::serialize(command);
 
     ESP_LOGI("serialized", serialized.c_str());
 

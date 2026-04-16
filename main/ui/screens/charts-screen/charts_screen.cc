@@ -10,13 +10,13 @@ namespace ON2Solutions {
   }
 
   void ChartsScreen::execute_status_trigger() const {
-    //   auto command = SerializableCommand<const char*>{
-    //     .command = SendableCommands::StatusCommand,
-    // };
-    //
-    //   std::string serialized = serialize(command);
-    //
-    //   auto status = this->uart_handler->send(serialized);
+    auto command = SerializableCommand<const char*>{
+        .command = SendableCommands::StatusCommand,
+    };
+
+    std::string serialized = serialize(command);
+
+    auto _ = this->props.uart->send(serialized);
   }
 
   $$CommonHeader ChartsScreen::render_header() const {
@@ -162,28 +162,28 @@ namespace ON2Solutions {
 
     const auto dataset = DatasetStore::getInstance()->get();
 
-    const auto current_status =
-       dataset->operative_data.status;
+    const auto current_status = dataset->operative_data.status;
     uint8_t count = dataset->optional.reset_countdown_sec;
 
     const std::string status_str =
         GetTextValueFromStatus(GetStatusFromTextValue(current_status.data()));
 
     const auto current_opacity =
-    GetStatusFromTextValue(current_status.data()) == DatasetStatuses::Alarm
-        ? LV_OPA_100
-        : LV_OPA_0;
+        GetStatusFromTextValue(current_status.data()) == DatasetStatuses::Alarm
+            ? LV_OPA_100
+            : LV_OPA_0;
 
     return $View(
         ViewProps::up()
             .set_children(children(
-                $TimerView(this->alarm_control, fmt_str("%d", count), current_opacity),
+                $TimerView(this->alarm_control, fmt_str("%d", count),
+                           current_opacity),
                 $Button(
                     ButtonProps::up()
                         .set_style([current_status](Styling& style) {
                           style.setFont(&lv_font_montserrat_16);
-                          style.setBackgroundColor(button_color_by_status(GetStatusFromTextValue(
-                              current_status.data())));
+                          style.setBackgroundColor(button_color_by_status(
+                              GetStatusFromTextValue(current_status.data())));
                           style.setBorderRadius(12);
                           style.setSize(300, 44);
                           style.setBorder(lv_color_hex(0x5B5AFF), 0, 0);
@@ -259,8 +259,10 @@ namespace ON2Solutions {
                           .items(LV_FLEX_ALIGN_START)
                           .track_cross(LV_FLEX_ALIGN_SPACE_BETWEEN)
                           .set_children(children(
-                              $Sidebar(SidebarProps::up().set_stack(
-                                  this->navigation_ref)),
+                              $Sidebar(
+                                  SidebarProps::up()
+                                      .set_uart_handler(this->props.uart.get())
+                                      .set_stack(this->navigation_ref)),
                               $View(ViewProps::up()
                                         .w(800 - 56)
                                         .h(LV_PCT(100))

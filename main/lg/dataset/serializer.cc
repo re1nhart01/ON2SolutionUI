@@ -28,7 +28,13 @@ namespace ON2Solutions::parser {
         return fmt_str("<PT%s>", command.data);
       }
 
-      if (command.command == SendableCommands::TankPressureSensorType) {}
+      if (command.command == SendableCommands::PrimaryScreenOxygenSensor) {
+        return fmt_str("<PO%s>", command.data);
+      }
+
+      if (command.command == SendableCommands::PrimaryScreenPressureSensor) {
+        return fmt_str("<PP%s>", command.data);
+      }
     }
 
     auto command_str = command_to_string(command.command);

@@ -232,7 +232,7 @@ namespace ON2Solutions::parser::paramspec {
   inline constexpr ParamSpec TempOverheatSpec{
       .label = "Temp Overheat",
       .min = 30.0f,
-      .max = 70.0f,
+      .max = 200.0f,
       .step = 1.0f,
       .precision = 0,
       .default_value = 55.0f,

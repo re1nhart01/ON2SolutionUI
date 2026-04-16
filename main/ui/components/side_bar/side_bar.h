@@ -65,6 +65,7 @@ namespace ON2Solutions {
       bool is_active = this->props.stack->get_current_route() == path ||
                        is_active_additional;
 
+
       return $Button(
           ButtonProps::up()
               .click([this, path](lv_event_t*) {
