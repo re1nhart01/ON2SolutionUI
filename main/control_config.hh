@@ -12,5 +12,6 @@
 #define default_pincode "0000"
 
 
-#define LCD_FIRMWARE_VERSION "1"
-#define LCD_LOADER_VERSION "1"
+#define LCD_FIRMWARE_VERSION "1.0.6"
+#define LCD_LOADER_VERSION "1.0.1"
+#define LCD_FIRMWARE_RELEASE_DATE "17.04.26"

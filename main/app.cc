@@ -8,19 +8,23 @@
 #include "ui/screens/preloader-screen/preloader_screen.h"
 #include "ui/screens/settings-screen/settings_screen.h"
 
+
 #include <core/application.h>
 
 extern "C" {
-#include "../components/foundation/internals/lvgl_port.h"
+  #include "../components/foundation/internals/lvgl_port.h"
+  #include "core/waveshare_rgb_lcd_port.h"
 }
 
 namespace ON2Solutions {
+  static void timer_handler_adapter(lv_timer_t* timer);
 
   class WaveApplication final : public foundation::Application {
+   public:
     std::shared_ptr<foundation::StackNavigator> stack_navigator;
     std::shared_ptr<UartHandler> uart_handler;
+    lv_timer_t* inactivity_timer = nullptr;
 
-   public:
     explicit WaveApplication(lv_obj_t* screen) : Application(screen) {
       this->stack_navigator = std::make_shared<foundation::StackNavigator>(
           foundation::StackNavigatorConfig{.initial_route = "/preloader"},
@@ -171,10 +175,39 @@ namespace ON2Solutions {
       this->uart_handler->enable_rx(true);
       this->add_uart_data_event();
       this->on_event_bootloader_mode();
+
+      inactivity_timer = lv_timer_create(timer_handler_adapter, 1000, this);
     }
 
     void after_load_application() override {
       ESP_LOGI("MyApp", "after_load_application called");
     }
   };
+
+  static bool is_active_lcd_bl = true;
+  int min = 60000;
+  constexpr uint32_t MS_MIN = 60000;
+  constexpr uint32_t MS_MIN5 = MS_MIN * 5;
+  constexpr uint32_t MS_MIN2 = MS_MIN * 2;
+  constexpr uint32_t MS_MIN15 = MS_MIN * 15;
+
+  static void timer_handler_adapter(lv_timer_t* timer) {
+    auto app = static_cast<WaveApplication*>(timer->user_data);
+    const uint32_t inactive_ms = lv_disp_get_inactive_time(nullptr);
+
+    if (inactive_ms >= MS_MIN5 && app->stack_navigator->current->name != "/main") {
+      app->stack_navigator->navigate("/main");
+    }
+
+    if (inactive_ms >= MS_MIN15 && is_active_lcd_bl) {
+      is_active_lcd_bl = false;
+      waveshare_rgb_lcd_bl_off();
+    }
+    else if (inactive_ms < MS_MIN2) {
+      if (!is_active_lcd_bl) {
+        is_active_lcd_bl = true;
+        waveshare_rgb_lcd_bl_on();
+      }
+    }
+  }
 }  // namespace ON2Solutions

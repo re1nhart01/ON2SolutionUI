@@ -14,7 +14,9 @@
 #include <unordered_map>
 
 namespace foundation {
+static const std::string empty = "";
 using NavigationParam = std::unordered_map<std::string, std::variant<float, int, short, const char*, bool, std::string>>;
+using ScreenFactory = Delegate<std::unique_ptr<VNode>(const NavigationParam& params)>;
 
 struct StackCurrentScreen {
     int id;
@@ -28,8 +30,6 @@ struct StackNavigatorConfig {
 };
 
 
-
-using ScreenFactory = Delegate<std::unique_ptr<VNode>(const NavigationParam& params)>;
 
 struct StackHistoryRoute
 {
@@ -126,7 +126,9 @@ public:
 
         last_update = now;
 
-        _mount_screen(name, with_save, {});
+      UIQueue::get_instance().push([this, name, with_save]() {
+        this->_mount_screen(name, with_save, {});
+      });
   }
 
   void navigate(const std::string& name, const NavigationParam& params, bool with_save = true) {
@@ -139,7 +141,9 @@ public:
 
         last_update = now;
 
-        _mount_screen(name, with_save, params);
+        UIQueue::get_instance().push([this, name, params, with_save]() {
+          this->_mount_screen(name, with_save, params);
+        });
   }
 
   void goBack() {
@@ -163,8 +167,8 @@ public:
         _mount_screen(name, false, param);
     }
 
-    const std::string& get_current_route() const {
-        static const std::string empty = "";
+    std::string get_current_route() const {
+      if (!current.has_value()) return "none";
         return current ? current->name : empty;
     }
 

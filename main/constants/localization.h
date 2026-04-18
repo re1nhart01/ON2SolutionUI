@@ -137,7 +137,7 @@ namespace ON2Solutions {
 
     inline constexpr const char* info_bit_23_error = "Prestart Timeout ERROR";
     inline constexpr const char* info_bit_24_error = "Preproduce Timeout ERROR";
-    inline constexpr const char* info_bit_25_error = "Reserved (25)";
+    inline constexpr const char* info_bit_25_error = "External Alarm";
     inline constexpr const char* info_bit_26_error = "LCD Module Wires Broken";
     inline constexpr const char* info_bit_27_error = "Oxygen Temperature Overheat";
     inline constexpr const char* info_bit_28_error = "Tank Pressure Sensor A Fault";

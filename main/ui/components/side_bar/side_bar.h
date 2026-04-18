@@ -10,6 +10,7 @@
 #include "constants/theme.h"
 
 #include <lg/dataset/serializer.h>
+#include "esp_log.h"
 
 #include "protocols/uart/uart_proto.h"
 
@@ -49,27 +50,20 @@ namespace ON2Solutions {
       }
     };
 
-    void on_navigation_press(const std::string& path) const {
-      if (this->props.stack == nullptr)
-        return;
-      if (this->props.stack->get_current_route() == path)
-        return;
-
-      this->props.stack->navigate(path, false);
-    }
-
     $$Button render_nav_button(const std::string& path, const char* icon,
                                bool is_active_additional = false) const {
-      if (this->props.stack == nullptr)
+      auto* stack = this->props.stack;
+      if (stack == nullptr)
         return $Button(ButtonProps::up());
       bool is_active = this->props.stack->get_current_route() == path ||
                        is_active_additional;
 
-
       return $Button(
           ButtonProps::up()
-              .click([this, path](lv_event_t*) {
-                this->on_navigation_press(path);
+              .click([path, stack](lv_event_t*) {
+                if (stack == nullptr) return;
+                if (stack->get_current_route() == path)return;
+                    stack->navigate(path, false);
               })
               .set_style([is_active](Styling& style) {
                 style.set_clear_default();
@@ -131,8 +125,7 @@ namespace ON2Solutions {
                 style.setBorder(BORDER_SECONDARY, 1, LV_OPA_100);
                 style.setBorderRadius(0);
                 style.setPadding(12, 12, 0, 0);
-                style.setGap(
-                    0, 0);
+                style.setGap(0, 0);
               })
               .set_children(children(
                   $View(ViewProps::up()

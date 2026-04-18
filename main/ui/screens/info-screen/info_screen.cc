@@ -59,6 +59,7 @@ namespace ON2Solutions {
        }},
       {"LCD FIRMWARE", [](const Dataset& s) { return LCD_FIRMWARE_VERSION; }},
       {"LCD BOOTLOADER", [](const Dataset& s) { return LCD_LOADER_VERSION; }},
+      {"LCD RELEASE DATE", [](const Dataset& s) { return LCD_FIRMWARE_RELEASE_DATE; }}
   };
 
   $$View InfoScreen::create_status_row(int index) {
@@ -157,10 +158,10 @@ namespace ON2Solutions {
                           .items(LV_FLEX_ALIGN_START)
                           .track_cross(LV_FLEX_ALIGN_SPACE_BETWEEN)
                           .set_children(children(
-                              $Sidebar(SidebarProps::up()
-                              .set_uart_handler(this->props.uart.get())
-                              .set_stack(
-                                  this->navigation_ref)),
+                              $Sidebar(
+                                  SidebarProps::up()
+                                      .set_uart_handler(this->props.uart.get())
+                                      .set_stack(this->navigation_ref)),
                               $View(ViewProps::up()
                                         .w(800 - 56)
                                         .h(LV_PCT(100))
