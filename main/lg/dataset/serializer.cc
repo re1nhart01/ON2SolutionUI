@@ -65,11 +65,13 @@ namespace ON2Solutions::parser {
     }
 
     result += ">";
+
     return result;
   }
 
   template std::string serialize<float>(const SerializableCommand<float>&);
   template std::string serialize<uint8_t>(const SerializableCommand<uint8_t>&);
+  template std::string serialize<int>(const SerializableCommand<int>&);
   template std::string serialize<uint16_t>(
       const SerializableCommand<uint16_t>&);
   template std::string serialize<int16_t>(const SerializableCommand<int16_t>&);

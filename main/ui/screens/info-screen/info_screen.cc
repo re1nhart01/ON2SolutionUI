@@ -2,13 +2,23 @@
 #include "info_screen.h"
 
 #include <constants/localization.h>
-
 #include <control_config.hh>
+#include <lg/dataset/store/dataset.store.h>
+#include <lg/dataset/types.h>
+#include "lg/dataset/serializer.h"
+#include "protocols/uart/uart_proto.h"
+
 
 namespace ON2Solutions {
+
+  void InfoScreen::on_focus() {
+    execute_typed_command(this->props.uart, parser::SendableCommands::RequestData, static_cast<int>(InfoRequest));
+  }
+
   void InfoScreen::component_did_mount() {
     ESP_LOGI("preloader_screen", "Preloading screen");
   }
+
   $$CommonHeader InfoScreen::render_header() const {
     return $CommonHeader(CommonHeaderProps::up());
   }

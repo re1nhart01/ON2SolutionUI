@@ -9,12 +9,8 @@
 #include "../../components/foundation/core/state/state.h"
 #include "../../components/reusable.h"
 #include "ui/components/on_circular/on_circular.h"
-#include "esp_random.h"
-#include "internals/lvgl_port.h"
-#include "lg/dataset/deserializer.h"
 #include "ui/components/common_header/common_header.h"
 #include "ui/components/errors_modal/error_modal.h"
-#include "ui/components/side_bar/side_bar.h"
 
 namespace ON2Solutions {
   class MainScreen;

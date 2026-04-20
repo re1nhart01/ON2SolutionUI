@@ -1,19 +1,11 @@
 
 #pragma once
 
-#include "constants/theme.h"
-#include "../../components/foundation/components/component.h"
 #include "../../components/foundation/core/application.h"
 #include "../../components/foundation/core/shortcuts.h"
 #include <ui/components/common_header/common_header.h>
-#include <ui/components/side_bar/side_bar.h>
 #include <ui/screens/errors-screen/errors_screen.h>
-#include <ui/styles/common_styles.h>
-#include "constants/theme.h"
-
-#include <ui/components/common_header/common_header.h>
-#include <iosfwd>
-#include <vector>
+#include <protocols/uart/uart_proto.h>
 
 namespace ON2Solutions {
   struct InfoModel;
@@ -33,6 +25,8 @@ namespace ON2Solutions {
 
     ~InfoScreen() override = default;
 
+
+    void on_focus() override;
     void component_did_mount() override;
     $$CommonHeader render_header() const;
     $$View create_status_row(int index);

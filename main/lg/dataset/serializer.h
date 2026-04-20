@@ -36,7 +36,20 @@ namespace ON2Solutions::parser {
     SpvValveAutoCalibration,   // CV
     PrimaryScreenOxygenSensor, // PO
     PrimaryScreenPressureSensor, // PP
+    RequestData //RQ
   };
+
+    enum RequestType : int {
+      AllRequest = 0,
+      SettingsRequest = 1,
+      InfoRequest = 2,
+      AllRequest2 = 3
+    };
+
+    // constexpr int AllRequest = 0;
+    // constexpr int SettingsRequest = 1;
+    // constexpr int InfoRequest = 2;
+    // constexpr int AllRequest2 = 3;
 
   constexpr std::string_view command_to_string(SendableCommands cmd) {
     switch (cmd) {
@@ -82,6 +95,8 @@ namespace ON2Solutions::parser {
         return "PO";
       case SendableCommands::PrimaryScreenPressureSensor:
         return "PP";
+      case SendableCommands::RequestData:
+        return "RQ";
       default:
         return "UNKNOWN";
     }
@@ -89,7 +104,7 @@ namespace ON2Solutions::parser {
 
   template<typename T>
   struct SerializableCommand {
-    SendableCommands command;
+    SendableCommands command = SendableCommands::StatusCommand;
     T data{};
     int8_t num_sensor{0};
     T min{};

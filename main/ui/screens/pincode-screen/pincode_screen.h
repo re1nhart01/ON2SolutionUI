@@ -1,17 +1,16 @@
 #pragma once
 
-#include <core/style_store/style_store.h>
 #include <protocols/uart/uart_proto.h>
-#include <ui/styles/common_styles.h>
-#include "../../components/foundation/core/shortcuts.h"
-#include "../../components/foundation/core/state/state.h"
-#include "control_config.hh"
+#include "core/shortcuts.h"
+#include "lg/helpers/utils.h"
+#include "constants/theme.h"
 
 namespace ON2Solutions {
   class PinCodeScreen;
   struct PinCodeScreenProps final
       : foundation::BaseProps<PinCodeScreenProps, PinCodeScreen> {
     foundation::NavigationParam params;
+    std::shared_ptr<UartHandler> uart;
   };
   inline const char* btnm_map[] = {
     "1", "2", "3", "\n",
@@ -27,7 +26,8 @@ namespace ON2Solutions {
 
    public:
     explicit PinCodeScreen(foundation::StackNavigator* stack, PinCodeScreenProps props)
-        : NavigationScreen(stack, std::move(props)) {}
+        : NavigationScreen(stack, std::move(props)) {
+    }
 
     ~PinCodeScreen() override = default;
 

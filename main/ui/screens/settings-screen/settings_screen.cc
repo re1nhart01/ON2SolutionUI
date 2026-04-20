@@ -9,6 +9,7 @@ namespace ON2Solutions {
 
   void SettingsScreen::on_focus() {
     NavigationScreen::on_focus();
+    execute_typed_command(this->props.uart, SendableCommands::RequestData, static_cast<int>(SettingsRequest));
   }
 
   void SettingsScreen::on_blur() {

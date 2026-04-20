@@ -1,7 +1,11 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
+
+#include "lg/dataset/serializer.h"
+#include "protocols/uart/uart_proto.h"
 
 inline bool is_up_bit_pos(uint32_t value, short pos = 0)
 {
@@ -61,4 +65,36 @@ inline int find_index(const std::array<T, N>& arr, const std::string_view value)
       return std::string_view(item) == value;
   });
   return (it != arr.end()) ? std::distance(arr.begin(), it) : 0;
+}
+
+inline void execute_simple_command(
+    const std::shared_ptr<UartHandler>& handler, const ON2Solutions::parser::SendableCommands cmd) {
+  if (!handler) return;
+
+  const auto command = ON2Solutions::parser::SerializableCommand<const char*>{
+    .command = cmd,
+};
+
+  const std::string serialized = ON2Solutions::parser::serialize(command);
+
+  auto _ = handler->send(serialized);
+}
+
+template<typename T>
+inline void execute_typed_command(
+    const std::shared_ptr<UartHandler>& handler, const ON2Solutions::parser::SendableCommands cmd, const T data) {
+  if (!handler) return;
+
+  const auto command = ON2Solutions::parser::SerializableCommand<T>{
+    .command = cmd,
+    .data = data,
+    .num_sensor = 0,
+    .min = 0,
+    .max = 10000,
+    .with_num_sensor = false
+  };
+
+  const std::string serialized = ON2Solutions::parser::serialize(command);
+
+  auto _ = handler->send(serialized);
 }

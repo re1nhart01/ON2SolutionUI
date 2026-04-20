@@ -1,7 +1,7 @@
 #include "main_screen.h"
 
-#include <hal/uart_ll.h>
 #include "constants/theme.h"
+#include "ui/components/side_bar/side_bar.h"
 
 using namespace foundation;
 using namespace ON2Solutions::parser;
@@ -16,17 +16,7 @@ namespace ON2Solutions {
   };
 
   void MainScreen::execute_status_trigger() const {
-    if (!this->props.uart) {
-      return;
-    }
-
-    auto command = SerializableCommand<const char*>{
-        .command = SendableCommands::StatusCommand,
-    };
-
-    std::string serialized = serialize(command);
-
-    auto _ = this->props.uart->send(serialized);
+    execute_simple_command(this->props.uart, SendableCommands::StatusCommand);
   }
 
   template <typename C>

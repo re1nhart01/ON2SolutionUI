@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "constants/theme.h"
-#include "../../components/foundation/components/component.h"
 #include "../../components/foundation/core/application.h"
 #include "../../components/foundation/core/shortcuts.h"
 

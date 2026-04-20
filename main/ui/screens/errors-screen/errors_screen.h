@@ -6,7 +6,6 @@
 #include <ui/components/common_header/common_header.h>
 #include <ui/components/side_bar/side_bar.h>
 #include <ui/styles/common_styles.h>
-#include "constants/theme.h"
 #include "ui/components/paginated_list/paginated_list.h"
 
 #include <protocols/uart/uart_proto.h>

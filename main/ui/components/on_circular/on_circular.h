@@ -2,12 +2,8 @@
 #pragma once
 
 #include <core/shortcuts.h>
-
 #include "core/styling/styling.h"
-
-#include <constants/assets.h>
 #include <constants/theme.h>
-#include <lg/helpers/utils.h>
 
 using namespace foundation;
 namespace ON2Solutions {

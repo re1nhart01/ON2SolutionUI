@@ -7,14 +7,14 @@
 #include "ui/screens/pincode-screen/pincode_screen.h"
 #include "ui/screens/preloader-screen/preloader_screen.h"
 #include "ui/screens/settings-screen/settings_screen.h"
-
-
 #include <core/application.h>
+#include "lg/dataset/deserializer.h"
 
 extern "C" {
   #include "../components/foundation/internals/lvgl_port.h"
   #include "core/waveshare_rgb_lcd_port.h"
 }
+//    heap_caps_print_heap_info(MALLOC_CAP_8BIT);
 
 namespace ON2Solutions {
   static void timer_handler_adapter(lv_timer_t* timer);
@@ -41,11 +41,6 @@ namespace ON2Solutions {
           .delegate = [](const UartTypes::UartCallbackResponse& uart_data) {
             if (strlen(uart_data.response.packet) <= 0)
               return;
-
-            // ESP_LOGI("main_screen", "Received data from UART %s",
-            //          uart_data.response.packet);
-
-            heap_caps_print_heap_info(MALLOC_CAP_8BIT);
 
             if (uart_data.response.packet &&
                 strlen(uart_data.response.packet) > 0) {
@@ -103,9 +98,11 @@ namespace ON2Solutions {
       });
 
       navigator->register_screen(
-          "/pin_code", [navigator](const NavigationParam& params) {
+          "/pin_code", [navigator, uart = this->uart_handler](
+                           const NavigationParam& params) {
             return std::make_unique<PinCodeScreen>(
-                navigator.get(), PinCodeScreenProps{.params = params});
+                navigator.get(),
+                PinCodeScreenProps{.params = params, .uart = uart});
           });
 
       navigator->register_screen("/preloader",
@@ -149,7 +146,6 @@ namespace ON2Solutions {
     void before_load_application() override {
       ESP_LOGI("MyApp", "before_load_application called");
       uart_driver_delete(UART_NUM_2);
-      // 1. Сначала настраиваем как выход
       gpio_config_t io_conf = {};
       io_conf.intr_type = GPIO_INTR_DISABLE;
       io_conf.mode = GPIO_MODE_OUTPUT;
@@ -180,7 +176,7 @@ namespace ON2Solutions {
     }
 
     void after_load_application() override {
-      ESP_LOGI("MyApp", "after_load_application called");
+      execute_typed_command(this->uart_handler, SendableCommands::RequestData, static_cast<int>(parser::AllRequest));
     }
   };
 
@@ -195,15 +191,15 @@ namespace ON2Solutions {
     auto app = static_cast<WaveApplication*>(timer->user_data);
     const uint32_t inactive_ms = lv_disp_get_inactive_time(nullptr);
 
-    if (inactive_ms >= MS_MIN5 && app->stack_navigator->current->name != "/main") {
+    if (inactive_ms >= MS_MIN5 &&
+        app->stack_navigator->current->name != "/main") {
       app->stack_navigator->navigate("/main");
     }
 
     if (inactive_ms >= MS_MIN15 && is_active_lcd_bl) {
       is_active_lcd_bl = false;
       waveshare_rgb_lcd_bl_off();
-    }
-    else if (inactive_ms < MS_MIN2) {
+    } else if (inactive_ms < MS_MIN2) {
       if (!is_active_lcd_bl) {
         is_active_lcd_bl = true;
         waveshare_rgb_lcd_bl_on();

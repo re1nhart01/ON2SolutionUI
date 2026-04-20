@@ -1,11 +1,16 @@
 #include "pincode_screen.h"
 
-#include <constants/assets.h>
+#include "constants/assets.h"
+#include "control_config.hh"
+#include "lg/dataset/serializer.h"
+#include "ui/styles/common_styles.h"
 
 using namespace foundation;
 
 namespace ON2Solutions {
-  void PinCodeScreen::component_did_mount() {};
+  void PinCodeScreen::component_did_mount() {
+    execute_typed_command(this->props.uart, parser::SendableCommands::RequestData, static_cast<int>(parser::AllRequest));
+  };
 
   void PinCodeScreen::show_info_modal() {
     const auto login = this->login_state.get();
