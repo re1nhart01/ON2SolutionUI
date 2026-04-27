@@ -13,7 +13,8 @@ namespace ON2Solutions {
     Ps,
     Fl,
     Tr,
-    Tn,
+    Tnc,
+    Tnf,
     Po,
     Pp,
   };
@@ -28,8 +29,10 @@ namespace ON2Solutions {
         return "psi";
       case Tr:
         return "psi";
-      case Tn:
+      case Tnc:
         return "C";
+      case Tnf:
+        return "F";
       case Fl:
         return "lpm";
       default:
@@ -48,8 +51,10 @@ namespace ON2Solutions {
         return {0, 150};
       case Tr:
         return {0, 60};
-      case Tn:
-        return {0, 100};
+      case Tnc:
+        return {0, 45};
+      case Tnf:
+        return {0, 113};
       case Fl:
         return {0, 20};
       default:
@@ -82,7 +87,6 @@ namespace ON2Solutions {
     return NO_ERROR_COLOR;
   }
 
-  // Вспомогательная функция для получения настроек
   inline SelectorConfig get_config(CircularSelectorType type) {
     using D = parser::Dataset;
     switch (type) {
@@ -106,10 +110,14 @@ namespace ON2Solutions {
         return {" psi", 0, 60, [](const D& v, uint8_t i) {
                   return v.operative_data.secondary_tank_pressure[i];
                 }};
-      case Tn:
-        return {"", 0, 100, [](const D& v, uint8_t i) {
+      case Tnc:
+        return {" c", 0, 45, [](const D& v, uint8_t i) {
                   return v.operative_data.tank_temperatures[i];
                 }, 1};
+      case Tnf:
+        return {" f", 0, 113, [](const D& v, uint8_t i) {
+          return v.operative_data.tank_temperatures[i];
+        }, 1};
       case Fl:
         return {" lpm", 0, 20, [](const D& v, uint8_t i) {
                   return v.operative_data.oxygen_speed[i];

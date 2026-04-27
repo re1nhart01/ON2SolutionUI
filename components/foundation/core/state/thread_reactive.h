@@ -43,7 +43,7 @@ namespace foundation {
     };
 
    public:
-    ThreadReactive(const T& default_val)
+    explicit ThreadReactive(const T& default_val)
         : value_store(std::make_shared<const T>(default_val)) {
       _mutex = xSemaphoreCreateRecursiveMutex();
     }

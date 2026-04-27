@@ -22,6 +22,13 @@ namespace ON2Solutions::parser {
           "A",
           "B",
       };
+  static constexpr std::array<const char*, 2>
+      TEMPERATURE_UNIT_OPTIONS{
+        "Celsius",
+        "Fahrenheit",
+    };
+
+  inline auto TEMPERATURE_UNIT = "temp_uni";
 
   enum class DatasetStatuses {
     StandBy,

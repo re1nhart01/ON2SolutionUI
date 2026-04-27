@@ -79,4 +79,5 @@
 #include "core/structures/ui_queue.h"
 #include "core/structures/ui_queue_c.h"
 #include "components/registry.h"
-
+#include "core/state/flash_reactive.hh"
+#include "core/state/flash_reader.hh"

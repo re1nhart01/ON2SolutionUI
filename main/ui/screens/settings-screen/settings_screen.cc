@@ -5,11 +5,14 @@
 #include <ui/components/common_header/common_header.h>
 #include <ui/components/side_bar/side_bar.h>
 
+#include "lg/dataset/store/flash_store.h"
+
 namespace ON2Solutions {
 
   void SettingsScreen::on_focus() {
     NavigationScreen::on_focus();
-    execute_typed_command(this->props.uart, SendableCommands::RequestData, static_cast<int>(SettingsRequest));
+    execute_typed_command(this->props.uart, SendableCommands::RequestData,
+                          static_cast<int>(SettingsRequest));
   }
 
   void SettingsScreen::on_blur() {
@@ -45,7 +48,8 @@ namespace ON2Solutions {
     auto status = this->props.uart->send(serialized);
   }
 
-  void SettingsScreen::button_uart_action(const SendableCommands& sendable_command) const {
+  void SettingsScreen::button_uart_action(
+      const SendableCommands& sendable_command) const {
     auto command = parser::SerializableCommand<const char*>{
         .command = sendable_command,
     };
@@ -360,20 +364,25 @@ namespace ON2Solutions {
                                           self->set_state([value](DropdownProps&
                                                                       props) {
                                             props.set_selected(find_index(
-                                                parser::PRIMARY_SCREEN_OXYGEN_SENSOR_OPTIONS,
+                                                parser::
+                                                    PRIMARY_SCREEN_OXYGEN_SENSOR_OPTIONS,
                                                 value.settings
                                                     .primary_screen_oxygen_sensor_st
                                                     .data()));
                                           });
                                         })
                                     .set_selected(find_index(
-                                        parser::PRIMARY_SCREEN_OXYGEN_SENSOR_OPTIONS,
+                                        parser::
+                                            PRIMARY_SCREEN_OXYGEN_SENSOR_OPTIONS,
                                         dataset.primary_screen_oxygen_sensor_st
                                             .data()))
-                                    .set_options(parser::PRIMARY_SCREEN_OXYGEN_SENSOR_OPTIONS)
+                                    .set_options(
+                                        parser::
+                                            PRIMARY_SCREEN_OXYGEN_SENSOR_OPTIONS)
                                     .change([this](const std::string& option) {
-                                      this->update_param(PrimaryScreenOxygenSensorSpec,
-                                                         option.c_str());
+                                      this->update_param(
+                                          PrimaryScreenOxygenSensorSpec,
+                                          option.c_str());
                                     }))))),
 
                 $View(
@@ -399,20 +408,55 @@ namespace ON2Solutions {
                                           self->set_state([value](DropdownProps&
                                                                       props) {
                                             props.set_selected(find_index(
-                                                parser::PRIMARY_SCREEN_PRESSURE_SENSOR_OPTIONS,
+                                                parser::
+                                                    PRIMARY_SCREEN_PRESSURE_SENSOR_OPTIONS,
                                                 value.settings
                                                     .primary_screen_pressure_sensor_st
                                                     .data()));
                                           });
                                         })
                                     .set_selected(find_index(
-                                        parser::PRIMARY_SCREEN_PRESSURE_SENSOR_OPTIONS,
-                                        dataset.primary_screen_pressure_sensor_st
+                                        parser::
+                                            PRIMARY_SCREEN_PRESSURE_SENSOR_OPTIONS,
+                                        dataset
+                                            .primary_screen_pressure_sensor_st
                                             .data()))
-                                    .set_options(parser::PRIMARY_SCREEN_PRESSURE_SENSOR_OPTIONS)
+                                    .set_options(
+                                        parser::
+                                            PRIMARY_SCREEN_PRESSURE_SENSOR_OPTIONS)
                                     .change([this](const std::string& option) {
-                                      this->update_param(PrimaryScreenPressureSensorSpec,
-                                                         option.c_str());
+                                      this->update_param(
+                                          PrimaryScreenPressureSensorSpec,
+                                          option.c_str());
+                                    }))))),
+                $View(
+                    ViewProps::up()
+                        .w(LV_PCT(100))
+                        .h(52)
+                        .flow(FlexPreset::RowBetween)
+                        .set_style([](Styling& style) {
+                          style.setPadding(0, 0, 16, 16);
+                          style.setBorder(PRIMARY_BG, 0, LV_OPA_0);
+                          style.setBackgroundColor(TERTIARY_BG);
+                        })
+                        .set_children(children(
+                            $Text(TextProps::up().value(
+                                locales::en::temperature_unit)),
+                            $Dropdown(
+                                DropdownProps::up()
+                                    .set_selected(find_index(
+                                        TEMPERATURE_UNIT_OPTIONS,
+                                        FlashStore::getInstance()
+                                            ->get_value<std::string>(
+                                                TEMPERATURE_UNIT,
+                                                TEMPERATURE_UNIT_OPTIONS
+                                                    [0]
+                                                )
+
+                                            ))
+                                    .set_options(TEMPERATURE_UNIT_OPTIONS)
+                                    .change([](const std::string& option) {
+                                      FlashStore::getInstance()->set_value<std::string>(TEMPERATURE_UNIT, option);
                                     }))))),
                 $Button(ButtonProps::up()
                             .set_style([](Styling& style) {
@@ -425,7 +469,8 @@ namespace ON2Solutions {
                             .set_child($Text(TextProps::up().value(
                                 locales::en::set_default)))
                             .click([this](lv_event_t* e) {
-                              this->button_uart_action(SendableCommands::SetDefault);
+                              this->button_uart_action(
+                                  SendableCommands::SetDefault);
                             })),
                 $Button(ButtonProps::up()
                             .set_style([](Styling& style) {
@@ -438,7 +483,8 @@ namespace ON2Solutions {
                             .set_child($Text(TextProps::up().value(
                                 locales::en::hour_run_reset)))
                             .click([this](lv_event_t* e) {
-                              this->button_uart_action(SendableCommands::ResetMotoCommand);
+                              this->button_uart_action(
+                                  SendableCommands::ResetMotoCommand);
                             }))))
             .w(LV_PCT(100))
             .h(LV_SIZE_CONTENT));
@@ -468,10 +514,10 @@ namespace ON2Solutions {
                         .items(LV_FLEX_ALIGN_START)
                         .track_cross(LV_FLEX_ALIGN_SPACE_BETWEEN)
                         .set_children(children(
-                            $Sidebar(SidebarProps::up()
-                            .set_uart_handler(this->props.uart.get())
-                            .set_stack(
-                                this->navigation_ref)),
+                            $Sidebar(
+                                SidebarProps::up()
+                                    .set_uart_handler(this->props.uart.get())
+                                    .set_stack(this->navigation_ref)),
                             $View(
                                 ViewProps::up()
                                     .w(800 - 56)

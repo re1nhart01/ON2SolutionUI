@@ -80,6 +80,7 @@ namespace ON2Solutions {
     inline constexpr const char* oxygen_rate = "Oxygen Flow";
     inline constexpr const char* pressure_sensor_type = "Pressure Sensor Type";
     inline constexpr const char* primary_screen_oxygen_sensor = "Primary Screen Oxygen Sensor";
+    inline constexpr const char* temperature_unit = "Temperature Unit";
     inline constexpr const char* primary_screen_pressure_sensor = "Primary Screen Pressure Sensor";
 
     inline constexpr const char* oxygen_offset = "Oxygen offset";

@@ -200,7 +200,7 @@ namespace ON2Solutions::parser::paramspec {
   inline constexpr ParamSpec TankHighLimitSpec{
       .label = "Tank High Limit PSI",
       .min = 0.0f,
-      .max = 75.0f,
+      .max = 180.0f,
       .step = 1.0f,
       .precision = 0,
       .default_value = 50.0f,
@@ -210,7 +210,7 @@ namespace ON2Solutions::parser::paramspec {
   inline constexpr ParamSpec TankLowLimitSpec{
       .label = "Tank Low Limit PSI",
       .min = 0.0f,
-      .max = 75.0f,
+      .max = 180.0f,
       .step = 1.0f,
       .precision = 0,
       .default_value = 40.0f,

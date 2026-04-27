@@ -32,6 +32,7 @@ namespace ON2Solutions {
     void component_did_mount() override;
     void execute_status_trigger() const;
     $$CommonHeader render_header() const;
+    $$View render_temp_with_unit(int circular_index) const;
     $$View render_body() const;
     $$View render_card(const CircularSelectorType& type, const char* title,
                        uint8_t index, bool is_small) const;

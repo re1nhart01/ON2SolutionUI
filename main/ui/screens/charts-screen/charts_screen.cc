@@ -4,6 +4,8 @@
 #include <ui/components/side_bar/side_bar.h>
 #include <ui/screens/main-screen/main_screen.h>
 
+#include "lg/dataset/store/flash_store.h"
+
 namespace ON2Solutions {
   void ChartsScreen::component_did_mount() {
     ESP_LOGI("preloader_screen", "Preloading screen");
@@ -21,6 +23,17 @@ namespace ON2Solutions {
 
   $$CommonHeader ChartsScreen::render_header() const {
     return $CommonHeader(CommonHeaderProps::up());
+  }
+
+  $$View ChartsScreen::render_temp_with_unit(int circular_index) const {
+    auto current_unit = FlashStore::getInstance()->get_value<std::string>(
+                            TEMPERATURE_UNIT, TEMPERATURE_UNIT_OPTIONS[0]) ==
+                                TEMPERATURE_UNIT_OPTIONS[0]
+                            ? Tnc
+                            : Tnf;
+
+    return this->render_card(current_unit, locales::en::temperature,
+                             circular_index, true);
   }
 
   $$View ChartsScreen::render_card(const CircularSelectorType& type,
@@ -138,10 +151,8 @@ namespace ON2Solutions {
                                                     Tr,
                                                     locales::en::booster_psi,
                                                     circular_index, true),
-                                                this->render_card(
-                                                    Tn,
-                                                    locales::en::temperature,
-                                                    circular_index, true)),
+                                                this->render_temp_with_unit(
+                                                    circular_index)),
                                             true)))
 
                                     ),

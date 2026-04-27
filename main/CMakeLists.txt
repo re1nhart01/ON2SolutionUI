@@ -10,7 +10,7 @@ file(GLOB_RECURSE SOURCES
 idf_component_register(
         SRCS ${SOURCES}
         INCLUDE_DIRS .
-        REQUIRES foundation
+        REQUIRES foundation nvs_flash
 )
 
 littlefs_create_partition_image(storage ../flash_data FLASH_IN_PROJECT)

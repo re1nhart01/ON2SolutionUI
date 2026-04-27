@@ -14,6 +14,7 @@ idf_component_register(
         driver
         esp_timer
         esp_lcd_touch_gt911
+        nvs_flash
 )
 
 target_compile_features(${COMPONENT_LIB} PUBLIC cxx_std_20)

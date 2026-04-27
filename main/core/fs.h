@@ -62,7 +62,7 @@ static void* fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode) {
 
   FILE* f = fopen(full_path, fs_mode);
 
-  if (f == NULL) {
+  if (f == nullptr) {
   } else {
   }
 
@@ -74,8 +74,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file) {
   return LV_FS_RES_OK;
 }
 
-static lv_fs_res_t
-fs_read(lv_fs_drv_t *drv, void *file, void *buf, uint32_t btr, uint32_t *br)
+static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file, void *buf, uint32_t btr, uint32_t *br)
 {
   *br = fread(buf, 1, btr, (FILE *)file);
   return (*br <= 0) ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;

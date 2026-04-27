@@ -9,6 +9,7 @@
 #include "ui/screens/settings-screen/settings_screen.h"
 #include <core/application.h>
 #include "lg/dataset/deserializer.h"
+#include "lg/dataset/store/flash_store.h"
 
 extern "C" {
   #include "../components/foundation/internals/lvgl_port.h"
@@ -171,6 +172,7 @@ namespace ON2Solutions {
       this->uart_handler->enable_rx(true);
       this->add_uart_data_event();
       this->on_event_bootloader_mode();
+      FlashStore::getInstance()->init();
 
       inactivity_timer = lv_timer_create(timer_handler_adapter, 1000, this);
     }
