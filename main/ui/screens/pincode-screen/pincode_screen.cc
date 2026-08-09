@@ -67,6 +67,10 @@ namespace ON2Solutions {
     if (login.empty())
       return;
     if (login == USER_LOGIN) {
+      execute_typed_command(this->props.uart,
+                            parser::SendableCommands::RequestData,
+                          static_cast<int>(parser::SettingsRequest));
+      vTaskDelay(pdMS_TO_TICKS(200));
       this->navigation_ref->navigate("/settings");
     } else {
       show_info_modal();

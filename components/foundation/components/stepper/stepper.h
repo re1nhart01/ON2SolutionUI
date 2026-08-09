@@ -154,6 +154,8 @@ namespace foundation {
         props.style_override(style);
         lv_obj_refresh_style(obj, LV_PART_MAIN, LV_STYLE_PROP_ANY);
       }
+
+      update_text(props.initial_value, props.precision);
     };
 
     void update_text(float val, short precision) {

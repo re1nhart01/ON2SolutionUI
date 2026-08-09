@@ -75,7 +75,6 @@ namespace ON2Solutions {
                                        const int max) {
     if (max <= min)
       return BORDER_PRIMARY;
-
     float ratio = (value - min) / (max - min);
 
     if (ratio < 0.25f) {

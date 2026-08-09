@@ -9,6 +9,66 @@
 
 namespace ON2Solutions {
 
+  inline float get_param_value(
+    const ON2Solutions::parser::paramspec::ParamSpec& spec,
+    const ON2Solutions::parser::Dataset& dataset
+) {
+    const auto& settings = dataset.settings;
+
+    switch (spec.command) {
+        case ON2Solutions::parser::SendableCommands::OxygenShift:
+            return settings.oxygen_sensor_offset[spec.num_sensor];
+
+        case ON2Solutions::parser::SendableCommands::FlowShift:
+            return settings.flow_sensor_offset[spec.num_sensor];
+
+        case ON2Solutions::parser::SendableCommands::CompressorDelay:
+            return settings.compressor_delay_sec;
+
+        case ON2Solutions::parser::SendableCommands::RunUpTime:
+            return settings.run_up_delay_sec;
+
+        case ON2Solutions::parser::SendableCommands::PreStartTime:
+            return settings.prestart_time_sec;
+
+        case ON2Solutions::parser::SendableCommands::WorkOxygenConcentration:
+            return settings.work_oxygen_concentration;
+
+        case ON2Solutions::parser::SendableCommands::LowOxygenLimit:
+            return settings.low_limit_oxygen_concentration;
+
+        case ON2Solutions::parser::SendableCommands::LowOxygenLimitTime:
+            return settings.low_limit_time_to_error_sec;
+
+        case ON2Solutions::parser::SendableCommands::ErrorCountToAlarm:
+            return settings.error_to_alarm_count;
+
+        case ON2Solutions::parser::SendableCommands::TankPressureHighLimit:
+            return settings.tank_high_pressure;
+
+        case ON2Solutions::parser::SendableCommands::TankPressureLowLimit:
+            return settings.tank_low_pressure;
+
+        case ON2Solutions::parser::SendableCommands::SpvValveOpenTime:
+            return settings.spv_on_time_sec;
+
+        case ON2Solutions::parser::SendableCommands::SpvValveCloseTime:
+            return settings.spv_off_time_sec;
+
+        case ON2Solutions::parser::SendableCommands::OxygenOverheatTempLimit:
+            return settings.temperature_overheat_alarm;
+
+        case ON2Solutions::parser::SendableCommands::FlowError:
+            return settings.flow_low_limit_to_error;
+
+        case ON2Solutions::parser::SendableCommands::SpvValveAutoCalibration:
+            return settings.calibrate_valve_1_9_cycle;
+
+        default:
+            return 0.0f;
+    }
+}
+
   void SettingsScreen::on_focus() {
     NavigationScreen::on_focus();
     execute_typed_command(this->props.uart, SendableCommands::RequestData,
@@ -18,6 +78,18 @@ namespace ON2Solutions {
   void SettingsScreen::on_blur() {
     NavigationScreen::on_blur();
   };
+
+  void SettingsScreen::schedule_settings_refresh() const {
+    const auto uart = this->props.uart;
+
+    this->debounce->exec([uart]() {
+        execute_typed_command(
+            uart,
+            SendableCommands::RequestData,
+            static_cast<int>(SettingsRequest)
+        );
+    });
+  }
 
   template <typename T>
   void SettingsScreen::update_param(const ParamSpec& spec, T value, T min,
@@ -32,7 +104,9 @@ namespace ON2Solutions {
     };
     std::string serialized = parser::serialize(command);
 
-    auto status = this->props.uart->send(serialized);
+    auto _ = this->props.uart->send(serialized);
+
+    this->schedule_settings_refresh();
   }
 
   void SettingsScreen::update_param(const ParamSpec& spec,
@@ -45,7 +119,9 @@ namespace ON2Solutions {
 
     ESP_LOGI("serialized", serialized.c_str());
 
-    auto status = this->props.uart->send(serialized);
+    auto _ = this->props.uart->send(serialized);
+
+    this->schedule_settings_refresh();
   }
 
   void SettingsScreen::button_uart_action(
@@ -55,7 +131,10 @@ namespace ON2Solutions {
     };
 
     std::string serialized = parser::serialize(command);
-    auto status = this->props.uart->send(serialized);
+    auto _ = this->props.uart->send(serialized);
+
+    this->schedule_settings_refresh();
+
   }
 
   template void SettingsScreen::update_param<float>(const ParamSpec& spec,
@@ -128,20 +207,19 @@ namespace ON2Solutions {
                         .template watch<parser::Dataset>(
                             parser::DatasetStore::getInstance(),
                             fmt<10>("param_%s", spec.label).data(),
-                            [spec](Stepper* self,
-                                   const parser::Dataset& dataset) {
-                              auto [min, max] =
-                                  calculate_dynamic_range(spec, dataset);
-                              self->set_state([min, max](StepperProps& props) {
+                            [spec](Stepper* self, const parser::Dataset& dataset) {
+                              auto [min, max] = calculate_dynamic_range(spec, dataset);
+                              const float new_value = get_param_value(spec, dataset);
+
+                              self->set_state([min, max, new_value](StepperProps& props) {
                                 props.range(min, max);
+                                props.value(new_value);
                               });
                             })
                         .on_change([this, spec, min, max](const float v) {
-                          this->debounce->exec([this, spec, v, min, max]() {
                             this->update_param<T>(
                                 spec, static_cast<T>(std::clamp(v, min, max)),
                                 min, max);
-                          });
                         })))));
   }
 

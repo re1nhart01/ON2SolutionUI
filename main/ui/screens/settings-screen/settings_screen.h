@@ -25,10 +25,11 @@ namespace ON2Solutions {
     std::unique_ptr<Debounce> debounce = nullptr;
    public:
     explicit SettingsScreen(StackNavigator* stack, SettingsScreenProps props)
-        : NavigationScreen(stack, std::move(props)), debounce(std::make_unique<Debounce>(800)) {}
+        : NavigationScreen(stack, std::move(props)), debounce(std::make_unique<Debounce>(100)) {}
 
     void on_focus() override;
     void on_blur() override;
+    void schedule_settings_refresh() const;
     template <typename T>
     void update_param(const ParamSpec& spec, T value, T min, T max) const;
     void update_param(const ParamSpec& spec, const char* option) const;
