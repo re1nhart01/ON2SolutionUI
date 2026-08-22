@@ -8,6 +8,8 @@
 
 #define default_pincode "0000"
 
-#define LCD_FIRMWARE_VERSION "1.1.0"
+#define LCD_FIRMWARE_VERSION "1.1.4"
 #define LCD_LOADER_VERSION "1.0.2"
-#define LCD_FIRMWARE_RELEASE_DATE "09.08.26"
+#define LCD_FIRMWARE_RELEASE_DATE "16.08.26"
+
+#define UART_SPEED 460800

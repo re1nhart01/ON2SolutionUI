@@ -4,7 +4,7 @@
 #include <string>
 #include <limits>
 #include <type_traits>
-#include "esp_log.h";
+#include "esp_log.h"
 
 namespace ON2Solutions::parser::helpers {
 

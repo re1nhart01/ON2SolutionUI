@@ -90,7 +90,7 @@ namespace ON2Solutions {
       for (size_t i = 0; i < dots_ref.size(); ++i) {
         bool is_enabled = is_up_bit_pos(static_cast<int>(this->props.active_hex), i);
 
-        dots_ref[i]->set_state([is_enabled](ViewProps& props) {
+        dots_ref[i]->set_state_async([is_enabled](ViewProps& props) {
           props.set_style([is_enabled](Styling& style) {
             style.setBackgroundColor(is_enabled ? PRIMARY_COLOR_2
                                                 : PRIMARY_COLOR_3);

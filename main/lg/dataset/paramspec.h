@@ -314,9 +314,13 @@ namespace ON2Solutions::parser::paramspec {
 #pragma region HELPERS
 
   inline std::pair<float, float> calculate_dynamic_range(const ParamSpec& spec,
-                                                         float dependable) {
+                                                         float dependable, bool enabled_dyn = false) {
     float mn = spec.min;
     float mx = spec.max;
+
+    if (!enabled_dyn) {
+      return { mn, mx };
+    }
 
     switch (spec.command) {
 
@@ -376,9 +380,13 @@ namespace ON2Solutions::parser::paramspec {
   }
 
   inline std::pair<float, float> calculate_dynamic_range(
-      const ParamSpec& spec, const Dataset& dataset) {
+      const ParamSpec& spec, const Dataset& dataset, bool enabled_dyn = false) {
     float mn = spec.min;
     float mx = spec.max;
+
+    if (!enabled_dyn) {
+      return { mn, mx };
+    }
 
     switch (spec.command) {
 

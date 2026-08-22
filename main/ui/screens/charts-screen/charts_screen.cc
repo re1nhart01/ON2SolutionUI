@@ -12,8 +12,9 @@ namespace ON2Solutions {
   }
 
   void ChartsScreen::execute_status_trigger() const {
-    auto command = SerializableCommand<const char*>{
+    const auto command = SerializableCommand<int>{
         .command = SendableCommands::StatusCommand,
+        .with_num_sensor = false,
     };
 
     std::string serialized = serialize(command);

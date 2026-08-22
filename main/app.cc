@@ -8,6 +8,8 @@
 #include "ui/screens/preloader-screen/preloader_screen.h"
 #include "ui/screens/settings-screen/settings_screen.h"
 #include <core/application.h>
+
+#include "control_config.hh"
 #include "lg/dataset/deserializer.h"
 #include "lg/dataset/store/flash_store.h"
 
@@ -32,7 +34,7 @@ namespace ON2Solutions {
           screen);
 
       this->uart_handler = std::make_unique<UartHandler>(
-          UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, 9600, 16384);
+          UART_NUM_2, GPIO_NUM_43, GPIO_NUM_44, UART_SPEED, 16384);
     }
 
     void add_uart_data_event() const {
@@ -46,6 +48,8 @@ namespace ON2Solutions {
             if (uart_data.response.packet &&
                 strlen(uart_data.response.packet) > 0) {
               const char* p = uart_data.response.packet;
+
+              ESP_LOGI("response packet", "%s", p);
 
               DatasetStore::getInstance()->set([p](const Dataset& current) {
                 Dataset next = current;

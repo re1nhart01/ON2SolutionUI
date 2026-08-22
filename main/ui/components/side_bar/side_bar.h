@@ -86,9 +86,10 @@ namespace ON2Solutions {
 
       return $Button(ButtonProps::up()
                          .click([uart_handle](lv_event_t*) {
-                           constexpr auto command =
-                               SerializableCommand<const char*>{
+                          const auto command =
+                               SerializableCommand<int>{
                                    .command = SendableCommands::CabinetLight,
+                                 .with_num_sensor = false,
                                };
 
                            const std::string serialized = serialize(command);

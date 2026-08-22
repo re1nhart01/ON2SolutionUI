@@ -22,7 +22,7 @@ namespace ON2Solutions {
   template <typename C>
   void MainScreen::update_styles(Component<C>* component,
                                  const Delegate<void(Styling&)>& style) {
-    component->set_state([style](C& props) { props.set_style(style); });
+    component->set_state_async([style](C& props) { props.set_style(style); });
   }
 
 #pragma region UI

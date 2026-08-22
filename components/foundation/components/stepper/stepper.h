@@ -119,6 +119,8 @@ namespace foundation {
             float current = std::stof(lv_label_get_text(self->text));
             if (current - self->props.step >= self->props.min_value) {
               current -= self->props.step;
+
+              self->props.initial_value = current;
               self->update_text(current, self->props.precision);
 
               if (self->props.on_change_cb)
@@ -135,6 +137,8 @@ namespace foundation {
             float current = std::stof(lv_label_get_text(self->text));
             if (current + self->props.step <= self->props.max_value) {
               current += self->props.step;
+
+              self->props.initial_value = current;
               self->update_text(current, self->props.precision);
 
               if (self->props.on_change_cb)

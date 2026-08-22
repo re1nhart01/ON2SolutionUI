@@ -17,10 +17,10 @@ namespace ON2Solutions {
 
     switch (spec.command) {
         case ON2Solutions::parser::SendableCommands::OxygenShift:
-            return settings.oxygen_sensor_offset[spec.num_sensor];
+            return settings.oxygen_sensor_offset[spec.num_sensor - 1];
 
         case ON2Solutions::parser::SendableCommands::FlowShift:
-            return settings.flow_sensor_offset[spec.num_sensor];
+            return settings.flow_sensor_offset[spec.num_sensor - 1];
 
         case ON2Solutions::parser::SendableCommands::CompressorDelay:
             return settings.compressor_delay_sec;
@@ -79,62 +79,64 @@ namespace ON2Solutions {
     NavigationScreen::on_blur();
   };
 
-  void SettingsScreen::schedule_settings_refresh() const {
+  template <typename T>
+  void SettingsScreen::update_param(const ParamSpec& spec, T value, T min, T max) const {
     const auto uart = this->props.uart;
 
-    this->debounce->exec([uart]() {
-        execute_typed_command(
-            uart,
-            SendableCommands::RequestData,
-            static_cast<int>(SettingsRequest)
-        );
+      this->debounce->exec([uart, spec, value, min, max]() {
+        auto command = parser::SerializableCommand<T>{
+         .command = spec.command,
+         .data = value,
+         .num_sensor = spec.num_sensor,
+         .min = min,
+         .max = max,
+         .with_num_sensor = spec.with_num_sensor,
+     };
+
+      std::string serialized = parser::serialize(command);
+
+      auto _ = uart->send(serialized);
     });
   }
 
-  template <typename T>
-  void SettingsScreen::update_param(const ParamSpec& spec, T value, T min,
-                                    T max) const {
-    auto command = parser::SerializableCommand<T>{
-        .command = spec.command,
-        .data = value,
-        .num_sensor = spec.num_sensor,
-        .min = min,
-        .max = max,
-        .with_num_sensor = spec.with_num_sensor,
-    };
-    std::string serialized = parser::serialize(command);
+  void SettingsScreen::update_param(
+    const ParamSpec& spec,
+    std::string option
+) const {
+    const auto uart = this->props.uart;
 
-    auto _ = this->props.uart->send(serialized);
+    this->debounce->exec(
+        [uart, spec, option = std::move(option)]() mutable {
+          const auto command =
+              parser::SerializableCommand<std::string>{
+                  .command = spec.command,
+                  .data = std::move(option),
+                  .with_num_sensor = false,
+              };
 
-    this->schedule_settings_refresh();
-  }
+          const std::string serialized =
+              parser::serialize(command);
 
-  void SettingsScreen::update_param(const ParamSpec& spec,
-                                    const char* option) const {
-    auto command = parser::SerializableCommand<const char*>{
-        .command = spec.command,
-        .data = option,
-    };
-    const std::string serialized = parser::serialize(command);
+          ESP_LOGI(
+              "update param",
+              "%s",
+              serialized.c_str());
 
-    ESP_LOGI("serialized", serialized.c_str());
-
-    auto _ = this->props.uart->send(serialized);
-
-    this->schedule_settings_refresh();
+          int _ = uart->send(serialized);
+    });
   }
 
   void SettingsScreen::button_uart_action(
-      const SendableCommands& sendable_command) const {
-    auto command = parser::SerializableCommand<const char*>{
-        .command = sendable_command,
-    };
+    const SendableCommands& sendable_command) const {
 
-    std::string serialized = parser::serialize(command);
-    auto _ = this->props.uart->send(serialized);
+    auto command = parser::SerializableCommand<int>{
+      .command = sendable_command,
+      .with_num_sensor = false,
+  };
 
-    this->schedule_settings_refresh();
+    const std::string serialized = parser::serialize(command);
 
+    int _ = this->props.uart->send(serialized);
   }
 
   template void SettingsScreen::update_param<float>(const ParamSpec& spec,
@@ -173,7 +175,7 @@ namespace ON2Solutions {
   template <typename T>
   $$View SettingsScreen::make_param(const ParamSpec& spec, T value,
                                     float dependable, short width) const {
-    auto [min, max] = calculate_dynamic_range(spec, dependable);
+    auto [min, max] = calculate_dynamic_range(spec, dependable, false);
     return $View(
         ViewProps::up()
             .w(338)
@@ -208,7 +210,7 @@ namespace ON2Solutions {
                             parser::DatasetStore::getInstance(),
                             fmt<10>("param_%s", spec.label).data(),
                             [spec](Stepper* self, const parser::Dataset& dataset) {
-                              auto [min, max] = calculate_dynamic_range(spec, dataset);
+                              auto [min, max] = calculate_dynamic_range(spec, dataset, false);
                               const float new_value = get_param_value(spec, dataset);
 
                               self->set_state([min, max, new_value](StepperProps& props) {
@@ -398,8 +400,7 @@ namespace ON2Solutions {
                                             .data()))
                                     .set_options(parser::PRESSURE_TYPE_OPTIONS)
                                     .change([this](const std::string& option) {
-                                      this->update_param(PressureTypeSensorSpec,
-                                                         option.c_str());
+                                      this->update_param(PressureTypeSensorSpec, option);
                                     })))))))
             .w(LV_PCT(100))
             .h(LV_SIZE_CONTENT));
@@ -459,8 +460,7 @@ namespace ON2Solutions {
                                             PRIMARY_SCREEN_OXYGEN_SENSOR_OPTIONS)
                                     .change([this](const std::string& option) {
                                       this->update_param(
-                                          PrimaryScreenOxygenSensorSpec,
-                                          option.c_str());
+                                          PrimaryScreenOxygenSensorSpec, option);
                                     }))))),
 
                 $View(
@@ -504,8 +504,7 @@ namespace ON2Solutions {
                                             PRIMARY_SCREEN_PRESSURE_SENSOR_OPTIONS)
                                     .change([this](const std::string& option) {
                                       this->update_param(
-                                          PrimaryScreenPressureSensorSpec,
-                                          option.c_str());
+                                          PrimaryScreenPressureSensorSpec, option);
                                     }))))),
                 $View(
                     ViewProps::up()

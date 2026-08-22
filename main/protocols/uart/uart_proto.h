@@ -1,43 +1,27 @@
 #pragma once
+#include <sys/stat.h>
+#include <ctgmath>
+#include <cstring>
+#include <string>
 
 #include "driver/uart.h"
 
 #include "core/structures/delegate.h"
 #include "core/structures/static_hashmap.h"
 
-#include <bits/range_access.h>
-#include <string>
-
-#include "freertos/queue.h"
-
-#include <sys/stat.h>
-#include <tgmath.h>
-#include <cstring>
-
 extern "C" {
-#include "driver/gpio.h"
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "sdkconfig.h"
+  #include "driver/gpio.h"
+  #include "esp_log.h"
+  #include "freertos/FreeRTOS.h"
+  #include "freertos/task.h"
+  #include "freertos/queue.h"
+  #include "sdkconfig.h"
 }
 
 static auto TAG = "example";
 
 #define BUF_SIZE (1024)
 #define UART_EMPTY_THRESH_DEFAULT (10)
-
-extern "C" {
-inline uart_config_t uart_config = {
-    .baud_rate = 9600,
-    .data_bits = UART_DATA_8_BITS,
-    .parity = UART_PARITY_DISABLE,
-    .stop_bits = UART_STOP_BITS_1,
-    .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-    .rx_flow_ctrl_thresh = 122,
-    .source_clk = UART_SCLK_DEFAULT,
-    .flags = {.allow_pd = 0, .backup_before_sleep = 0}};
-}
 
 namespace UartTypes {
   struct UartData {
@@ -68,7 +52,7 @@ class UartHandler {
   size_t size = 0;
   std::array<UartTypes::UartHandlerEvent, 32> list{};
   TaskHandle_t task_handle = nullptr;
-  std::array<char, 512> rx_buffer;
+  std::array<char, 512> rx_buffer{};
   size_t rx_idx = 0;
   bool is_recording = false;
   volatile bool is_on = false;
@@ -94,15 +78,50 @@ class UartHandler {
 
   bool init() {
     vTaskDelay(pdMS_TO_TICKS(50));
+
     uart_mutex = xSemaphoreCreateMutex();
-    uart_driver_install(current_uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 20,
-                        &uart_queue, 0);
-    uart_param_config(current_uart_num, &uart_config);
-    uart_set_pin(current_uart_num, this->tx_pin, this->rx_pin,
-                 UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+
+    uart_config_t config = {
+      .baud_rate = this->baud_rate,
+      .data_bits = UART_DATA_8_BITS,
+      .parity = UART_PARITY_DISABLE,
+      .stop_bits = UART_STOP_BITS_1,
+      .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+      .rx_flow_ctrl_thresh = 122,
+      .source_clk = UART_SCLK_DEFAULT,
+      .flags = {.allow_pd = 0, .backup_before_sleep = 0},
+  };
+
+    uart_driver_install(
+        current_uart_num,
+        BUF_SIZE * 2,
+        BUF_SIZE * 2,
+        20,
+        &uart_queue,
+        0
+    );
+
+    uart_param_config(current_uart_num, &config);
+
+    uart_set_pin(
+        current_uart_num,
+        this->tx_pin,
+        this->rx_pin,
+        UART_PIN_NO_CHANGE,
+        UART_PIN_NO_CHANGE
+    );
+
     uart_enable_rx_intr(current_uart_num);
-    xTaskCreate(uart_interrupt_handler_trampoline, "uart_event_task",
-                stack_dept, this, 6, &this->task_handle);
+
+    xTaskCreate(
+        uart_interrupt_handler_trampoline,
+        "uart_event_task",
+        stack_dept,
+        this,
+        6,
+        &this->task_handle
+    );
+
     is_on = true;
     return true;
   }
@@ -161,12 +180,12 @@ class UartHandler {
     xSemaphoreGive(uart_mutex);
   }
 
-  int send(const char* text) const {
+  size_t send(const char* text) const {
     if (!is_on)
       return 0;
     xSemaphoreTake(uart_mutex, portMAX_DELAY);
 
-    const uint8_t length = strlen(text);
+    const size_t length = strlen(text);
     uart_write_bytes(this->current_uart_num, text, length);
 
     xSemaphoreGive(uart_mutex);
@@ -176,14 +195,19 @@ class UartHandler {
   int send(const std::string& text) const {
     if (!is_on)
       return 0;
+
     xSemaphoreTake(uart_mutex, portMAX_DELAY);
 
-    const uint8_t length = strlen(text.c_str());
-    uart_write_bytes(this->current_uart_num, text.c_str(), length);
+    const int written = uart_write_bytes(
+        current_uart_num,
+        text.data(),
+        text.size()
+    );
 
     xSemaphoreGive(uart_mutex);
-    return length;
-  };
+
+    return written;
+  }
 
   void remove_all_event_listeners() {
     if (uart_queue == nullptr) {
@@ -272,7 +296,7 @@ class UartHandler {
     while (xQueueReceive(uart_queue, &event, portMAX_DELAY)) {
         switch (event.type) {
           case UART_DATA: {
-            int len = uart_read_bytes(current_uart_num, temp_data, BUF_SIZE,
+            const int len = uart_read_bytes(current_uart_num, temp_data, BUF_SIZE,
                                       pdMS_TO_TICKS(10));
             if (len <= 0)
               continue;
@@ -297,7 +321,7 @@ class UartHandler {
                 if (c == '>') {
                   rx_buffer[rx_idx] = '\0';
 
-                  UartTypes::UartData ready_data;
+                  UartTypes::UartData ready_data{};
                   memcpy(ready_data.packet, rx_buffer.data(), rx_idx + 1);
                   ready_data.len = rx_idx;
                   ready_data.flag = true;
@@ -346,8 +370,8 @@ class UartHandler {
   }
 
   void dispatch_packet(const std::array<char, 512>& packet_str,
-                       size_t packet_len) {
-    UartTypes::UartData uart_data;
+                       const size_t packet_len) {
+    UartTypes::UartData uart_data{};
 
     size_t copy_len = std::min(packet_len, sizeof(uart_data.packet) - 1);
 

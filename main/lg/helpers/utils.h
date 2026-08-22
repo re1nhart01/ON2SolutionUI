@@ -71,8 +71,9 @@ inline void execute_simple_command(
     const std::shared_ptr<UartHandler>& handler, const ON2Solutions::parser::SendableCommands cmd) {
   if (!handler) return;
 
-  const auto command = ON2Solutions::parser::SerializableCommand<const char*>{
+  const auto command = ON2Solutions::parser::SerializableCommand<int>{
     .command = cmd,
+    .with_num_sensor = false,
 };
 
   const std::string serialized = ON2Solutions::parser::serialize(command);

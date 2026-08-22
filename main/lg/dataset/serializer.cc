@@ -23,17 +23,19 @@ namespace ON2Solutions::parser {
     if (command.command == SendableCommands::SetDefault) {
       return "<RD>";
     }
-    if constexpr (std::is_same_v<T, const char*>) {
-      if (command.command == SendableCommands::TankPressureSensorType) {
-        return fmt_str("<PT%s>", command.data);
-      }
+    if constexpr (std::is_same_v<T, std::string>) {
+      switch (command.command) {
+        case SendableCommands::TankPressureSensorType:
+          return "<PT" + command.data + ">";
 
-      if (command.command == SendableCommands::PrimaryScreenOxygenSensor) {
-        return fmt_str("<PO%s>", command.data);
-      }
+        case SendableCommands::PrimaryScreenOxygenSensor:
+          return "<PO" + command.data + ">";
 
-      if (command.command == SendableCommands::PrimaryScreenPressureSensor) {
-        return fmt_str("<PP%s>", command.data);
+        case SendableCommands::PrimaryScreenPressureSensor:
+          return "<PP" + command.data + ">";
+
+        default:
+          break;
       }
     }
 
@@ -69,14 +71,25 @@ namespace ON2Solutions::parser {
     return result;
   }
 
-  template std::string serialize<float>(const SerializableCommand<float>&);
-  template std::string serialize<uint8_t>(const SerializableCommand<uint8_t>&);
-  template std::string serialize<int>(const SerializableCommand<int>&);
+  template std::string serialize<float>(
+    const SerializableCommand<float>&);
+
+  template std::string serialize<uint8_t>(
+      const SerializableCommand<uint8_t>&);
+
+  template std::string serialize<int>(
+      const SerializableCommand<int>&);
+
   template std::string serialize<uint16_t>(
       const SerializableCommand<uint16_t>&);
-  template std::string serialize<int16_t>(const SerializableCommand<int16_t>&);
-  template std::string serialize<const char*>(
-      const SerializableCommand<const char*>&);
-  template std::string serialize<char>(const SerializableCommand<char>&);
+
+  template std::string serialize<int16_t>(
+      const SerializableCommand<int16_t>&);
+
+  template std::string serialize<std::string>(
+      const SerializableCommand<std::string>&);
+
+  template std::string serialize<char>(
+      const SerializableCommand<char>&);
 
 }  // namespace ON2Solutions::parser

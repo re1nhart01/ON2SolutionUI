@@ -92,14 +92,15 @@ namespace ON2Solutions {
         this->items_container_ref->get()->props.children = std::move(rows);
         this->items_container_ref->get()->refresh_childrens();
 
-        if (this->pagination_ref) {
-          this->pagination_ref->get()->set_state(
-              [total_pages](PaginationProps& pagination_props) {
-              pagination_props.pages(total_pages);
-              if (pagination_props.current_page > total_pages) {
-                pagination_props.active_page(1);
-              }
-          });
+        if (auto* pagination = this->pagination_ref->get()) {
+          pagination->set_state_async(
+              [total_pages](PaginationProps& props) {
+                  props.pages(total_pages);
+
+                  if (props.current_page > total_pages) {
+                      props.active_page(1);
+                  }
+              });
         }
 
       }
